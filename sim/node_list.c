@@ -49,77 +49,40 @@
 
 LIST(node_list);
 
-/**************************************************************************
-Function Name: node_list_init
-
-Description:
-
-**************************************************************************/
 void node_list_init()
 {
     list_init(node_list);
 }
 
-/**************************************************************************
-Function Name: node_list_get_head
-
-Description:
-
-**************************************************************************/
 sim_node_t *node_list_get_head()
 {
     return list_head(node_list);
 }
 
-/**************************************************************************
-Function Name: node_list_add
-
-Description:
-
-**************************************************************************/
 void node_list_add(sim_node_t *entry)
 {
     list_add(node_list, entry);
 }
 
-/**************************************************************************
-Function Name: node_list_remove
-
-Description:
-
-**************************************************************************/
 void node_list_remove(sim_node_t *entry)
 {
     list_remove(node_list, entry);
     free(entry);
 }
 
-/**************************************************************************
-Function Name: node_list_pop
-
-Description:
-
-**************************************************************************/
 sim_node_t *node_list_pop()
 {
     return (sim_node_t *)list_pop(node_list);
 }
 
-/**************************************************************************
-Function Name: node_list_print
-
-Description:
-Print out all of the nodes in the nwk.
-**************************************************************************/
 void node_list_print()
 {
-    sim_node_t *node;
+	sim_node_t *node;
 
-    printf("Current node PIDs are:\n");
-    for (node = list_head(node_list); node != NULL; node = node->next)
-    {
-        printf("Node Index = %d, PID = %d.\n", node->index, node->pid);
-    }
-    printf("\n");
+	printf("Current node PIDs are:\n");
+	for (node = list_head(node_list); node != NULL; node = node->next)
+		printf("Node Index = %d, PID = %d.\n", node->index, node->pid);
+
+	printf("\n");
 }
 

@@ -50,29 +50,28 @@
 
 typedef struct
 {
-    int pipe;
-    char name[30];
-    pthread_t thread;
+	int pipe;
+	char name[30];
+	pthread_t thread;
 } pipe_t;
 
 typedef struct _sim_node_t
 {
-    struct _sim_node_t  *next;
-    int                 pid;
-    int                 index;
-    U16                 addr;
-    pipe_t              data_in;
-    pipe_t              data_out;
-    pipe_t              cmd_in;
-    pipe_t              cmd_out;
-    U8                  buf[ARGVMAX];
-    U8                  cmdbuf[ARGVMAX];
+	struct _sim_node_t  *next;
+	int	pid;
+	int	index;
+	U16	addr;
+	pipe_t	data_in;
+	pipe_t	data_out;
+	pipe_t	cmd_in;
+	pipe_t	cmd_out;
+	U8	buf[ARGVMAX];
+	U8	cmdbuf[ARGVMAX];
 } sim_node_t;
 
-enum
-{
-    READPIPE,
-    WRITEPIPE
+enum {
+	READPIPE,
+	WRITEPIPE
 };
 
 void cli();

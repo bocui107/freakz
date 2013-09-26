@@ -83,8 +83,8 @@
  * \param name The name of the list.
  */
 #define LIST(name) \
-         static void *LIST_CONCAT(name,_list) = NULL; \
-         static list_t name = (list_t)&LIST_CONCAT(name,_list)
+	 static void *LIST_CONCAT(name,_list) = NULL; \
+	 static list_t name = (list_t)&LIST_CONCAT(name,_list)
 
 /**
  * The linked list type.

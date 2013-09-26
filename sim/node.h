@@ -27,7 +27,6 @@
 #ifndef NODE_H
 #define NODE_H
 
-
 sim_node_t *get_self();
 void rcv_msg();
 #endif

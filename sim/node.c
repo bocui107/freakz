@@ -37,31 +37,31 @@ static sim_node_t self_node;
 
 sim_node_t *get_self()
 {
-    return &self_node;
+	return &self_node;
 }
 
 void rcv_msg()
 {
-    struct timeval tv;
-    fd_set fdset;
-    int ret;
+	struct timeval tv;
+	fd_set fdset;
+	int ret;
 
-    while (1)
-    {
-        tv.tv_sec = 0;
-        tv.tv_usec = 1000;
+	while (1)
+	{
+		tv.tv_sec = 0;
+		tv.tv_usec = 1000;
 
-        FD_ZERO(&fdset);
-        FD_SET(self_node.fd[0], &fdset);
+		FD_ZERO(&fdset);
+		FD_SET(self_node.fd[0], &fdset);
 
-        ret = select(self_node.fd[0] + 1, &fdset, NULL, NULL, &tv);
-        if (FD_ISSET(self_node.fd[0], &fdset))
-        {
-            if ((read(self_node.fd[0], self_node.buf, 100)) != -1)
-            {
-                printf("PID %d Msg Rcvd: %s\n", getpid(), self_node.buf);
-                fflush(stdout);
-            }
-        }
-    }
+		ret = select(self_node.fd[0] + 1, &fdset, NULL, NULL, &tv);
+		if (FD_ISSET(self_node.fd[0], &fdset))
+		{
+			if ((read(self_node.fd[0], self_node.buf, 100)) != -1)
+			{
+				printf("PID %d Msg Rcvd: %s\n", getpid(), self_node.buf);
+				fflush(stdout);
+			}
+		}
+	}
 }

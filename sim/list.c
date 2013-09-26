@@ -50,10 +50,9 @@
 #define NULL 0
 
 struct list {
-  struct list *next;
+	struct list *next;
 };
 
-/*---------------------------------------------------------------------------*/
 /**
  * Initialize a list.
  *
@@ -62,12 +61,11 @@ struct list {
  *
  * \param list The list to be initialized.
  */
-void
-list_init(list_t list)
+void list_init(list_t list)
 {
-  *list = NULL;
+	*list = NULL;
 }
-/*---------------------------------------------------------------------------*/
+
 /**
  * Get a pointer to the first element of a list.
  *
@@ -79,12 +77,11 @@ list_init(list_t list)
  *
  * \sa list_tail()
  */
-void *
-list_head(list_t list)
+void * list_head(list_t list)
 {
-  return *list;
+	return *list;
 }
-/*---------------------------------------------------------------------------*/
+
 /**
  * Duplicate a list.
  *
@@ -97,12 +94,11 @@ list_head(list_t list)
  * \param dest The destination list.
  * \param src The source list.
  */
-void
-list_copy(list_t dest, list_t src)
+void list_copy(list_t dest, list_t src)
 {
-  *dest = *src;
+	*dest = *src;
 }
-/*---------------------------------------------------------------------------*/
+
 /**
  * Get the tail of a list.
  *
@@ -114,21 +110,19 @@ list_copy(list_t dest, list_t src)
  *
  * \sa list_head()
  */
-void *
-list_tail(list_t list)
+void * list_tail(list_t list)
 {
-  struct list *l;
+	struct list *l;
 
-  if(*list == NULL) {
-    return NULL;
-  }
+	if(*list == NULL)
+		return NULL;
 
-  for(l = *list; l->next != NULL; l = l->next);
+	for(l = *list; l->next != NULL; l = l->next);
 
-  return l;
+	return l;
 }
-/*---------------------------------------------------------------------------*/
-/**
+
+/*
  * Add an item at the end of a list.
  *
  * This function adds an item to the end of the list.
@@ -139,35 +133,30 @@ list_tail(list_t list)
  * \sa list_push()
  *
  */
-void
-list_add(list_t list, void *item)
+void list_add(list_t list, void *item)
 {
-  struct list *l;
+	struct list *l;
 
-  ((struct list *)item)->next = NULL;
+	((struct list *)item)->next = NULL;
 
-  l = list_tail(list);
+	l = list_tail(list);
 
-  if(l == NULL) {
-    *list = item;
-  } else {
-    l->next = item;
-  }
+	if(l == NULL)
+		*list = item;
+	else
+		l->next = item;
 }
-/*---------------------------------------------------------------------------*/
-/**
+
+/*
  * Add an item to the start of the list.
  */
-void
-list_push(list_t list, void *item)
+void list_push(list_t list, void *item)
 {
-  /*  struct list *l;*/
-
-  ((struct list *)item)->next = *list;
-  *list = item;
+	((struct list *)item)->next = *list;
+	*list = item;
 }
-/*---------------------------------------------------------------------------*/
-/**
+
+/*
  * Remove the last object on the list.
  *
  * This function removes the last object on the list and returns it.
@@ -176,28 +165,27 @@ list_push(list_t list, void *item)
  * \return The removed object
  *
  */
-void *
-list_chop(list_t list)
+void * list_chop(list_t list)
 {
-  struct list *l, *r;
+	struct list *l, *r;
 
-  if(*list == NULL) {
-    return NULL;
-  }
-  if(((struct list *)*list)->next == NULL) {
-    l = *list;
-    *list = NULL;
-    return l;
-  }
+	if(*list == NULL)
+		return NULL;
 
-  for(l = *list; l->next->next != NULL; l = l->next);
+	if(((struct list *)*list)->next == NULL) {
+		l = *list;
+		*list = NULL;
+		return l;
+	}
 
-  r = l->next;
-  l->next = NULL;
+	for(l = *list; l->next->next != NULL; l = l->next);
 
-  return r;
+	r = l->next;
+	l->next = NULL;
+
+	return r;
 }
-/*---------------------------------------------------------------------------*/
+
 /**
  * Remove the first object on a list.
  *
@@ -207,17 +195,14 @@ list_chop(list_t list)
  * \param list The list.
  * \return The new head of the list.
  */
-/*---------------------------------------------------------------------------*/
-void *
-list_pop(list_t list)
+void * list_pop(list_t list)
 {
-  if(*list != NULL) {
-    *list = ((struct list *)*list)->next;
-  }
+	if(*list != NULL)
+		*list = ((struct list *)*list)->next;
 
-  return *list;
+	return *list;
 }
-/*---------------------------------------------------------------------------*/
+
 /**
  * Remove a specific element from a list.
  *
@@ -227,33 +212,30 @@ list_pop(list_t list)
  * \param item The item that is to be removed from the list.
  *
  */
-/*---------------------------------------------------------------------------*/
-void
-list_remove(list_t list, void *item)
+void list_remove(list_t list, void *item)
 {
-  struct list *l, *r;
+	struct list *l, *r;
 
-  if(*list == NULL) {
-    return;
-  }
+	if(*list == NULL)
+		return;
 
-  r = NULL;
-  for(l = *list; l != NULL; l = l->next) {
-    if(l == item) {
-      if(r == NULL) {
-	/* First on list */
-	*list = l->next;
-      } else {
-	/* Not first on list */
-	r->next = l->next;
-      }
-      l->next = NULL;
-      return;
-    }
-    r = l;
-  }
+	r = NULL;
+	for(l = *list; l != NULL; l = l->next) {
+		if(l == item) {
+			if(r == NULL)
+				/* First on list */
+				*list = l->next;
+			else
+				/* Not first on list */
+				r->next = l->next;
+
+			l->next = NULL;
+			return;
+		}
+		r = l;
+	}
 }
-/*---------------------------------------------------------------------------*/
+
 /**
  * Get the length of a list.
  *
@@ -262,20 +244,18 @@ list_remove(list_t list, void *item)
  * \param list The list.
  * \return The length of the list.
  */
-/*---------------------------------------------------------------------------*/
-int
-list_length(list_t list)
+int list_length(list_t list)
 {
-  struct list *l;
-  int n = 0;
+	struct list *l;
+	int n = 0;
 
-  for(l = *list; l != NULL; l = l->next) {
-    ++n;
-  }
+	for(l = *list; l != NULL; l = l->next) {
+		++n;
+	}
 
-  return n;
+	return n;
 }
-/*---------------------------------------------------------------------------*/
+
 /**
  * \brief      Insert an item after a specified item on the list
  * \param list The list
@@ -291,16 +271,12 @@ list_length(list_t list)
  *             start of the list.
  *
  */
-void
-list_insert(list_t list, void *previtem, void *newitem)
+void list_insert(list_t list, void *previtem, void *newitem)
 {
-  if(previtem == NULL) {
-    list_push(list, newitem);
-  } else {
-
-    ((struct list *)newitem)->next = ((struct list *)previtem)->next;
-    ((struct list *)previtem)->next = newitem;
-  }
+	if(previtem == NULL) {
+		list_push(list, newitem);
+	} else {
+		((struct list *)newitem)->next = ((struct list *)previtem)->next;
+		((struct list *)previtem)->next = newitem;
+	}
 }
-/*---------------------------------------------------------------------------*/
-/** @} */
