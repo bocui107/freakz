@@ -52,24 +52,24 @@
 #include "freakz.h"
 
 /**************************************************************************/
-/*!
+/*
     Generate the mac header frame control field from the given header data.
 */
 /**************************************************************************/
 U16 mac_gen_frm_ctrl(const mac_hdr_t *hdr)
 {
-    U16 tmp = 0;
-    tmp |= (U16)((hdr->src_addr.mode                     & 0x3) << MAC_SRC_ADDR_MODE_OFF);
-    tmp |= (U16)((hdr->dest_addr.mode                    & 0x3) << MAC_DEST_ADDR_MODE_OFF);
-    tmp |= (U16)((hdr->mac_frm_ctrl.pan_id_compr         & 0x1) << MAC_PAN_ID_COMPR_OFF);
-    tmp |= (U16)((hdr->mac_frm_ctrl.ack_req              & 0x1) << MAC_ACK_REQ_OFF);
-    tmp |= (U16)((hdr->mac_frm_ctrl.frame_pending        & 0x1) << MAC_FRM_PEND_OFF);
-    tmp |= (U16)(hdr->mac_frm_ctrl.frame_type            & 0x3);
-    return tmp;
+	U16 tmp = 0;
+	tmp |= (U16)((hdr->src_addr.mode		 & 0x3) << MAC_SRC_ADDR_MODE_OFF);
+	tmp |= (U16)((hdr->dest_addr.mode		 & 0x3) << MAC_DEST_ADDR_MODE_OFF);
+	tmp |= (U16)((hdr->mac_frm_ctrl.pan_id_compr	 & 0x1) << MAC_PAN_ID_COMPR_OFF);
+	tmp |= (U16)((hdr->mac_frm_ctrl.ack_req		 & 0x1) << MAC_ACK_REQ_OFF);
+	tmp |= (U16)((hdr->mac_frm_ctrl.frame_pending	 & 0x1) << MAC_FRM_PEND_OFF);
+	tmp |= (U16)(hdr->mac_frm_ctrl.frame_type	 & 0x3);
+	return tmp;
 }
 
 /**************************************************************************/
-/*!
+/*
     Generate the complete MAC frame header and place it in the specified
     buffer. The generated data gets placed in the buffer backwards (ie: from
     the end to the beginning) since we are moving down the stack. You can see
@@ -83,20 +83,18 @@ void mac_gen_header(buffer_t *buf, mac_hdr_t *hdr)
     U8 hdr_size, frame_length;
     hdr->mac_fcf = mac_gen_frm_ctrl(hdr);
 
-    //lint --e{826} Suppress Info 826: Suspicious pointer-to-pointer conversion (area too small)
-    // ex: *(U16 *)buf->dptr  = hdr->mac_fcf;
-    // this removes the lint warning for this block only
-
-    // Calculate the size of the header
-    hdr_size = 4;                                               // length(1) + fcf (2) + dsn (1) = 4 bytes
+    /* Calculate the size of the header */
+    hdr_size = 4;   /* length(1) + fcf (2) + dsn (1) = 4 bytes */
     if (hdr->dest_addr.mode > 0)
     {
-        hdr_size += ((hdr->dest_addr.mode == SHORT_ADDR) ? 4 : 10);     // dest_pan_id (2) + dest_addr (2/8) = 4/10 bytes
+	// dest_pan_id (2) + dest_addr (2/8) = 4/10 bytes
+        hdr_size += ((hdr->dest_addr.mode == SHORT_ADDR) ? 4 : 10);
     }
 
     if (hdr->src_addr.mode > 0)
     {
-        hdr_size += (hdr->mac_frm_ctrl.pan_id_compr == true) ?  0 : 2;  // if pan_id_compr, then we don't have src_pan_id
+	/* if pan_id_compr, then we don't have src_pan_id */
+        hdr_size += (hdr->mac_frm_ctrl.pan_id_compr == true) ?  0 : 2;
         hdr_size += (hdr->src_addr.mode == SHORT_ADDR) ? 2 : 8;
     }
 
@@ -105,7 +103,8 @@ void mac_gen_header(buffer_t *buf, mac_hdr_t *hdr)
     // add not only the header size but also 2 bytes for the FCS.
     buf->dptr -= hdr_size;
     buf->len += hdr_size;
-    frame_length = ((buf->len) - 1) + MAC_FCS_LENGTH;           // The '-1' is because we don't count the length byte in the frame length
+    /* The '-1' is because we don't count the length byte in the frame length */
+    frame_length = ((buf->len) - 1) + MAC_FCS_LENGTH;
 
     // Start filling in the frame header. Write in the data, then advance the data pointer.
     *buf->dptr++        = frame_length;
@@ -186,7 +185,7 @@ void mac_gen_cmd_header(buffer_t *buf, mac_hdr_t *hdr, bool ack_req, address_t *
 }
 
 /**************************************************************************/
-/*!
+/*
     Generate an ack frame and put it in the given buffer. The ack generation is
     a little bit ugly because we need the ack to be fast. It needs to be out
     within 1 msec. Most chips support auto-ACK so this function may end up being
