@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -49,7 +49,7 @@
 #include "types.h"
 
 #define ZCL_END_MARKER          0xffff          ///< Used to define the end of a list or table.
-#define ZCL_MAX_DISC_ATTRIBS    20              ///< Maximum discovered attributes. 
+#define ZCL_MAX_DISC_ATTRIBS    20              ///< Maximum discovered attributes.
 #define ZCL_MAX_STR_SZ          32              ///< Maximum string size.
 #define ZCL_MAX_PAYLOAD_SIZE    80              ///< Maximum payload size.
 #define ZCL_MAX_RPT_SZ          20              ///< Maximum report size.
@@ -65,22 +65,22 @@
 /**************************************************************************/
 typedef enum _zcl_frm_enums_t
 {
-    ZCL_FRM_TYPE_OFF    = 0,                        ///< Frame type offset  
+    ZCL_FRM_TYPE_OFF    = 0,                        ///< Frame type offset
     ZCL_MANUF_SPEC_OFF  = 2,                        ///< Manuf specification offset
     ZCL_DIR_OFF         = 3,                        ///< Direction offset
     ZCL_DIS_DEF_OFF     = 4,                        ///< Disable default response offset
-                                                   
+
     ZCL_FRM_TYPE_MASK   = (3<<ZCL_FRM_TYPE_OFF),    ///< Frame type mask
     ZCL_MANUF_SPEC_MASK = (1<<ZCL_MANUF_SPEC_OFF),  ///< Manufacturing spec mask
     ZCL_DIR_MASK        = (1<<ZCL_DIR_OFF),         ///< Direction mask
     ZCL_DIS_DEF_MASK    = (1<<ZCL_DIS_DEF_OFF),     ///< Disable default response mask
-                                                   
+
     ZCL_FRM_TYPE_GENERAL    = 0,                    ///< Frame type - general
     ZCL_FRM_TYPE_CLUST_SPEC = 1,                    ///< Frame type - cluster specific
-                                                
+
     ZCL_FRM_DIR_TO_SRVR     = 0,                    ///< Direction - To server
     ZCL_FRM_DIR_TO_CLI      = 1,                    ///< Direction - To client
-                                                   
+
     ZCL_RPT_DIR_SEND_RPT    = 0                     ///< Report Direction - Send report
 } zcl_frm_enums_t;
 
@@ -107,20 +107,20 @@ typedef enum _zcl_clust_id_t
 /**************************************************************************/
 typedef enum _zcl_gen_cmd_t
 {
-    ZCL_CMD_READ_ATTRIB             = 0x00,      ///< Read attributes foundation command ID 
-    ZCL_CMD_READ_ATTRIB_RESP        = 0x01,      ///< Read attributes response foundation command ID 
-    ZCL_CMD_WRITE_ATTRIB            = 0x02,      ///< Write attributes foundation command ID 
-    ZCL_CMD_WRITE_ATTRIB_RESP       = 0x03,      ///< Write attributes response foundation command ID 
-    ZCL_CMD_WRITE_ATTRIB_UNDIV      = 0x04,      ///< Write attributes undivided foundation command ID 
-    ZCL_CMD_WRITE_ATTRIB_NO_RESP    = 0x05,      ///< Write attributes no response foundation command ID 
-    ZCL_CMD_CONFIG_REPORT           = 0x06,      ///< Configure reporting foundation command ID 
-    ZCL_CMD_CONFIG_REPORT_RESP      = 0x07,      ///< Configure reporting response foundation command ID 
-    ZCL_CMD_READ_REPORT_CFG         = 0x08,      ///< Read reporting config foundation command ID 
-    ZCL_CMD_READ_REPORT_CFG_RESP    = 0x09,      ///< Read reporting config response foundation command ID 
-    ZCL_CMD_REPORT_ATTRIB           = 0x0a,      ///< Report attribute foundation command ID 
-    ZCL_CMD_DEFAULT_RESP            = 0x0b,      ///< Default response foundation command ID 
-    ZCL_CMD_DISC_ATTRIB             = 0x0c,      ///< Discover attributes foundation command ID 
-    ZCL_CMD_DISC_ATTRIB_RESP        = 0x0d       ///< Discover attributes response foundation command ID 
+    ZCL_CMD_READ_ATTRIB             = 0x00,      ///< Read attributes foundation command ID
+    ZCL_CMD_READ_ATTRIB_RESP        = 0x01,      ///< Read attributes response foundation command ID
+    ZCL_CMD_WRITE_ATTRIB            = 0x02,      ///< Write attributes foundation command ID
+    ZCL_CMD_WRITE_ATTRIB_RESP       = 0x03,      ///< Write attributes response foundation command ID
+    ZCL_CMD_WRITE_ATTRIB_UNDIV      = 0x04,      ///< Write attributes undivided foundation command ID
+    ZCL_CMD_WRITE_ATTRIB_NO_RESP    = 0x05,      ///< Write attributes no response foundation command ID
+    ZCL_CMD_CONFIG_REPORT           = 0x06,      ///< Configure reporting foundation command ID
+    ZCL_CMD_CONFIG_REPORT_RESP      = 0x07,      ///< Configure reporting response foundation command ID
+    ZCL_CMD_READ_REPORT_CFG         = 0x08,      ///< Read reporting config foundation command ID
+    ZCL_CMD_READ_REPORT_CFG_RESP    = 0x09,      ///< Read reporting config response foundation command ID
+    ZCL_CMD_REPORT_ATTRIB           = 0x0a,      ///< Report attribute foundation command ID
+    ZCL_CMD_DEFAULT_RESP            = 0x0b,      ///< Default response foundation command ID
+    ZCL_CMD_DISC_ATTRIB             = 0x0c,      ///< Discover attributes foundation command ID
+    ZCL_CMD_DISC_ATTRIB_RESP        = 0x0d       ///< Discover attributes response foundation command ID
 } zcl_gen_cmd_t;
 
 /**************************************************************************/
@@ -191,7 +191,7 @@ typedef enum _zcl_status_enum_t
 /**************************************************************************/
 /*!
         ZCL attribute structure. Contains all fields to address the attribute.
-        Also, contains an optional field in case the attribute is set to 
+        Also, contains an optional field in case the attribute is set to
         report.
 */
 /**************************************************************************/
@@ -211,7 +211,7 @@ typedef struct _zcl_attrib_t
 /**************************************************************************/
 typedef struct _zcl_frm_ctrl_t
 {
-    U8      frm_type;       ///< ZCL Frame type 
+    U8      frm_type;       ///< ZCL Frame type
     bool    manuf_spec;     ///< Manufacturer specific frame
     bool    dir;            ///< Direction
     bool    dis_def_resp;   ///< Disable default response
@@ -236,8 +236,8 @@ typedef struct _zcl_hdr_t
 /**************************************************************************/
 /*!
         ZCL cluster structure. Each cluster contains endpoint, cluster ID, attribute list
-        and callbacks to handle processing for that cluster. The RX handler is 
-        for incoming frames addressed to that cluster. The action handler is 
+        and callbacks to handle processing for that cluster. The RX handler is
+        for incoming frames addressed to that cluster. The action handler is
         for further actions on that cluster which can be defined by the user:
         ie: Set a GPIO to turn on or off a light.
 */
@@ -283,7 +283,7 @@ typedef struct _zcl_disc_attrib_rep_t
 /**************************************************************************/
 /*!
         ZCL Report entry
-        This is the structure that goes into the ZCL reporting table. Multiple 
+        This is the structure that goes into the ZCL reporting table. Multiple
         attributes can be set to report at different time intervals. All reports
         will end up as entries in the reporting table which is scanned once per
         second for any pending attribs that need reporting.

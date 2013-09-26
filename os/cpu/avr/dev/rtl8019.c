@@ -72,11 +72,11 @@ void writeRTL(unsigned char address, unsigned char data)
     outp( address, RTL8019_ADDRESS_PORT );
     outp( 0xFF, RTL8019_DATA_DDR );
     outp( data, RTL8019_DATA_PORT );
-    
+
 	// toggle write pin
     RTL8019_CLEAR_WRITE;
     RTL8019_SET_WRITE;
-    
+
 	// set data port back to input with pullups enabled
     outp( 0x00, RTL8019_DATA_DDR );
     outp( 0xFF, RTL8019_DATA_PORT );
@@ -112,16 +112,16 @@ void writeRTL(unsigned char address, unsigned char data)
 unsigned char readRTL(unsigned char address)
 {
    unsigned char byte;
-   
+
    // drive the read address
    outp( address, RTL8019_ADDRESS_PORT );
-    
+
    //nop();
-   
+
    // assert read
    RTL8019_CLEAR_READ;
    nop();
-   
+
    // read in the data
    byte = inp( RTL8019_DATA_PIN );
 
@@ -155,7 +155,7 @@ volatile unsigned char *base = (unsigned char *)0x8300;
 
     // make the address port output
     outp( 0xFF, RTL8019_ADDRESS_DDR );
-    
+
     // make the data port input with pull-ups
     outp( 0xFF, RTL8019_DATA_PORT );
 
@@ -164,7 +164,7 @@ volatile unsigned char *base = (unsigned char *)0x8300;
 	//          (1<<RTL8019_CONTROL_WRITEPIN), RTL8019_CONTROL_DDR );
 	sbi( RTL8019_CONTROL_DDR, RTL8019_CONTROL_READPIN );
 	sbi( RTL8019_CONTROL_DDR, RTL8019_CONTROL_WRITEPIN );
-	          
+
 	//outp( inp(RTL8019_CONTROL_PORT) | (1<<RTL8019_CONTROL_READPIN) |
 	//          (1<<RTL8019_CONTROL_WRITEPIN), RTL8019_CONTROL_PORT );
 	sbi( RTL8019_CONTROL_PORT, RTL8019_CONTROL_READPIN );
@@ -174,9 +174,9 @@ volatile unsigned char *base = (unsigned char *)0x8300;
 
 	// enable output pin for Resetting the RTL8019
 	sbi( RTL8019_RESET_DDR, RTL8019_RESET_PIN );
-	
-	
-	
+
+
+
 
 
 }
@@ -296,20 +296,20 @@ void RTL8019beginPacketSend(unsigned int packetLength)
 	unsigned int sendPacketLength;
 	sendPacketLength = (packetLength>=ETHERNET_MIN_PACKET_LENGTH) ?
 	                 packetLength : ETHERNET_MIN_PACKET_LENGTH ;
-	
+
 	//start the NIC
 	writeRTL(CR,0x22);
-	
+
 	// still transmitting a packet - wait for it to finish
 	while( readRTL(CR) & 0x04 );
 
 	//load beginning page for transmit buffer
 	writeRTL(TPSR,TXSTART_INIT);
-	
+
 	//set start address for remote DMA operation
 	writeRTL(RSAR0,0x00);
 	writeRTL(RSAR1,0x40);
-	
+
 	//clear the packet stored interrupt
 	writeRTL(ISR,(1<<ISR_PTX));
 
@@ -319,7 +319,7 @@ void RTL8019beginPacketSend(unsigned int packetLength)
 
 	writeRTL(TBCR0, (unsigned char)(sendPacketLength));
 	writeRTL(TBCR1, (unsigned char)((sendPacketLength)>>8));
-	
+
 	//do remote write operation
 	writeRTL(CR,0x12);
 }
@@ -341,7 +341,7 @@ void RTL8019endPacketSend(void)
   volatile unsigned char *base = (unsigned char *)0x8300;
 	//send the contents of the transmit buffer onto the network
 	writeRTL(CR,0x24);
-	
+
 	// clear the remote DMA interrupt
 	writeRTL(ISR, (1<<ISR_RDC));
 }
@@ -366,20 +366,20 @@ unsigned int RTL8019beginPacketRetreive(void)
   volatile unsigned char *base = (unsigned char *)0x8300;
 	unsigned char i;
 	unsigned char bnry;
-	
+
 	unsigned char pageheader[4];
 	unsigned int rxlen;
-	
+
 	// check for and handle an overflow
 	processRTL8019Interrupt();
-	
+
 	// read CURR from page 1
 	writeRTL(CR,0x62);
 	i = readRTL(CURR);
-	
+
 	// return to page 0
 	writeRTL(CR,0x22);
-	
+
 	// read the boundary register - pointing to the beginning of the packet
 	bnry = readRTL(BNRY) ;
 
@@ -394,12 +394,12 @@ unsigned int RTL8019beginPacketRetreive(void)
 	if( bnry == i ) {
 	  return 0;
 	}
-	
+
 
 	// clear the packet received interrupt flag
 	writeRTL(ISR, (1<<ISR_PRX));
-	
-	
+
+
 	// the boundary pointer is invalid, reset the contents of the buffer and exit
 	if( (bnry >= RXSTOP_INIT) || (bnry < RXSTART_INIT) )
 	{
@@ -422,7 +422,7 @@ unsigned int RTL8019beginPacketRetreive(void)
 	  pageheader[i] = readRTL(RDMAPORT);
 	  /*	  debug_print8(pageheader[i]);*/
 	}
-	
+
 	// end the DMA operation
     writeRTL(CR, 0x22);
     for(i = 0; i <= 20; i++) {
@@ -432,22 +432,22 @@ unsigned int RTL8019beginPacketRetreive(void)
     }
     writeRTL(ISR, 1<<6);
 
-	
-	
+
+
 	rxlen = (pageheader[enetpacketLenH]<<8) + pageheader[enetpacketLenL];
 	nextPage = pageheader[nextblock_ptr] ;
-	
+
 	currentRetreiveAddress = (bnry<<8) + 4;
 
 	/*	debug_print(PSTR("nextPage: "));
 		debug_print8(nextPage);*/
-	
+
 	// if the nextPage pointer is invalid, the packet is not ready yet - exit
 	if( (nextPage >= RXSTOP_INIT) || (nextPage < RXSTART_INIT) ) {
 	  /*	  UDR0 = '0';*/
 	  return 0;
 	}
-    
+
     return rxlen-4;
 }
 
@@ -471,7 +471,7 @@ void RTL8019retreivePacketData(unsigned char * localBuffer, unsigned int length)
         if(readRTL(ISR) & 1<<6)
             break;
     writeRTL(ISR, 1<<6);
-    
+
     currentRetreiveAddress += length;
     if( currentRetreiveAddress >= 0x6000 )
     	currentRetreiveAddress = currentRetreiveAddress - (0x6000-0x4600) ;
@@ -516,7 +516,7 @@ void overrun(void)
 	    else
 	    	resend = 1;
 	}
-	
+
 	writeRTL(TCR, 0x02);
 	writeRTL(CR, 0x22);
 	writeRTL(BNRY, RXSTART_INIT);
@@ -525,7 +525,7 @@ void overrun(void)
 	writeRTL(CR, 0x22);
 	writeRTL(ISR, 0x10);
 	writeRTL(TCR, TCR_INIT);
-	
+
 	writeRTL(ISR, 0xFF);
 }
 
@@ -633,7 +633,7 @@ void initRTL8019(void)
 {
   unsigned char i, rb;
   volatile unsigned char *base = (unsigned char *)0x8300;
-  
+
   RTL8019setupPorts();
 
   /*#define nic_write writeRTL
@@ -778,7 +778,7 @@ void initRTL8019(void)
 #endif /* 0 */
 
     NicReset();
-    
+
     debug_print(PSTR("Init controller..."));
     nic_write(NIC_PG0_IMR, 0);
     nic_write(NIC_PG0_ISR, 0xff);
@@ -869,13 +869,13 @@ void initRTL8019(void)
 
 
     return;
-    
+
   /*  HARD_RESET_RTL8019();*/
 
   // do soft reset
   writeRTL( ISR, readRTL(ISR) ) ;
   Delay_10ms(5);
-  
+
   writeRTL(CR,0x21);       // stop the NIC, abort DMA, page 0
   Delay_1ms(2);               // make sure nothing is coming in or going out
   writeRTL(DCR, DCR_INIT);    // 0x58
@@ -890,21 +890,21 @@ void initRTL8019(void)
   writeRTL(CR, 0x61);
   Delay_1ms(2);
   writeRTL(CURR, RXSTART_INIT);
-  
+
   writeRTL(PAR0+0, MYMAC_0);
   writeRTL(PAR0+1, MYMAC_1);
   writeRTL(PAR0+2, MYMAC_2);
   writeRTL(PAR0+3, MYMAC_3);
   writeRTL(PAR0+4, MYMAC_4);
   writeRTL(PAR0+5, MYMAC_5);
-     	  
+
   writeRTL(CR,0x21);
   writeRTL(DCR, DCR_INIT);
   writeRTL(CR,0x22);
   writeRTL(ISR,0xFF);
   writeRTL(IMR, IMR_INIT);
   writeRTL(TCR, TCR_INIT);
-	
+
   writeRTL(CR, 0x22);	// start the NIC
 }
 
@@ -913,7 +913,7 @@ void processRTL8019Interrupt(void)
 {
   volatile unsigned char *base = (unsigned char *)0x8300;
   unsigned char byte = readRTL(ISR);
-	
+
   if( byte & (1<<ISR_OVW) )
     overrun();
 
@@ -927,10 +927,10 @@ void processRTL8019Interrupt(void)
   // read CURR from page 1
   writeRTL(CR,0x62);
   temp = readRTL(CURR);
-	
+
   // return to page 0
   writeRTL(CR,0x22);
-	
+
   return ( readRTL(BNRY) == temp );
-	
+
   }*/

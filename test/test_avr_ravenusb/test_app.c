@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -110,7 +110,7 @@ static test_app_cmd_t test_app_cmd_tbl[] =
     {"udr",     test_data_unicast_data_req},
     {"rudr",    test_data_unicast_rel_data_req},
     {"idr",     test_data_ind_data_req},
-    {"gdr",     test_data_grp_data_req},    
+    {"gdr",     test_data_grp_data_req},
     {NULL,      NULL}
 };
 
@@ -120,7 +120,7 @@ static test_app_cmd_t test_app_cmd_tbl[] =
 */
 /**************************************************************************/
 void test_app_init()
-{   
+{
     test_zdo_init();
     test_zcl_init();
     test_data_init();

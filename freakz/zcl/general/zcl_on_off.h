@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,18 +28,18 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
 *******************************************************************/
 /*!
-    \file zcl_on_off.h 
+    \file zcl_on_off.h
     \ingroup zcl
     \brief ZCL on/off cluster header file
 
         Contains the definitions for the ZCL On/Off cluster including the
-        attribute IDs, command IDs, and defines the structure that will 
+        attribute IDs, command IDs, and defines the structure that will
         hold the attributes.
 */
 /******************************************************************/
@@ -66,7 +66,7 @@ typedef enum _zcl_on_off_enum_t
 
 /**************************************************************************/
 /*!
-        This struct holds the actual attribute value. 
+        This struct holds the actual attribute value.
 */
 /**************************************************************************/
 typedef struct _zcl_on_off_data_t

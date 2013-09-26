@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -44,7 +44,7 @@
         and frees. Eventually, your memory ends up looking like swiss cheeses
         and you will get to a point where you may have the necessary amount
         of free memory but it won't be contiguous. Hence, your malloc will fail
-        and your program will crash and burn. 
+        and your program will crash and burn.
 
         Non fragmenting dynamic memory allocation uses Contiki's mmem.c managed
         memory library. It actually implements a pointer to a pointer to a memory
@@ -52,7 +52,7 @@
         always point to the real memory block pointer. However every time a mem
         block is freed, the memory will get compacted and made contiguous, hence
         removing any holes. Since the memory blocks can move around, you will need
-        the handle to tell you the real instaneous position of the memory. 
+        the handle to tell you the real instaneous position of the memory.
 */
 /*******************************************************************/
 #include "freakz.h"
@@ -60,9 +60,9 @@
 
 /**************************************************************************/
 /*!
-        The mem pointer pool contains an array of all the memory pointers that 
+        The mem pointer pool contains an array of all the memory pointers that
         are available to the stack. Each memory pointer can contain one block
-        of memory allocated from the heap. Needless to say, if we run out of 
+        of memory allocated from the heap. Needless to say, if we run out of
         memory pointers, then that is just as bad as running out of memory.
 */
 /**************************************************************************/
@@ -70,7 +70,7 @@ static mem_ptr_t mem_ptr_pool[MAX_MEM_PTR_POOL];
 
 /**************************************************************************/
 /*!
-        Initialize the total memory heap. 
+        Initialize the total memory heap.
 */
 /**************************************************************************/
 void mem_heap_init()

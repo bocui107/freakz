@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -50,15 +50,15 @@
 #define APS_MAX_FRAME_RETRIES       3   ///< Max frame retries at the APS level
 /// Define amount of time to wait in seconds for an ACK before timeout.
 /// Curr value is dummy value. Here is the real value: 0.05 * (2 * nwkcMaxDepth)
-#define APS_ACK_WAIT_DURATION       2   
+#define APS_ACK_WAIT_DURATION       2
 
 // Zigbee 2007 NWK Defined constants
-#define NWK_COORDINATOR_CAPABLE     true                ///< Device is capable of being coordinator 
+#define NWK_COORDINATOR_CAPABLE     true                ///< Device is capable of being coordinator
 #define NWK_DEFAULT_SECURITY_LEVEL  ENC_MIC_64  ///< Default security level
 #define NWK_DISCOVERY_RETRY_LIMIT   0x03        ///< Number of times to retry network discovery
 #define NWK_MIN_HDR_OVERHEAD        0x08        ///< Minimum num bytes for NWK header
-//0x2AF8 - add one second to the actual          
-// value to reflect uncertainty in the timer    
+//0x2AF8 - add one second to the actual
+// value to reflect uncertainty in the timer
 #define NWK_RTE_DISC_TIME           0x7D0       ///< Time allowed for route discovery before operation is ended
 #define NWK_BRC_JITTER              0x40        ///< Max value of broadcast jitter
 #define NWK_PASSIVE_ACK_TIMEOUT     1000        ///< Timeout value for passive acks during broadcast
@@ -73,21 +73,21 @@
 
 /*! 802.15.4 defined slot duration. Used to calculate other values in MAC layer.
 60 symbols = 960 usec ~ 1 msec*/
-#define aBaseSlotDuration           1   
+#define aBaseSlotDuration           1
 #define aBaseSuperframeDuration     (aBaseSlotDuration * aNumSuperframeSlots)  ///< Length of superframe
-#define aGTSDescPersistenceTime     4                   ///< Unused in FreakZ 
-#define aMaxBeaconOverhead          75                  ///< Unused in FreakZ 
-#define aMaxBeaconPayloadLength     (aMaxPHYPacketSize - aMaxBeaconOverhead) ///< Max payload length for beacons 
-#define aMaxLostBeacons             4                   ///< Unused in FreakZ 
+#define aGTSDescPersistenceTime     4                   ///< Unused in FreakZ
+#define aMaxBeaconOverhead          75                  ///< Unused in FreakZ
+#define aMaxBeaconPayloadLength     (aMaxPHYPacketSize - aMaxBeaconOverhead) ///< Max payload length for beacons
+#define aMaxLostBeacons             4                   ///< Unused in FreakZ
 #define aMaxMACPayloadSize          (aMaxPHYPacketSize - aMinMPDUOverhead)      ///< Max payload length for MAC frames
-#define aMaxMPDUUnsecuredOverhead   25  ///< Unused in FreakZ 
-#define aMaxSIFSFrameSize           18  ///< Unused in FreakZ 
+#define aMaxMPDUUnsecuredOverhead   25  ///< Unused in FreakZ
+#define aMaxSIFSFrameSize           18  ///< Unused in FreakZ
 #define aMinCAPLength               7   ///< 440 symbols = 7040 usec ~7 msec
 #define aMinMPDUOverhead            9   ///< Min MAC header size
-#define aNumSuperframeSlots         16  ///< Unused in FreakZ 
+#define aNumSuperframeSlots         16  ///< Unused in FreakZ
 #define aUnitBackoffPeriod          1   ///< 20 symbols = 320 usec...round to 1 msec
-#define aMinLIFSPeriod              40  ///< Unused in FreakZ 
-#define aminSIFSPeriod              12  ///< Unused in FreakZ 
+#define aMinLIFSPeriod              40  ///< Unused in FreakZ
+#define aminSIFSPeriod              12  ///< Unused in FreakZ
 #define aMacAckWaitDuration                     2   ///< 54 symbols = 864 usec ~ 1 msec...round to 2 msec
 #define aMacMaxFrameTotalWaitTime   20  ///< 1220 symbols = 19500 usec ~ 20 msec
 #define aMacResponseWaitTime        32  ///< default value = 32 * aBaseSlotDuration ~ 32 msec
@@ -97,7 +97,7 @@
 
 // 802.15.4 PHY Defined constants
 #define aMaxPHYPacketSize           127 ///< Actual size of 802.15.4 frame
-#define aPhyChannelPage             0   ///< Unused in FreakZ 
+#define aPhyChannelPage             0   ///< Unused in FreakZ
 //#define aPhyChannelsSupported       0x07FFF800  // channels supported by 802.15.4
 #define aPhyChannelsSupported       0x00000800  ///< Channels supported by 802.15.4
 #define aPhySymbolsPerOctet         2   ///< Takes 2 symbols to produce a byte @ 2.4 GHz OQPSK
@@ -152,8 +152,8 @@
 #define ZIGBEE_MANUF_CODE           0       ///< Manufacturer code
 #define ZIGBEE_MAX_BUFSIZE          80      ///< Maximum buffer size
 #define ZIGBEE_SERVER_MASK          0       ///< Server mask
-#define ZIGBEE_MAX_IN_XFER          MAX_APS_PAYLOAD ///< Node descr - max size of in apdu payload           
-#define ZIGBEE_MAX_OUT_XFER         MAX_APS_PAYLOAD ///< Node descr - max size of out apdu payload     
+#define ZIGBEE_MAX_IN_XFER          MAX_APS_PAYLOAD ///< Node descr - max size of in apdu payload
+#define ZIGBEE_MAX_OUT_XFER         MAX_APS_PAYLOAD ///< Node descr - max size of out apdu payload
 #define ZIGBEE_DESC_CAPABILITY      0           ///< Capabilities
 
 #define ZIGBEE_MAX_ENDPOINTS        10          ///< Max endpoints for this device

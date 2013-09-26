@@ -110,7 +110,7 @@ FLASH S_usb_user_configuration_descriptor_composite usb_conf_desc_composite = {
     0xFF,               // bFunctionProcotol (Vendor specific)
     0x00                // iInterface
   },//8
-  
+
  /// RNDIS DEVICE
  { sizeof(S_usb_interface_descriptor)
  , INTERFACE_DESCRIPTOR
@@ -485,7 +485,7 @@ FLASH S_usb_language_id usb_user_language_id = {
 
 
 
-PGM_VOID_P Usb_get_dev_desc_pointer(void) 
+PGM_VOID_P Usb_get_dev_desc_pointer(void)
 {
 	if (usb_mode == rndis_only)
 		return &(usb_dev_desc_network.bLength);
@@ -510,7 +510,7 @@ U8 Usb_get_dev_desc_length(void)
 }
 
 
-PGM_VOID_P  Usb_get_conf_desc_pointer(void) 
+PGM_VOID_P  Usb_get_conf_desc_pointer(void)
 {
 	if (usb_mode == rndis_only)
 		return &(usb_conf_desc_network.cfg.bLength);

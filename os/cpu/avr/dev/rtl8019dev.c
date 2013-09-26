@@ -37,7 +37,7 @@ void RTL8019dev_init(void)
 void RTL8019dev_send(void)
 {
   RTL8019beginPacketSend(uip_len);
-  
+
   // send packet, using data in uip_appdata if over the IP+TCP header size
   if( uip_len <= TOTAL_HEADER_LENGTH ) {
     RTL8019sendPacketData(uip_buf, uip_len);
@@ -46,7 +46,7 @@ void RTL8019dev_send(void)
     RTL8019sendPacketData(uip_buf, TOTAL_HEADER_LENGTH);
     RTL8019sendPacketData((unsigned char *)uip_appdata, uip_len);
   }
-  
+
   RTL8019endPacketSend();
 }
 
@@ -55,7 +55,7 @@ void RTL8019dev_send(void)
 unsigned int RTL8019dev_poll(void)
 {
   unsigned int packetLength;
-	
+
   packetLength = RTL8019beginPacketRetreive();
 
   // if there's no packet or an error - exit without ending the operation
@@ -68,11 +68,11 @@ unsigned int RTL8019dev_poll(void)
     RTL8019endPacketRetreive();
     return 0;
   }
-	
+
   // copy the packet data into the uIP packet buffer
   RTL8019retreivePacketData( uip_buf, packetLength );
   RTL8019endPacketRetreive();
-		
+
   return packetLength;
 }
 

@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
     3. Neither the name of the the copyright holder nor the names of its contributors
        may be used to endorse or promote products derived from this software
        without specific prior written permission.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -26,7 +26,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -187,7 +187,7 @@ ISR(USB_COM_vect)
     // select the endpoint number and get the intp src
     ep_select(ep_intp_num);
     if ((intp_src = ep_intp_get_src()) == 0xFF)
-    {   
+    {
                 // no intp source was found. restore the ep number and enable the interrupts
         ep_select(ep_num);
         sei();
@@ -204,7 +204,7 @@ ISR(USB_COM_vect)
         break;
     case RXOUTI:
         ep_read(ep_intp_num);
-        
+
         // clear the intps
         RX_OUT_INT_CLR();
         FIFOCON_INT_CLR();
@@ -248,7 +248,7 @@ ISR(USB_GEN_vect)
     U8 ep_num;
 
     cli();
-        
+
         // save off the endpoint number we were just on. we'll restore it later
     ep_num = UENUM;
 
@@ -257,7 +257,7 @@ ISR(USB_GEN_vect)
     {
         intp_suspend();
     }
-        
+
         // vbus status change
     if (VBUS_INT && VBUS_INT_ENABLED)
     {

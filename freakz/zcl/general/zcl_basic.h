@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -73,13 +73,13 @@ typedef enum _zcl_basic_enum_t
     ZCL_BASIC_MODEL_ID      = 0x0005,       ///< Model name attrib ID
     ZCL_BASIC_DATE_CODE     = 0x0006,       ///< Date code attrib ID
     ZCL_BASIC_PWR_SRC       = 0x0007,       ///< Power source attrib ID
-                                                  
+
     ZCL_BASIC_LOC_DESC      = 0x0010,       ///< Location description attrib ID
     ZCL_BASIC_PHYS_ENV      = 0x0011,       ///< Physical environment attrib ID
     ZCL_BASIC_DEV_ENB       = 0x0012,       ///< Device enable attrib ID
     ZCL_BASIC_ALARM_MSK     = 0x0013,       ///< Alarm mask attrib ID
-                                                 
-    // cmd id                                    
+
+    // cmd id
     ZCL_BASIC_CMD_RESET     = 0x00,         ///< Command reset command ID
 
     // pwr src enum
@@ -94,7 +94,7 @@ typedef enum _zcl_basic_enum_t
     // phys env
     ZCL_BASIC_PHYS_ENV_UNSPECD  = 0x00,         ///< Physical environment unspecified
     ZCL_BASIC_PHYS_ENV_UNKNOWN  = 0xff          ///< Physical environment unknown
-} zcl_basic_enum_t;       
+} zcl_basic_enum_t;
 
 /**************************************************************************/
 /*!
@@ -106,17 +106,17 @@ typedef struct _zcl_basic_data_t
 {
     U8 zcl_ver;                                                 ///< ZCL version attribute
     U8 app_ver;                         ///< App version attribute
-    U8 stack_ver;                       ///< Stack version attribute 
-    U8 hw_ver;                          ///< Hardware version attribute 
-    U8 manuf_id[ZCL_MAX_STR_SZ];        ///< Manufacturer name attribute 
-    U8 model_id[ZCL_MAX_STR_SZ];        ///< Model name attribute 
+    U8 stack_ver;                       ///< Stack version attribute
+    U8 hw_ver;                          ///< Hardware version attribute
+    U8 manuf_id[ZCL_MAX_STR_SZ];        ///< Manufacturer name attribute
+    U8 model_id[ZCL_MAX_STR_SZ];        ///< Model name attribute
     U8 date_code[ZCL_MAX_STR_SZ/2];     ///< Date code attribute - defined to be a max of 16 chars
-    U8 pwr_src;                         ///< power source attribute 
-                                             
-    U8 loc_desc[ZCL_MAX_STR_SZ/2];      ///< Location description attribute 
-    U8 phys_env;                        ///< Physical environment attribute 
-    bool dev_enb;                       ///< Device enabled attribute 
-    U8 alarm_msk;                       ///< Alarm mask attribute 
+    U8 pwr_src;                         ///< power source attribute
+
+    U8 loc_desc[ZCL_MAX_STR_SZ/2];      ///< Location description attribute
+    U8 phys_env;                        ///< Physical environment attribute
+    bool dev_enb;                       ///< Device enabled attribute
+    U8 alarm_msk;                       ///< Alarm mask attribute
 } zcl_basic_data_t;
 
 /**************************************************************************/

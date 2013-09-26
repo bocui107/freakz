@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -38,10 +38,10 @@
     \ingroup aps
     \brief APS group table
 
-        This file contains functions that implement the group table. The group 
+        This file contains functions that implement the group table. The group
         table allows frames to be sent to multiple groups of endpoints. The reason
-        this is desirable is because one Zigbee controller may house multiple 
-        identical devices, each on a separate endpoint. The standard case is a set 
+        this is desirable is because one Zigbee controller may house multiple
+        identical devices, each on a separate endpoint. The standard case is a set
         of lights, each one of them have similar functionality, but each endpoint
         controls a different light. Certain lights can be grouped together to be
         controlled by a single switch or dimmer. This would require the use
@@ -145,7 +145,7 @@ U8 aps_grp_add(U16 id, U8 ep)
     }
     else
     {
-        // we ran out of heap memory. 
+        // we ran out of heap memory.
         return APS_FAIL;
     }
 }

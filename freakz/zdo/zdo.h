@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -399,13 +399,13 @@ typedef struct
 
 /**************************************************************************/
 /*!
-        Bind and Unbind request. Used to request a device to add/remove an entry 
+        Bind and Unbind request. Used to request a device to add/remove an entry
         in its binding table. The src addr, ep, and clust will be used by the device
         that holds the binding table. The src addr will always be the address of the
         device that contains the binding table. The endpoint and cluster will be
         used to determine the specific binding entry in the table. The destination
         address and endpoint are the destination values that any frame coming from
-        the particular src endpoint and cluster will be sent to.  
+        the particular src endpoint and cluster will be sent to.
 */
 /**************************************************************************/
 typedef struct _bind_req_t
@@ -420,7 +420,7 @@ typedef struct _bind_req_t
 /**************************************************************************/
 /*!
         End device bind request. Used to request an end device bind operation between
-        two devices. End device binding is used to perform binding between two 
+        two devices. End device binding is used to perform binding between two
         devices when no commissioning device is present.
 */
 /**************************************************************************/
@@ -684,7 +684,7 @@ typedef struct
 
 /**************************************************************************/
 /*!
-        Main structure for end device binding. This holds the info for two 
+        Main structure for end device binding. This holds the info for two
         devices and state information.
 */
 /**************************************************************************/

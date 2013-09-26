@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -36,7 +36,7 @@
 /*!
     \file test_data.c
     \ingroup test_sim
- 
+
     This file contains the application endpoint for data only transfers. It does
     not use the ZCL and is only used to transfer data directly between Zigbee
     devices.
@@ -57,14 +57,14 @@ static U8 test_data_simple_desc[] = {
     0xAA,                       // dev id
     0x33,                       // dev ver
     1,                          // num in clusters
-    TEST_DATA_IN_CLUST,         // in clusters   
+    TEST_DATA_IN_CLUST,         // in clusters
     1,                          // num out clusters
     TEST_DATA_OUT_CLUST         // out clusters
 };
 
 /**************************************************************************/
 /*!
-    
+
 */
 /**************************************************************************/
 void test_data_init()

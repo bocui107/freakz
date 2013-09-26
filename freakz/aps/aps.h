@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -62,7 +62,7 @@
 typedef enum
 {
     // aps frame control offsets
-    APS_DELIV_MODE_OFF          = 2,    ///< Delivery mode field offset         
+    APS_DELIV_MODE_OFF          = 2,    ///< Delivery mode field offset
     APS_ACK_FMT_OFF             = 4,    ///< ACK format field offset
     APS_SEC_OFF                 = 5,    ///< Security field offset
     APS_ACK_REQ_OFF             = 6,    ///< APS ACK request field offset
@@ -201,7 +201,7 @@ typedef struct _bind_t
 {
     U8                  src_ep;             ///< Src endpoint - used to identify destination addresses
     U16                 clust;              ///< Src cluster - used to identify destination addresses
-    address_t           dest_addr;          ///< Dest addr 
+    address_t           dest_addr;          ///< Dest addr
     U8                  dest_ep;            ///< Dest endpoint - used to identify where to send the frame
 } aps_bind_t;
 
@@ -212,7 +212,7 @@ typedef struct _bind_t
 /**************************************************************************/
 typedef struct _aps_grp_t
 {
-    U16 id;             ///< Group ID 
+    U16 id;             ///< Group ID
     U8 ep;              ///< Endpoint associated with this Group ID
 } aps_grp_t;
 

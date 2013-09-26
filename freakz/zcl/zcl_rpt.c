@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -202,7 +202,7 @@ static void zcl_rpt_send_rpt(mem_ptr_t *mem_ptr)
 {
     U8 ep, len, *rpt_ptr, rpt[ZCL_MAX_RPT_SZ];
     U16 addr, clust, prof_id;
-    U32 change; 
+    U32 change;
     zcl_hdr_t hdr;
     bool rpt_needed;
     zcl_attrib_t *attrib;
@@ -215,7 +215,7 @@ static void zcl_rpt_send_rpt(mem_ptr_t *mem_ptr)
     clust       = ZCL_RPT(mem_ptr)->clust;
     prof_id     = ZCL_RPT(mem_ptr)->prof_id;
 
-    // no need to send a report if the change value is greater than zero and 
+    // no need to send a report if the change value is greater than zero and
     // the report needed flag is false. that means that no change larger than
     // the min change value occurred.
     if (change && !rpt_needed)
@@ -262,7 +262,7 @@ static void zcl_rpt_send_rpt(mem_ptr_t *mem_ptr)
     }
     len = rpt_ptr - rpt;
 
-    af_tx(rpt, len, ep, addr, ep, clust, prof_id, APS_DEST_ADDR_16_EP_PRESENT, 0, 6, af_handle_get()); 
+    af_tx(rpt, len, ep, addr, ep, clust, prof_id, APS_DEST_ADDR_16_EP_PRESENT, 0, 6, af_handle_get());
 }
 
 /**************************************************************************/
@@ -276,7 +276,7 @@ void zcl_rpt_periodic()
 {
     mem_ptr_t *mem_ptr;
 
-    // scroll through list and decrement the expiry. 
+    // scroll through list and decrement the expiry.
     for (mem_ptr = list_head(zcl_rpt); mem_ptr != NULL; mem_ptr = mem_ptr->next)
     {
         if (ZCL_RPT(mem_ptr)->expiry == 0)

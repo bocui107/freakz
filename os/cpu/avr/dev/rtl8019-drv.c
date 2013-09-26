@@ -90,7 +90,7 @@ PROCESS_THREAD(rtl8019_process, ev, data)
   tcpip_set_outputfunc(rtl8019_output);
 
   process_poll(&rtl8019_process);
-  
+
   PROCESS_WAIT_UNTIL(ev == PROCESS_EVENT_EXIT);
 
   RTL8019dev_exit();

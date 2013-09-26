@@ -3,7 +3,7 @@
 
 #if 0
 #define debug_print(x)
-#define debug_print8(x) 
+#define debug_print8(x)
 
 #else
 

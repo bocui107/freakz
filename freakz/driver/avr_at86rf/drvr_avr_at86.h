@@ -137,7 +137,7 @@ typedef enum{
 
 /**************************************************************************/
 /*!
-        Radio status enumerations. These are the status values that can be 
+        Radio status enumerations. These are the status values that can be
         returned by the radio.
 */
 /**************************************************************************/

@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -39,7 +39,7 @@
     \ingroup af
 
     \brief Application Framework Toplevel File
- 
+
     This file contains functions to implement the Application Framework.
     To summarize what the application framework is, it basically is a
     container for all of the endpoints of the Zigbee device.
@@ -150,7 +150,7 @@ void af_rx_handler()
                 // we need to get the mem pointer for the group id entry first. then we can figure out the group ID
                 if (GROUP_ENTRY(grp_mem_ptr)->id == RX_ENTRY(rx_mem_ptr)->grp_id)
                 {
-                    af_ep_rx(GROUP_ENTRY(grp_mem_ptr)->ep, RX_ENTRY(rx_mem_ptr)->buf, len, RX_ENTRY(rx_mem_ptr)->src_addr, 
+                    af_ep_rx(GROUP_ENTRY(grp_mem_ptr)->ep, RX_ENTRY(rx_mem_ptr)->buf, len, RX_ENTRY(rx_mem_ptr)->src_addr,
                              RX_ENTRY(rx_mem_ptr)->src_ep, RX_ENTRY(rx_mem_ptr)->clust_id);
                 }
             }
@@ -158,7 +158,7 @@ void af_rx_handler()
         else
         {
             // we're not in group mode so just send the payload to the destination endpoint
-            af_ep_rx(RX_ENTRY(rx_mem_ptr)->dest_ep, RX_ENTRY(rx_mem_ptr)->buf, len, RX_ENTRY(rx_mem_ptr)->src_addr, 
+            af_ep_rx(RX_ENTRY(rx_mem_ptr)->dest_ep, RX_ENTRY(rx_mem_ptr)->buf, len, RX_ENTRY(rx_mem_ptr)->src_addr,
                      RX_ENTRY(rx_mem_ptr)->src_ep, RX_ENTRY(rx_mem_ptr)->clust_id);
         }
 
@@ -263,7 +263,7 @@ void af_tx_handler()
     if ((mem_ptr = af_tx_pop()) != NULL)
     {
         // generate the aps data request
-        req.dest_addr_mode          = TX_ENTRY(mem_ptr)->mode; 
+        req.dest_addr_mode          = TX_ENTRY(mem_ptr)->mode;
 
         // switch up the addressing based on the address mode
         switch (req.dest_addr_mode)
@@ -273,7 +273,7 @@ void af_tx_handler()
             break;
 
         case APS_GROUP_ADDR_PRESENT:
-            // this is gonna be a group frame. the group id goes into the dest addr 
+            // this is gonna be a group frame. the group id goes into the dest addr
             // and we just add a dummy endpoint here. the ep will be stripped from
             // the frame in the APS when we build the aps header
             req.dest_addr.mode          = SHORT_ADDR;
@@ -282,7 +282,7 @@ void af_tx_handler()
             break;
 
         case APS_DEST_ADDR_16_EP_PRESENT:
-            // standard frame with short address 
+            // standard frame with short address
             req.dest_addr.mode          = SHORT_ADDR;
             req.dest_addr.short_addr    = TX_ENTRY(mem_ptr)->dest_addr;
             req.dest_ep                 = TX_ENTRY(mem_ptr)->dest_ep;

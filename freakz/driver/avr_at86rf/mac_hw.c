@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -41,7 +41,7 @@
     MAC functions that are hardware specific. Any MAC functions that might
     be handled by hardware should go in here.
 
-        Just a note: the MAC was split into two parts because many chips 
+        Just a note: the MAC was split into two parts because many chips
         incorporate certain MAC functions in hardware. Hence, I've kept
         one portion of the MAC as hardware independent such as the MAC
         management functions. For the MAC data functions, portions of it
@@ -128,7 +128,7 @@ void mac_set_pan_id(U16 pan_id)
 
 /**************************************************************************/
 /*!
-        Enable the MAC receiver. In case the receiver is ever turned off, ie: 
+        Enable the MAC receiver. In case the receiver is ever turned off, ie:
         the device decides to go to sleep to save power, this function needs
         to be called to enable it. This function can also be called to disable
         the receiver. You would set the enb parameter to false.

@@ -72,12 +72,12 @@ int usb_stdout_putchar(char c, FILE *stream)
      Usb_select_endpoint(TX_EP);
      if (!uart_usb_tx_ready())
 			return 0;
-	        
+
 	 // turn on LED
 	 vcptx_end_led();
 
 	uart_usb_putchar(c);
-	 
+
 	return 0;
 	}
 
@@ -128,9 +128,9 @@ bit uart_usb_tx_ready(void)
 int uart_usb_putchar(int data_to_send)
 {
   	Usb_select_endpoint(VCP_TX_EP);
-    
+
 	if(!uart_usb_tx_ready()) return -1;
-	
+
 	Usb_write_byte(data_to_send);
 	tx_counter++;
   	if(!Is_usb_write_enabled()) //If Endpoint full -> flush
@@ -140,9 +140,9 @@ int uart_usb_putchar(int data_to_send)
 	return data_to_send;
 }
 
-/** 
+/**
   * @brief This function checks if a character has been received on the USB bus.
-  * 
+  *
   * @return bit (true if a byte is ready to be read)
   */
 bit uart_usb_test_hit(void)
@@ -162,12 +162,12 @@ bit uart_usb_test_hit(void)
   return (rx_counter!=0);
 }
 
-/** 
+/**
   * @brief This function reads one byte from the USB bus
   *
   * If one byte is present in the USB fifo, this byte is returned. If no data
   * is present in the USB fifo, this function waits for USB data.
-  * 
+  *
   * @return U8 byte received
   */
 char uart_usb_getchar(void)
@@ -179,10 +179,10 @@ char uart_usb_getchar(void)
   data_rx=Usb_read_byte();
   rx_counter--;
   if (!rx_counter) Usb_ack_receive_out();
-  
+
   //Local echo
   uart_usb_putchar(data_rx);
-  
+
   return data_rx;
 }
 

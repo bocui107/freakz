@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -41,7 +41,7 @@
         This file implements the binding manager for the ZDO binding cluster. The
         binding manager is used to bind two devices together via a commissioning device
         or to handle an end device which is a binding operation that is done without
-        a commissioning device. 
+        a commissioning device.
 */
 /**************************************************************************/
 #include "freakz.h"
@@ -60,10 +60,10 @@ enum
     END_DEV_BIND_SENDING                ///< End device bind send state enum
 };
 
-static U8 ed_bind_state;                                        ///< End device bind state variable 
+static U8 ed_bind_state;                                        ///< End device bind state variable
 static struct ctimer ed_bind_tmr;           ///< Callback timer used for the end device bind timeout
 static mem_ptr_t *ed_bind_mem_ptr;          ///< Memory handle used to keep the end device bind info
-                                            
+
 extern process_event_t event_ed_bind_req;   ///< End device bind request event
 extern process_event_t event_ed_bind_match; ///< End device bind match event
 extern process_event_t event_unbind_resp;   ///< End device unbind response event
@@ -87,12 +87,12 @@ void zdo_bind_mgr_init()
     ed_bind_mem_ptr = NULL;
 
     // alloc events for the end dev bind process
-    event_ed_bind_req   = process_alloc_event();  
+    event_ed_bind_req   = process_alloc_event();
     event_ed_bind_match = process_alloc_event();
     event_unbind_resp   = process_alloc_event();
-    
+
     // start the ed bind process
-    process_start(&zdo_ed_bind_process, NULL);  
+    process_start(&zdo_ed_bind_process, NULL);
 }
 
 /**************************************************************************/
@@ -127,8 +127,8 @@ static void zdo_bind_ed_timeout(void *ptr)
 
 /**************************************************************************/
 /*!
-    Generate a match list for the clusters. Return the number of matches. All 
-        clusters in the match list will be bound together. 
+    Generate a match list for the clusters. Return the number of matches. All
+        clusters in the match list will be bound together.
 */
 /**************************************************************************/
 static U8 zdo_bind_ed_match_clust(U8 num_in_clust, const U8 *in_clust, U8 num_out_clust, const U8 *out_clust, U8 *match_list)
@@ -171,7 +171,7 @@ static void zdo_bind_ed_send_resp(U8 status, U16 addr, U8 seq)
 }
 
 /**************************************************************************/
-/*! 
+/*!
     Generate a bind/unbind request for the ed bind request state machine.
     dev = true if you want to use dev1 or false to use dev0. bind = true if you want
     to send a bind req or false to send an unbind req.
@@ -226,7 +226,7 @@ static void zdo_bind_ed_gen_req(U8 dev)
 static void zdo_bind_ed_find_match()
 {
     U8 status, num_matches1, num_matches2, match_list1[ZDO_MAX_CLUST], match_list2[ZDO_MAX_CLUST];
-    
+
     status = AF_SUCCESS;
     if (!ed_bind_mem_ptr)
     {
@@ -244,8 +244,8 @@ static void zdo_bind_ed_find_match()
 
     // generate the match lists by pairing up the in clusters with the out clusters to see which ones are in common
     // NOTE: we normally should not send addresses from managed memory into a function. it's very dangerous because the
-    // address can change if any memory is freed. however as long as we're careful not to free any memory inside the 
-    // function, then it's okay. 
+    // address can change if any memory is freed. however as long as we're careful not to free any memory inside the
+    // function, then it's okay.
     num_matches1 = zdo_bind_ed_match_clust(ED_BIND(ed_bind_mem_ptr)->dev0.req.type.ed_bind.num_in_clust,
                                            ED_BIND(ed_bind_mem_ptr)->dev0.in_clust,
                                            ED_BIND(ed_bind_mem_ptr)->dev1.req.type.ed_bind.num_out_clust,
@@ -283,7 +283,7 @@ static void zdo_bind_ed_find_match()
         ED_BIND(ed_bind_mem_ptr)->dev1.num_matches = num_matches2;
 
         // register an event to the process to move to the next step
-        process_post(&zdo_ed_bind_process, event_ed_bind_match, NULL); 
+        process_post(&zdo_ed_bind_process, event_ed_bind_match, NULL);
     }
 }
 
@@ -304,8 +304,8 @@ static void zdo_bind_ed_cleanup()
 /*!
         Handle an end device bind request. When an end device bind request comes in,
         we need to do some checks, start off a timer, save the info, and wait for
-        the next end device bind request to come in. ED bind request must come in 
-        pairs because two devices will be bound together. 
+        the next end device bind request to come in. ED bind request must come in
+        pairs because two devices will be bound together.
 */
 /**************************************************************************/
 void zdo_bind_ed_req_handler(U8 *data, U8 len, U16 src_addr, U8 src_ep, U16 clust)
@@ -357,7 +357,7 @@ void zdo_bind_ed_req_handler(U8 *data, U8 len, U16 src_addr, U8 src_ep, U16 clus
             ED_BIND(ed_bind_mem_ptr)->dev0.src_ep        = req.type.ed_bind.src_ep;
 
             // register the event to the process thread
-            process_post(&zdo_ed_bind_process, event_ed_bind_req, NULL); 
+            process_post(&zdo_ed_bind_process, event_ed_bind_req, NULL);
         }
         else if (ed_bind_state == END_DEV_BIND_START)
         {
@@ -403,7 +403,7 @@ void zdo_bind_unbind_req_handler(U8 *data, U8 len, U16 src_addr, U8 src_ep, U16 
             tmp = aps_bind_req(req.type.bind.src_ep, &req.type.bind.dest_addr, req.type.bind.dest_ep, req.type.bind.clust);
             status = (tmp == APS_SUCCESS) ? AF_SUCCESS : AF_TABLE_FULL;
         }
-        else 
+        else
         {
             tmp = aps_unbind_req(req.type.bind.src_ep, &req.type.bind.dest_addr, req.type.bind.dest_ep, req.type.bind.clust);
             status = (tmp == APS_SUCCESS) ? AF_SUCCESS : AF_NO_ENTRY;
@@ -421,7 +421,7 @@ void zdo_bind_unbind_req_handler(U8 *data, U8 len, U16 src_addr, U8 src_ep, U16 
 /**************************************************************************/
 /*!
         Handle the end device bind response. This just parses the end device
-        bind response to see what the status is. 
+        bind response to see what the status is.
 */
 /**************************************************************************/
 void zdo_bind_ed_resp_handler(U8 *data, U8 len, U16 src_addr, U8 src_ep, U16 clust)
@@ -455,7 +455,7 @@ void zdo_bind_unbind_resp_handler(U8 *data, U8 len, U16 src_addr, U8 src_ep, U16
             // that cluster. increment the index and proceed with the rest of the unbind.
             bind = resp.type.unbind.status == AF_NO_ENTRY;
             ED_BIND(ed_bind_mem_ptr)->bind = bind;
-            
+
             // we need to increment the curr_index because we just successfully unbound the cluster. if we don't
             // increment, then we'll unbind it again later when we start the actual unbind procedure.
             if (!bind)
@@ -470,7 +470,7 @@ void zdo_bind_unbind_resp_handler(U8 *data, U8 len, U16 src_addr, U8 src_ep, U16
     case END_DEV_BIND_SENDING:
         if (resp.type.unbind.status == AF_SUCCESS)
         {
-            // process next matched clust check to see if we're done with the match list for this device. 
+            // process next matched clust check to see if we're done with the match list for this device.
             // if so, then switch over to the next one.
             ED_BIND(ed_bind_mem_ptr)->curr_index++;
             if (ED_BIND(ed_bind_mem_ptr)->curr_dev == 0)
@@ -485,7 +485,7 @@ void zdo_bind_unbind_resp_handler(U8 *data, U8 len, U16 src_addr, U8 src_ep, U16
             {
                 if (ED_BIND(ed_bind_mem_ptr)->curr_index == ED_BIND(ed_bind_mem_ptr)->dev1.num_matches)
                 {
-                    // we're finished. 
+                    // we're finished.
                     zdo_bind_ed_cleanup();
                     return;
                 }
@@ -523,7 +523,7 @@ PROCESS_THREAD(zdo_ed_bind_process, ev, data)
             if (ed_bind_state == END_DEV_BIND_IDLE)
             {
                 // start the binding timer and wait for the next bind req
-                ctimer_set(&ed_bind_tmr, ED_BIND_TIMEOUT, zdo_bind_ed_timeout, NULL); 
+                ctimer_set(&ed_bind_tmr, ED_BIND_TIMEOUT, zdo_bind_ed_timeout, NULL);
                 ed_bind_state = END_DEV_BIND_START;
             }
             else if (ed_bind_state == END_DEV_BIND_START)

@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -68,7 +68,7 @@
         List head for the broadcast table. When a broadcast is sent, we receive
         return broadcasts containing the same information. The broadcast table
         implements a passive ack mechanism where we can check if all of our neighbors
-        sent the broadcast back to us. If anyone missed it, we will then re-send 
+        sent the broadcast back to us. If anyone missed it, we will then re-send
         the broadcast.
 
         It's actually kind of stupid. A broadcast is unreliable so I'm still not clear
@@ -224,7 +224,7 @@ U8 nwk_brc_start(buffer_t *buf, nwk_hdr_t *hdr)
     BUF_ALLOC(brc_curr_buf, TX);
 
     // save off the original index of the alloc'd frame. we'll need to restore it after the memcpy.
-    index = brc_curr_buf->index;                                         
+    index = brc_curr_buf->index;
     memcpy(brc_curr_buf, buf, sizeof(buffer_t));
     brc_curr_buf->index = index;
 
@@ -358,7 +358,7 @@ void nwk_brc_expire(void *ptr)
             len = aMaxPHYPacketSize - (pcb->brc_curr_frm->dptr - pcb->brc_curr_frm->buf);
 
             // save off the original index of the alloc'd frame. we'll need to restore it after the memcpy.
-            index = buf->index;                                         
+            index = buf->index;
             memcpy(buf, pcb->brc_curr_frm, sizeof(buffer_t));
             buf->index = index;
 

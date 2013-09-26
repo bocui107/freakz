@@ -51,21 +51,21 @@
 #define RF230_REVB                              ( 2 )       ///< ID for Rev B version of chip
 #define SUPPORTED_MANUFACTURER_ID               ( 31 )      ///< Manufacturer ID for Atmel
 #define RF230_SUPPORTED_INTERRUPT_MASK          ( 0x0C )    ///< Initial val for irq mask
-                                                             
+
 #define RF230_MIN_CHANNEL                       ( 11 )      ///< Min channel val for this radio
 #define RF230_MAX_CHANNEL                       ( 26 )      ///< Max channel val for this radio
 #define RF230_MIN_ED_THRESHOLD                  ( 0 )       ///< Min energy detect threshold
 #define RF230_MAX_ED_THRESHOLD                  ( 15 )      ///< Max energy detect threshold
-#define RF230_MAX_TX_FRAME_LENGTH               ( 127 ) 	///< 127 Byte PSDU. 
+#define RF230_MAX_TX_FRAME_LENGTH               ( 127 ) 	///< 127 Byte PSDU.
 
 #define TX_PWR_3DBM                             ( 0 )       ///< Max Tx power val
 #define TX_PWR_17_2DBM                          ( 15 )      ///< Min Tx power val
-                                                             
+
 #define BATTERY_MONITOR_HIGHEST_VOLTAGE         ( 0xF )     ///< Max threshold voltage for battmon
 #define BATTERY_MONITOR_VOLTAGE_UNDER_THRESHOLD ( 0 )       ///< Val indicating batt under threshold
 #define BATTERY_MONITOR_HIGH_VOLTAGE            ( 1 )       ///< Enable high voltage threshold
 #define BATTERY_MONITOR_LOW_VOLTAGE             ( 0 )       ///< Enable low voltage threshold
-                                                            
+
 #define FTN_CALIBRATION_DONE                    ( 0 )       ///< Filter tuning calibration done
 #define PLL_DCU_CALIBRATION_DONE                ( 0 )       ///< PLL delay cell calibration done
 #define PLL_CF_CALIBRATION_DONE                 ( 0 )       ///< PLL centery freq calibration done

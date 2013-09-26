@@ -89,23 +89,23 @@
 
 
 //! USB Event: USB plugged
-#define EVT_USB_POWERED               1         
+#define EVT_USB_POWERED               1
 //! USB Event: USB un-plugged
-#define EVT_USB_UNPOWERED             2         
+#define EVT_USB_UNPOWERED             2
 //! USB Event: USB in device
-#define EVT_USB_DEVICE_FUNCTION       3         
+#define EVT_USB_DEVICE_FUNCTION       3
 //! USB Event: USB in host
-#define EVT_USB_HOST_FUNCTION         4         
+#define EVT_USB_HOST_FUNCTION         4
 //! USB Event: USB suspend
-#define EVT_USB_SUSPEND               5         
+#define EVT_USB_SUSPEND               5
 //! USB Event: USB wake up
-#define EVT_USB_WAKE_UP               6         
+#define EVT_USB_WAKE_UP               6
 //! USB Event: USB resume
-#define EVT_USB_RESUME                7         
+#define EVT_USB_RESUME                7
 //! USB Event: USB reset
-#define EVT_USB_RESET                 8         
+#define EVT_USB_RESET                 8
 //! USB Event: USB setup received
-#define EVT_USB_SETUP_RX              9         
+#define EVT_USB_SETUP_RX              9
 //! @}
 
 //! \name Standard requests defines

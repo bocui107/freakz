@@ -33,7 +33,7 @@
 
 /**
  * \file
- *         AVR specific definitions for the rs232 port.   
+ *         AVR specific definitions for the rs232 port.
  *
  * \author
  *         Simon Barner <barner@in.tum.de

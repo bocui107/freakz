@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -75,7 +75,7 @@ void zcl_grp_rx_handler(U8 *resp, U8 *resp_len, U16 addr, U8 ep, zcl_clust_t *cl
     grp_list_cnt = 0;
 
     // init the pointers. the data ptr points to the payload, the resp ptr points to the response, and the grp id list is 5
-    // bytes down. we need a separate pointer for the grp id list because it's variable in size and we're going to fill 
+    // bytes down. we need a separate pointer for the grp id list because it's variable in size and we're going to fill
     // it out first to determine the grp list cnt which goes in later
     data_ptr    = hdr->payload;
     resp_ptr    = resp;
@@ -94,8 +94,8 @@ void zcl_grp_rx_handler(U8 *resp, U8 *resp_len, U16 addr, U8 ep, zcl_clust_t *cl
     case ZCL_GRP_CMD_ADD_GRP:
         // get the grp id and then add the group. the status will be used in the response
         grp_id = *(U16 *)data_ptr;
-        status = aps_grp_add(grp_id, ep) ? ZCL_STATUS_INSUFF_SPACE : ZCL_STATUS_SUCCESS; 
-        
+        status = aps_grp_add(grp_id, ep) ? ZCL_STATUS_INSUFF_SPACE : ZCL_STATUS_SUCCESS;
+
         // gen the resp header
         resp_hdr.cmd = ZCL_GRP_CMD_ADD_GRP_RESP;
         len = zcl_gen_hdr(resp_ptr, &resp_hdr);
@@ -147,14 +147,14 @@ void zcl_grp_rx_handler(U8 *resp, U8 *resp_len, U16 addr, U8 ep, zcl_clust_t *cl
         else
         {
             // there is a grp list so we need to match up the grp ids with any ids in our table.
-            // loop through the grp cnt, get the grp id in the list, and check to see if 
-            // it's in our grp tables. 
+            // loop through the grp cnt, get the grp id in the list, and check to see if
+            // it's in our grp tables.
             for (i=0; i<grp_cnt; i++)
             {
                 // get the next grp id in the list
                 grp_id = *(U16 *)data_ptr;
                 data_ptr += sizeof(U16);
-                
+
                 // look in the group table to see if the grp id exists
                 for (mem_ptr = aps_grp_get_head(); mem_ptr != NULL; mem_ptr = mem_ptr->next)
                 {
@@ -166,7 +166,7 @@ void zcl_grp_rx_handler(U8 *resp, U8 *resp_len, U16 addr, U8 ep, zcl_clust_t *cl
                             // grp id exists in our table. add it to the grp id list in the response
                             // and increment the grp list cnt
                             *(U16 *)grp_id_list = grp_id;
-                            grp_id_list += sizeof(U16); 
+                            grp_id_list += sizeof(U16);
                             grp_list_cnt++;
                         }
                     }
@@ -179,7 +179,7 @@ void zcl_grp_rx_handler(U8 *resp, U8 *resp_len, U16 addr, U8 ep, zcl_clust_t *cl
         resp_ptr += len;
 
         // generate the response payload. the grp id list should come directly after the grp list cnt
-        *resp_ptr++ = ZCL_GRP_CAPACITY_AVAIL;       // set the capacity 
+        *resp_ptr++ = ZCL_GRP_CAPACITY_AVAIL;       // set the capacity
         *resp_ptr++ = grp_list_cnt;                 // set the grp list cnt
 
         // move the resp ptr to the same position as the grp_id_list pointer. we need to do this to accurately

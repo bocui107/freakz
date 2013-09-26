@@ -96,7 +96,7 @@ void eeprom_read(eeprom_addr_t addr, unsigned char *buf, int size);
  * bootup code.
  *
  */
- 
+
 void eeprom_init(void);
 
 #endif /* __EEPROM_H__ */

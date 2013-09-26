@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -40,15 +40,15 @@
     \brief Zigbee Cluster Library Toplevel file
 
         This is the main entry point into the Zigbee cluster library and where
-        the foundation commands are implemented. The ZCL actually consists of 
-        the foundation commands which are used to access basic attributes of 
+        the foundation commands are implemented. The ZCL actually consists of
+        the foundation commands which are used to access basic attributes of
         the clusters and then separate files where the application specific
-        clusters are defined. 
+        clusters are defined.
 */
 /**************************************************************************/
 #include "freakz.h"
 
-static U8 seq_num;      ///< Instantiation of the ZCL sequence number. 
+static U8 seq_num;      ///< Instantiation of the ZCL sequence number.
 
 /**************************************************************************/
 /*!
@@ -73,7 +73,7 @@ U8 zcl_get_seq_num()
 
 /**************************************************************************/
 /*!
-        Used to find the attribute from a list of attributes based on the 
+        Used to find the attribute from a list of attributes based on the
         attribute ID.
 */
 /**************************************************************************/
@@ -128,21 +128,21 @@ U8 zcl_get_attrib_size(zcl_attrib_t *attrib)
     switch (attrib->type)
     {
     case ZCL_TYPE_8BIT:
-    case ZCL_TYPE_U8:           
+    case ZCL_TYPE_U8:
         return sizeof(U8);
-        
+
     case ZCL_TYPE_16BIT:
-    case ZCL_TYPE_U16:          
+    case ZCL_TYPE_U16:
         return sizeof(U16);
 
     case ZCL_TYPE_32BIT:
-    case ZCL_TYPE_U32:          
+    case ZCL_TYPE_U32:
         return sizeof(U32);
 
     case ZCL_TYPE_BOOL:
         return sizeof(bool);
 
-    case ZCL_TYPE_CHAR_STRING:  
+    case ZCL_TYPE_CHAR_STRING:
         // the first byte of the string attrib has the size. so we need
         // to return the value of the first byte + 1 to account for using
         // a byte to hold the string size
@@ -167,7 +167,7 @@ static bool zcl_attrib_check_space_avail(zcl_attrib_t *attrib, U8 resp_len)
         // need to add an extra 4 bytes to the size because we need to send the attrib id
         // type, and status
         size = zcl_get_attrib_size(attrib);
-        return ((resp_len + size + 4) < ZCL_MAX_PAYLOAD_SIZE); 
+        return ((resp_len + size + 4) < ZCL_MAX_PAYLOAD_SIZE);
     }
     return false;
 }
@@ -193,7 +193,7 @@ void zcl_set_string_attrib(U8 *attrib_data, U8 *val, U8 max_sz)
 
 */
 /**************************************************************************/
-void zcl_set_clust(zcl_clust_t *clust, U8 ep, U16 clust_id, zcl_attrib_t *attrib_list, 
+void zcl_set_clust(zcl_clust_t *clust, U8 ep, U16 clust_id, zcl_attrib_t *attrib_list,
                    void (*rx_handler)(U8 *, U8 *, U16, U8, struct _zcl_clust_t *, zcl_hdr_t *),
                    void (*action_handler)(U8, void *))
 {
@@ -237,7 +237,7 @@ static U8 zcl_cmd_read_attrib(U8 *resp, U16 src_addr, U8 src_ep, zcl_clust_t *cl
 
     // save the original position so we can calculate the amount of data we wrote
     resp_ptr = resp;
-    data_ptr = hdr->payload; 
+    data_ptr = hdr->payload;
 
     // generate the header. most of the info is the same as the inbound hdr so do
     // a memcpy and just modify the parts that need to change
@@ -357,7 +357,7 @@ static U8 zcl_cmd_write_attrib(U8 *resp, U16 src_addr, U8 src_ep, zcl_clust_t *c
         status = ZCL_STATUS_SUCCESS;
 
         attrib_id = *(U16 *)data_ptr;
-        data_ptr += sizeof(U16);     
+        data_ptr += sizeof(U16);
 
         // find attribute
         if ((attrib = zcl_find_attrib(clust->attrib_list, attrib_id)) == NULL)
@@ -373,12 +373,12 @@ static U8 zcl_cmd_write_attrib(U8 *resp, U16 src_addr, U8 src_ep, zcl_clust_t *c
             {
                 status = ZCL_STATUS_INVALID_TYPE;
             }
-    
+
             if (attrib->access == ZCL_ACCESS_READ_ONLY)
             {
                 status = ZCL_STATUS_READ_ONLY;
             }
-    
+
             if (!zcl_attrib_check_space_avail(attrib, resp_ptr - resp))
             {
                 status = ZCL_STATUS_INSUFF_SPACE;
@@ -389,7 +389,7 @@ static U8 zcl_cmd_write_attrib(U8 *resp, U16 src_addr, U8 src_ep, zcl_clust_t *c
         *resp_ptr++        = status;
         *(U16 *)resp_ptr   = attrib_id;
         resp_ptr += sizeof(U16);
-    
+
         // if we're out of room, then end the response frame here. otherwise if we ran into a problem
         // with the attrib, then update the status and move on to the next one.
         if (status == ZCL_STATUS_INSUFF_SPACE)
@@ -400,37 +400,37 @@ static U8 zcl_cmd_write_attrib(U8 *resp, U16 src_addr, U8 src_ep, zcl_clust_t *c
         {
             continue;
         }
-    
-        // update the attrib value. if the attrib was not found, then 
+
+        // update the attrib value. if the attrib was not found, then
         // don't update, but move the data pointer along to the next attrib to be udpated.
         switch (type)
         {
         case ZCL_TYPE_U8:
-            *(U8 *)attrib->data = *data_ptr++;  
+            *(U8 *)attrib->data = *data_ptr++;
             break;
-    
+
         case ZCL_TYPE_U16:
             *(U16 *)attrib->data = *(U16 *)data_ptr;
             data_ptr += sizeof(U16);
             break;
-    
+
         case ZCL_TYPE_U32:
             *(U32 *)attrib->data = *(U32 *)data_ptr;
             data_ptr += sizeof(U32);
             break;
-    
+
         case ZCL_TYPE_BOOL:
             *(bool *)attrib->data = *(bool *)data_ptr++;
             break;
-    
+
         case ZCL_TYPE_CHAR_STRING:
             // byte 0 is the length of the string
             size = *(U8 *)data_ptr++;
-    
-            // start the copy from byte 1 
-            memcpy(attrib->data, data_ptr, size); 
+
+            // start the copy from byte 1
+            memcpy(attrib->data, data_ptr, size);
             data_ptr += size;
-            break; 
+            break;
         default:
             continue;
         }
@@ -475,8 +475,8 @@ static U8 zcl_cmd_disc_attrib(U8 *resp, U16 src_addr, U8 src_ep, zcl_clust_t *cl
     attrib_id = *(U16 *)data_ptr;
     data_ptr += sizeof(U16);
     max_attribs = *data_ptr++;
-    
-    // keep a variable pointing to the state of the discovery status field. it might 
+
+    // keep a variable pointing to the state of the discovery status field. it might
     // need to change later on if we can't accomodate all the attribute responses
     disc_comp_field = resp_ptr++;
     *disc_comp_field = ZCL_STATUS_DISC_COMPLETE;
@@ -486,12 +486,12 @@ static U8 zcl_cmd_disc_attrib(U8 *resp, U16 src_addr, U8 src_ep, zcl_clust_t *cl
     {
         if ((resp_ptr - resp) >= (ZCL_MAX_PAYLOAD_SIZE - 3))
         {
-            // we don't want to exceed the size of the response payload so terminate the response 
+            // we don't want to exceed the size of the response payload so terminate the response
             // if we exceed the max payload size
             *disc_comp_field = ZCL_STATUS_DISC_INCOMPLETE;
             break;
         }
-        
+
         if ((attrib = zcl_find_attrib(clust->attrib_list, attrib_id)) != NULL)
         {
             *(U16 *)resp_ptr = attrib->id;
@@ -505,10 +505,10 @@ static U8 zcl_cmd_disc_attrib(U8 *resp, U16 src_addr, U8 src_ep, zcl_clust_t *cl
 
 /**************************************************************************/
 /*!
-        This function configures a reporting entry. Reporting entries are used 
+        This function configures a reporting entry. Reporting entries are used
         to report on an attribute value at specified time intervals. Multiple
-        attributes can be configured for reporting. All attributes that are 
-        configured to report their status will go into a reporting table that is 
+        attributes can be configured for reporting. All attributes that are
+        configured to report their status will go into a reporting table that is
         checked once every second and their expiry is decremented. When the expiry
         goes to zero, a reporting frame will be generated. Only one attribute is reported
         per report frame.
@@ -549,7 +549,7 @@ static U8 zcl_cmd_cfg_rpt(U8 *resp, U16 src_addr, U8 src_ep, zcl_clust_t *clust,
             status = ZCL_STATUS_UNSUP_ATTRIB;
         }
 
-        // we are only expecting to send out reports. If they try and configure us to receive reports, then figure out 
+        // we are only expecting to send out reports. If they try and configure us to receive reports, then figure out
         // the size of the fields and then skip over them. otherwise, just return.
         if (dir)
         {
@@ -626,14 +626,14 @@ static U8 zcl_cmd_cfg_rpt(U8 *resp, U16 src_addr, U8 src_ep, zcl_clust_t *clust,
 /**************************************************************************/
 /*!
         This is the main ZCL command handler. When a ZCL frame arrives, it first
-        comes here and then gets decoded and sent to the correct function for 
+        comes here and then gets decoded and sent to the correct function for
         handling.
 */
 /**************************************************************************/
 void zcl_cmd_handler(U8 *resp, U8 *resp_len, U16 src_addr, U8 src_ep, U16 prof_id, zcl_clust_t *clust, zcl_hdr_t *hdr)
 {
     // make sure that the buffers and clusters are present
-    if ((clust == NULL) || (hdr == NULL)) 
+    if ((clust == NULL) || (hdr == NULL))
     {
         return;
     }

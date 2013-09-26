@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -91,14 +91,14 @@ void zdo_nwk_start()
 /**************************************************************************/
 /*!
     This is a slow clock countdown timer to make sure that we clear the
-    contents of any scan and reset the nwk disc state. 
+    contents of any scan and reset the nwk disc state.
 */
 /**************************************************************************/
 void zdo_nwk_mgr_periodic()
 {
     if (rmt_nwk_disc)
     {
-        if (rmt_nwk_disc_expiry == 0) 
+        if (rmt_nwk_disc_expiry == 0)
         {
             rmt_nwk_disc = false;
             rmt_disc_mem_ptr = NULL;
@@ -453,7 +453,7 @@ void nwk_disc_send_resp(U8 status)
     U8 i, size, *resp, *resp_info, resp_data[MAX_APS_PAYLOAD];
     mem_ptr_t *scan_mem_ptr;
     zdo_pcb_t *pcb = zdo_pcb_get();
-    
+
     if (!rmt_disc_mem_ptr)
     {
         // TODO: send an error response here
@@ -494,7 +494,7 @@ void nwk_disc_send_resp(U8 status)
     zdo_tx(resp_data, size, RMT_DISC(rmt_disc_mem_ptr)->src_addr, NWK_DISC_RESP_CLUST, 0, af_handle_get());
 
     // if we've finished the operation, set the expiry to zero and let it clean things up for us.
-    rmt_nwk_disc_expiry = (i == mac_scan_get_entry_cnt()) ? 0 : rmt_nwk_disc_expiry; 
+    rmt_nwk_disc_expiry = (i == mac_scan_get_entry_cnt()) ? 0 : rmt_nwk_disc_expiry;
 }
 
 /**************************************************************************/
@@ -508,16 +508,16 @@ void zdo_nwk_lqi_req_handler(U8 *data, U8 len, U16 src_addr, U8 src_ep, U16 clus
     U8 i, size, entry_cnt, tmp, *resp_info, *resp, resp_data[MAX_APS_PAYLOAD];
     zdo_req_t req;
     mem_ptr_t *nbor_mem_ptr;
-    
+
     // parse the req
     zdo_parse_req(src_addr, data, clust, &req);
-    
+
     // get the total number of entries and calculate the number of entries
     // we will send back to the requesting device. we can only send about three
     // entries at a time due to size restrictions on the aps payload size
     entry_cnt = nwk_neighbor_get_cnt();
-    
-    // we need to separate the response into two parts: 
+
+    // we need to separate the response into two parts:
     // resp_info carries info. we will fill this out last
     // resp contains the actual neighbor list entries. we will fill this in first
     resp_info = resp_data;
@@ -548,7 +548,7 @@ void zdo_nwk_lqi_req_handler(U8 *data, U8 len, U16 src_addr, U8 src_ep, U16 clus
         resp += sizeof(U64);
         *(U16 *)resp = NBOR_ENTRY(nbor_mem_ptr)->nwk_addr;
         resp += sizeof(U16);
-        
+
         // gen the bit-sliced field
         tmp =  (NBOR_ENTRY(nbor_mem_ptr)->device_type       & 0x3);
         tmp |= (NBOR_ENTRY(nbor_mem_ptr)->rx_on_when_idle   & 0x3) << 2;
@@ -564,7 +564,7 @@ void zdo_nwk_lqi_req_handler(U8 *data, U8 len, U16 src_addr, U8 src_ep, U16 clus
         i++;
     }
 
-    // fill out the info fields of the data here 
+    // fill out the info fields of the data here
     *resp_info++ = req.seq;
     *resp_info++ = AF_SUCCESS;                          // status
     *resp_info++ = entry_cnt;                           // total num neighbor entries
@@ -593,7 +593,7 @@ void zdo_nwk_leave_req_handler(U8 *data, U8 len, U16 src_addr, U8 src_ep, U16 cl
     address_t addr;
 
     zdo_parse_req(src_addr, data, clust, &req);
-    
+
     // this needs to be added in case the device making the leave request is the one that will be leaving.
     // if that's the case, then no response can be sent to it so don't send a response.
     addr.mode = LONG_ADDR;
@@ -608,7 +608,7 @@ void zdo_nwk_leave_req_handler(U8 *data, U8 len, U16 src_addr, U8 src_ep, U16 cl
     resp = resp_data;
     *resp++ = zdo_seq_get();
     *resp++ = leave_req_status;
-   
+
     if (send_resp)
     {
         zdo_tx(resp_data, 2, src_addr, NWK_LEAVE_RESP_CLUST, 0, af_handle_get());
@@ -694,7 +694,7 @@ void zdo_nwk_update_req_handler(U8 *data, U8 len, U16 src_addr, U8 src_ep, U16 c
         // save off the channel that we're using
         U8 channel = pib->curr_channel;
 
-        // an energy scan was requested. we need to perform it for as many times as was 
+        // an energy scan was requested. we need to perform it for as many times as was
         // requested
         pcb->channel_mask = req.type.nwk_update.scan_channels;
         pcb->duration = req.type.nwk_update.scan_duration;
@@ -731,7 +731,7 @@ void zdo_nwk_update_req_handler(U8 *data, U8 len, U16 src_addr, U8 src_ep, U16 c
     *resp_info++ = req.seq;
     *resp_info++ = status;                   // status
     *(U32 *)resp_info = pcb->channel_mask;  // scanned channels
-    resp_info += sizeof(U32);               
+    resp_info += sizeof(U32);
     *(U16 *)resp_info = pcb->total_xmit;    // total transmissions
     resp_info += sizeof(U16);
     *(U16 *)resp_info = pcb->total_fail;    // total transmission failures

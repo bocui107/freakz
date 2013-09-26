@@ -3,12 +3,12 @@
 
 /*****************************************************************************
 *  Module Name:       Realtek 8019AS Driver
-*  
+*
 *  Created By:        Louis Beaudoin (www.embedded-creations.com)
 *
-*  Original Release:  September 21, 2002 
+*  Original Release:  September 21, 2002
 *
-*  Module Description:  
+*  Module Description:
 *  Provides functions to initialize the Realtek 8019AS, and send and retreive
 *  packets
 *
@@ -53,7 +53,7 @@ void RTL8019beginPacketSend(unsigned int packetLength);
 *                 packet buffer
 *  Notes:       RTL8019beginPacketSend() must be called before sending
 *                 any data.
-*               Several calls to RTL8019retreivePacketData() may be made to 
+*               Several calls to RTL8019retreivePacketData() may be made to
 *                 copy packet data from different buffers
 *****************************************************************************/
 void RTL8019sendPacketData(unsigned char * localBuffer, unsigned int length);
@@ -138,7 +138,7 @@ unsigned int RTL8019beginPacketRetreive(void);
 *                 a local buffer
 *  Notes:       RTL8019beginPacketRetreive() must be called before retreiving
 *                 any data.
-*               Several calls to RTL8019retreivePacketData() may be made to 
+*               Several calls to RTL8019retreivePacketData() may be made to
 *                 copy packet data to different buffers
 *****************************************************************************/
 void RTL8019retreivePacketData(unsigned char * localBuffer,
@@ -204,7 +204,7 @@ void RTL8019endPacketRetreive(void);
 #define RTL8019_CLEAR_READ   cbi(RTL8019_CONTROL_PORT,\
                                  RTL8019_CONTROL_READPIN)
 #define RTL8019_SET_READ     sbi(RTL8019_CONTROL_PORT,\
-                                 RTL8019_CONTROL_READPIN) 
+                                 RTL8019_CONTROL_READPIN)
 #define RTL8019_CLEAR_WRITE  cbi(RTL8019_CONTROL_PORT,\
                                  RTL8019_CONTROL_WRITEPIN)
 #define RTL8019_SET_WRITE    sbi(RTL8019_CONTROL_PORT,\

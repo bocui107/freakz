@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -37,7 +37,7 @@
     \file aps_bind.c
     \ingroup aps
     \brief APS binding table
- 
+
     This file implements the binding table for the APS layer.
 
     \note Binding functionality has not been fully implemented and tested yet.
@@ -48,8 +48,8 @@
 /**************************************************************************/
 /*!
         List head for the binding table. The binding table allows us to use indirect
-        addressing at the application layer. The clusters and endpoints don't need to 
-        have any idea of where they are sending the data to. They just respond to 
+        addressing at the application layer. The clusters and endpoints don't need to
+        have any idea of where they are sending the data to. They just respond to
         requests and the addresses can be looked up in the binding table. The app layer
         also supports direct addressing, but the binding is supposed to make everything
         easier...for everyone except me...boo hoo...
@@ -120,7 +120,7 @@ mem_ptr_t *aps_bind_find_dest(U8 src_ep, U16 clust)
 /**************************************************************************/
 /*!
     Locate an entry with an exact match of src ep, clust, dest addr, and dest ep.
-    Return a memory handle only if everything matches. 
+    Return a memory handle only if everything matches.
 */
 /**************************************************************************/
 static mem_ptr_t *aps_bind_find(U8 src_ep, address_t *dest_addr, U8 dest_ep, U16 clust)
@@ -156,7 +156,7 @@ static mem_ptr_t *aps_bind_find(U8 src_ep, address_t *dest_addr, U8 dest_ep, U16
 
 /**************************************************************************/
 /*!
-    Allocate a free binding entry and add it to the binding table. 
+    Allocate a free binding entry and add it to the binding table.
 */
 /**************************************************************************/
 static U8 aps_bind_add(U8 src_ep, address_t *dest_addr, U8 dest_ep, U16 clust)
@@ -205,7 +205,7 @@ mem_ptr_t *aps_bind_get_head()
 /**************************************************************************/
 U8 aps_bind_req(U8 src_ep, address_t *dest_addr, U8 dest_ep, U16 clust)
 {
-    return aps_bind_add(src_ep, dest_addr, dest_ep, clust); 
+    return aps_bind_add(src_ep, dest_addr, dest_ep, clust);
 }
 
 /**************************************************************************/

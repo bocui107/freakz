@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -204,14 +204,14 @@ void nwk_parse_beacon(buffer_t *buf, mem_ptr_t *mem_ptr)
 
     // add in the info to the neighbor table here
     memset(&nbor_entry, 0, sizeof(nbor_tbl_entry_t));
-    nbor_entry.ext_pan_id       = SCAN_ENTRY(mem_ptr)->ext_pan_id;    
+    nbor_entry.ext_pan_id       = SCAN_ENTRY(mem_ptr)->ext_pan_id;
     nbor_entry.pan_id           = SCAN_ENTRY(mem_ptr)->coord_pan_id;
     nbor_entry.device_type      = NWK_ROUTER;                       // only routers send beacons
     nbor_entry.rx_on_when_idle  = true;                             // true for all routers
     nbor_entry.relationship     = NWK_NONE;                         // no relationship for now
     nbor_entry.channel          = pib->curr_channel;
     nbor_entry.depth            = SCAN_ENTRY(mem_ptr)->depth;
-    nbor_entry.permit_join      = (SCAN_ENTRY(mem_ptr)->superfrm_spec & (1<<MAC_ASSOC_PERMIT_OFF)) >> MAC_ASSOC_PERMIT_OFF; 
+    nbor_entry.permit_join      = (SCAN_ENTRY(mem_ptr)->superfrm_spec & (1<<MAC_ASSOC_PERMIT_OFF)) >> MAC_ASSOC_PERMIT_OFF;
     nbor_entry.pot_parent       = SCAN_ENTRY(mem_ptr)->pot_parent;
 
     if (SCAN_ENTRY(mem_ptr)->coord_addr.mode == SHORT_ADDR)

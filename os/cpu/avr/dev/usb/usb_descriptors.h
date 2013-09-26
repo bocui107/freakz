@@ -71,7 +71,7 @@
 #define COMPOSITE_DEVICE_PROTOCOL    0x01      // IAD
 
 #define NETWORK_DEVICE_CLASS          0x02      // CDC ACM
-#define NETWORK_DEVICE_SUB_CLASS      0x02      // 
+#define NETWORK_DEVICE_SUB_CLASS      0x02      //
 #define NETWORK_DEVICE_PROTOCOL       0xFF      // Vendor-specific
 
 #define MASS_DEVICE_CLASS            0x00      //
@@ -196,7 +196,7 @@
 #define MS_EP_ATTRIBUTES_1     0x02          // BULK = 0x02, INTERUPT = 0x03
 #define MS_EP_IN_LENGTH        64
 #define MS_EP_SIZE_1           MS_EP_IN_LENGTH
-#define MS_EP_INTERVAL_1       0x00 			
+#define MS_EP_INTERVAL_1       0x00
 
 
 // USB Endpoint 2 descriptor FS
@@ -204,7 +204,7 @@
 #define MS_EP_ATTRIBUTES_2     0x02          // BULK = 0x02, INTERUPT = 0x03
 #define MS_EP_IN_LENGTH        64
 #define MS_EP_SIZE_2           MS_EP_IN_LENGTH
-#define MS_EP_INTERVAL_2       0x00 			
+#define MS_EP_INTERVAL_2       0x00
 
 
 #define DEVICE_STATUS         0x00 // TBD
@@ -443,7 +443,7 @@ typedef struct
 } S_usb_user_configuration_descriptor_mass;
 
 
-PGM_VOID_P Usb_get_dev_desc_pointer(void); 
+PGM_VOID_P Usb_get_dev_desc_pointer(void);
 U8 Usb_get_dev_desc_length(void);
 PGM_VOID_P  Usb_get_conf_desc_pointer(void) ;
 U8  Usb_get_conf_desc_length(void);

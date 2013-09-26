@@ -77,7 +77,7 @@ rand(void)
    */
   lo = 16807ul * (uint16_t)(rand_state);
   hi = 16807ul * (uint16_t)(rand_state >> 16);
-        
+
   lo += (hi & 0x7fff) << 16;
 
   /*

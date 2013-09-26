@@ -33,11 +33,11 @@
 
 /*
   From:
-  
+
    D. Seetharam and S. Rhee, ``An Efficient Random Number Generator
    for Low-Power Sensor Networks'' First IEEE Workshop on Embedded
    Networked Sensors (EmNets-I), November 2004.
-   
+
    http://www.dseetharam.org/papers/emnets.pdf
 */
 
@@ -67,6 +67,6 @@ random_rand(void)
   key = ~tv + 4711;
   tv = ~rv;
   time = tv;
-  
+
   return rv;
 }

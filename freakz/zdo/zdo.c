@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -57,10 +57,10 @@
 /*********************** Global Variables **************************/
 static zdo_pcb_t pcb;   ///< ZDO protocol control block instantiation
 
-/*! 
+/*!
     Simple descriptor for this ep. The ZDO doesn't really need a simple
     descriptor, but it makes it easier to register it with the af_ep table.
-    What I really care about is using the ZDO rx and conf callbacks. 
+    What I really care about is using the ZDO rx and conf callbacks.
 */
 static U8 zdo_simple_desc[] = {
     ZDO_EP,                     // ep
@@ -73,10 +73,10 @@ static U8 zdo_simple_desc[] = {
 
 /**************************************************************************/
 /*!
-    This is the ZDO's master cluster list. It is a ZDO request and response 
-    function pointer table. When a request/response comes in, it gets looked 
-    up in here and the frame will get routed to the function that matches the 
-    cluster ID. 
+    This is the ZDO's master cluster list. It is a ZDO request and response
+    function pointer table. When a request/response comes in, it gets looked
+    up in here and the frame will get routed to the function that matches the
+    cluster ID.
 */
 /**************************************************************************/
 static zdo_handler_t zdo_handler_tbl[] =
@@ -92,7 +92,7 @@ static zdo_handler_t zdo_handler_tbl[] =
     {DEV_ANNCE_REQ_CLUST,           zdo_disc_dev_annce_req_handler     },
     {END_DEV_BIND_REQ_CLUST,        zdo_bind_ed_req_handler            },
     {BIND_REQ_CLUST,                zdo_bind_unbind_req_handler        },
-    {UNBIND_REQ_CLUST,              zdo_bind_unbind_req_handler        }, 
+    {UNBIND_REQ_CLUST,              zdo_bind_unbind_req_handler        },
     {NWK_DISC_REQ_CLUST,            zdo_nwk_disc_req_handler           },
     {NWK_LQI_REQ_CLUST,             zdo_nwk_lqi_req_handler            },
     {NWK_LEAVE_REQ_CLUST,           zdo_nwk_leave_req_handler          },
@@ -112,7 +112,7 @@ static zdo_handler_t zdo_handler_tbl[] =
     {UNBIND_RESP_CLUST,             zdo_bind_unbind_resp_handler       },
     {NWK_LQI_RESP_CLUST,            zdo_nwk_lqi_resp_handler           },
     {NWK_DISC_RESP_CLUST,           zdo_nwk_disc_resp_handler          },
-    {NWK_LEAVE_RESP_CLUST,          zdo_nwk_leave_resp_handler         }, 
+    {NWK_LEAVE_RESP_CLUST,          zdo_nwk_leave_resp_handler         },
     {NWK_UPDATE_RESP_CLUST,         zdo_nwk_update_resp_handler        },
 
     {END_MARKER_CLUST,              NULL                               }
@@ -179,7 +179,7 @@ zdo_pcb_t *zdo_pcb_get()
 
 /**************************************************************************/
 /*!
-    Return the next sequence number. The seq number is used to identify the 
+    Return the next sequence number. The seq number is used to identify the
     ZDO frame.
 */
 /**************************************************************************/

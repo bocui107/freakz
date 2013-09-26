@@ -43,7 +43,7 @@
 #ifndef _UART_USB_LIB_H_
 #define _UART_USB_LIB_H_
 
-/** 
+/**
   \addtogroup cdctask
   @{
   */

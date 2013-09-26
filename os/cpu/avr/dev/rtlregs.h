@@ -135,12 +135,12 @@
 #define NIC_PG0_TBCR1 0x06    /*!< \brief Transmit byte count register 1 */
 #define NIC_PG0_ISR 0x07      /*!< \brief Interrupt status register */
 #define NIC_PG0_CRDA0 0x08    /*!< \brief Current remote DMA address 0 */
-#define NIC_PG0_RSAR0 0x08    /*!< \brief Remote start address register 0 
+#define NIC_PG0_RSAR0 0x08    /*!< \brief Remote start address register 0
                                    Low byte address to read from the buffer. */
 #define NIC_PG0_CRDA1 0x09    /*!< \brief Current remote DMA address 1 */
-#define NIC_PG0_RSAR1 0x09    /*!< \brief Remote start address register 1 
+#define NIC_PG0_RSAR1 0x09    /*!< \brief Remote start address register 1
                                    High byte address to read from the buffer. */
-#define NIC_PG0_RBCR0 0x0a    /*!< \brief Remote byte count register 0 
+#define NIC_PG0_RBCR0 0x0a    /*!< \brief Remote byte count register 0
                                    Low byte of the number of bytes to read
                                    from the buffer. */
 #define NIC_PG0_RBCR1 0x0b    /*!< \brief Remote byte count register 1
@@ -300,8 +300,8 @@
 #define NIC_EECR_EEM1  0x80    /*!< \brief EEPROM Operating Mode */
 #define NIC_EECR_EEM0  0x40    /*!< \brief  EEPROM Operating Mode
                                     - 0 0 Normal operation
-                                    - 0 1 Auto-load 
-                                    - 1 0 9346 programming 
+                                    - 0 1 Auto-load
+                                    - 1 0 9346 programming
                                     - 1 1 Config register write enab */
 #define NIC_EECR_EECS  0x08    /*!< \brief EEPROM Chip Select */
 #define NIC_EECR_EESK  0x04    /*!< \brief EEPROM Clock */
@@ -313,9 +313,9 @@
  */
 #define NIC_CONFIG2_PL1   0x80 /*!< \brief Network media type */
 #define NIC_CONFIG2_PL0   0x40 /*!< \brief Network media type
-                                    - 0 0 TP/CX auto-detect 
-                                    - 0 1 10baseT 
-                                    - 1 0 10base5 
+                                    - 0 0 TP/CX auto-detect
+                                    - 0 1 10baseT
+                                    - 1 0 10base5
                                     - 1 1 10base2 */
 #define NIC_CONFIG2_BSELB 0x20 /*!< \brief BROM disable */
 #define NIC_CONFIG2_BS4   0x10 /*!< \brief BROM size/base */
@@ -329,11 +329,11 @@
  */
 #define NIC_CONFIG3_PNP     0x80 /*!< \brief PnP Mode */
 #define NIC_CONFIG3_FUDUP   0x40 /*!< \brief Full duplex */
-#define NIC_CONFIG3_LEDS1   0x20 /*!< \brief LED1/2 pin configuration 
-                                        - 0 LED1 == LED_RX, LED2 == LED_TX 
+#define NIC_CONFIG3_LEDS1   0x20 /*!< \brief LED1/2 pin configuration
+                                        - 0 LED1 == LED_RX, LED2 == LED_TX
                                         - 1 LED1 == LED_CRS, LED2 == MCSB */
 #define NIC_CONFIG3_LEDS0   0x10 /*!< \brief LED0 pin configration
-                                        - 0 LED0 pin == LED_COL 
+                                        - 0 LED0 pin == LED_COL
                                         - 1 LED0 pin == LED_LINK */
 #define NIC_CONFIG3_SLEEP   0x04 /*!< \brief Sleep mode */
 #define NIC_CONFIG3_PWRDN   0x02 /*!< \brief Power Down */

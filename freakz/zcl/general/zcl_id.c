@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -66,7 +66,7 @@ void zcl_id_init(zcl_id_attrib_list_t *attrib_list)
 {
     // init the data values first
     attrib_list->data.id_time = 0;
-     
+
     // init the attribute fields
     zcl_set_attrib(&attrib_list->list[0], ZCL_ID_ATTRIB, ZCL_TYPE_U16, ZCL_ACCESS_READ_WRITE, &attrib_list->data.id_time);
     zcl_set_attrib(&attrib_list->list[1], ZCL_END_MARKER, 0, 0, NULL);
@@ -86,7 +86,7 @@ static U8 zcl_id_gen_query_resp(U8 *resp, U16 timeout, zcl_hdr_t *hdr)
     zcl_hdr_t resp_hdr;
 
     resp_ptr = resp;
-    
+
     resp_hdr.frm_ctrl.dir            = ZCL_FRM_DIR_TO_CLI;
     resp_hdr.frm_ctrl.dis_def_resp   = false;
     resp_hdr.frm_ctrl.frm_type       = hdr->frm_ctrl.frm_type;
@@ -133,9 +133,9 @@ void zcl_id_rx_handler(U8 *resp, U8 *resp_len, U16 addr, U8 ep, zcl_clust_t *clu
         // store the value of the identify timeout
         *(U16 *)attrib->data = *(U16 *)data;
 
-        // add an id timer entry to automatically count down the id time 
+        // add an id timer entry to automatically count down the id time
         zcl_id_tmr_add(ep, (U16 *)attrib->data, clust->action_handler);
-         
+
         if (clust->action_handler)
         {
             clust->action_handler(ZCL_ID_ACTION_ID_ON, NULL);
@@ -143,7 +143,7 @@ void zcl_id_rx_handler(U8 *resp, U8 *resp_len, U16 addr, U8 ep, zcl_clust_t *clu
 
         if (!hdr->frm_ctrl.dis_def_resp)
         {
-            *resp_len = zcl_gen_def_resp(resp, ZCL_STATUS_SUCCESS, hdr); 
+            *resp_len = zcl_gen_def_resp(resp, ZCL_STATUS_SUCCESS, hdr);
         }
         break;
 
@@ -173,7 +173,7 @@ U8 zcl_id_gen_req(U8 *data, zcl_hdr_t *hdr, U16 timeout)
         *(U16 *)data_ptr = timeout;
         data_ptr += sizeof(U16);
     }
-    return data_ptr - data; 
+    return data_ptr - data;
 }
 
 /**************************************************************************/
@@ -246,7 +246,7 @@ void zcl_id_tmr_periodic()
     for (mem_ptr = list_head(id_tmr_list); mem_ptr != NULL; mem_ptr = mem_ptr->next)
     {
         // de-reference the time value
-        time = *ZCL_ID_TMR(mem_ptr)->time; 
+        time = *ZCL_ID_TMR(mem_ptr)->time;
 
         // check if the timeout occurred. if it didn't then decrement the time and update
         // the id attribute

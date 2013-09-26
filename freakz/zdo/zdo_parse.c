@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -49,8 +49,8 @@
 
 /**************************************************************************/
 /*!
-        Parse the incoming ZDO raw data request frame and fill out the request 
-        structure that was passed into it. Return the status of the request 
+        Parse the incoming ZDO raw data request frame and fill out the request
+        structure that was passed into it. Return the status of the request
         operation.
 */
 /**************************************************************************/
@@ -60,46 +60,46 @@ U8 zdo_parse_req(U16 addr, U8 *data_in, U16 clust, zdo_req_t *req)
 
     req->clust = clust;
     req->seq = *data++;
-    
+
     switch (clust)
     {
     case NWK_ADDR_REQ_CLUST:
-        req->type.nwk_addr.ext_addr = *(U64 *)data; 
+        req->type.nwk_addr.ext_addr = *(U64 *)data;
         data += sizeof(U64);
         req->type.nwk_addr.req_type = *data++;
-        req->type.nwk_addr.start_index = *data++;      
+        req->type.nwk_addr.start_index = *data++;
         break;
 
-    case IEEE_ADDR_REQ_CLUST:   
-        req->type.ieee_addr.nwk_addr = *(U16 *)data; 
+    case IEEE_ADDR_REQ_CLUST:
+        req->type.ieee_addr.nwk_addr = *(U16 *)data;
         data += sizeof(U16);
         req->type.ieee_addr.req_type = *data++;
-        req->type.ieee_addr.start_index = *data++;   
+        req->type.ieee_addr.start_index = *data++;
         break;
 
-    case NODE_DESC_REQ_CLUST:      
-    case PWR_DESC_REQ_CLUST:       
-    case ACTIVE_EP_REQ_CLUST:      
-        req->type.node_desc.nwk_addr = *(U16 *)data; 
+    case NODE_DESC_REQ_CLUST:
+    case PWR_DESC_REQ_CLUST:
+    case ACTIVE_EP_REQ_CLUST:
+        req->type.node_desc.nwk_addr = *(U16 *)data;
         data += sizeof(U16);
         break;
 
-    case SIMPLE_DESC_REQ_CLUST:    
-        req->type.simple_desc.nwk_addr = *(U16 *)data; 
+    case SIMPLE_DESC_REQ_CLUST:
+        req->type.simple_desc.nwk_addr = *(U16 *)data;
         data += sizeof(U16);
         req->type.simple_desc.ep = *data++;
         break;
 
     case DEV_ANNCE_REQ_CLUST:
-        req->type.dev_annce.nwk_addr = *(U16 *)data; 
-        data += sizeof(U16);      
-        req->type.dev_annce.ext_addr = *(U64 *)data; 
+        req->type.dev_annce.nwk_addr = *(U16 *)data;
+        data += sizeof(U16);
+        req->type.dev_annce.ext_addr = *(U64 *)data;
         data += sizeof(U64);
         req->type.dev_annce.capab_info = *data++;
         break;
 
-    case NWK_DISC_REQ_CLUST:       
-        req->type.nwk_disc.scan_channels = *(U32 *)data; 
+    case NWK_DISC_REQ_CLUST:
+        req->type.nwk_disc.scan_channels = *(U32 *)data;
         data += sizeof(U32);
         req->type.nwk_disc.scan_duration = *data++;
         req->type.nwk_disc.start_index = *data++;
@@ -120,21 +120,21 @@ U8 zdo_parse_req(U16 addr, U8 *data_in, U16 clust, zdo_req_t *req)
     case NWK_PERMIT_JOIN_REQ_CLUST:
         req->type.permit_join.duration = *data++;
         req->type.permit_join.tc_sig = *data++;
-        break;        
+        break;
 
-    case NWK_UPDATE_REQ_CLUST:     
-        req->type.nwk_update.scan_channels = *(U32 *)data; 
+    case NWK_UPDATE_REQ_CLUST:
+        req->type.nwk_update.scan_channels = *(U32 *)data;
         data += sizeof(U32);
         req->type.nwk_update.scan_duration = *data++;
 
         if (req->type.nwk_update.scan_duration == 0xFE)
         {
-            req->type.nwk_update.nwk_update_id = *data++; 
+            req->type.nwk_update.nwk_update_id = *data++;
         }
         else if (req->type.nwk_update.scan_duration == 0xFF)
         {
             req->type.nwk_update.nwk_update_id = *data++;
-            req->type.nwk_update.nwk_mngr_addr = *(U16 *)data; 
+            req->type.nwk_update.nwk_mngr_addr = *(U16 *)data;
             data += sizeof(U16);
         }
         else if (req->type.nwk_update.scan_duration <= 5)
@@ -161,16 +161,16 @@ U8 zdo_parse_req(U16 addr, U8 *data_in, U16 clust, zdo_req_t *req)
 
     case BIND_REQ_CLUST:
     case UNBIND_REQ_CLUST:
-        req->type.bind.src_addr = *(U64 *)data; 
+        req->type.bind.src_addr = *(U64 *)data;
         data += sizeof(U64);
         req->type.bind.src_ep = *data++;
-        req->type.bind.clust = *(U16 *)data; 
+        req->type.bind.clust = *(U16 *)data;
         data += sizeof(U16);
         req->type.bind.dest_addr.mode = *data++;
 
         if (req->type.bind.dest_addr.mode == BIND_GRP_ADDR)
         {
-            req->type.bind.dest_addr.short_addr = *(U16 *)data; 
+            req->type.bind.dest_addr.short_addr = *(U16 *)data;
             data += sizeof(U16);
         }
         else if (req->type.bind.dest_addr.mode == BIND_EXT_ADDR)
@@ -190,7 +190,7 @@ U8 zdo_parse_req(U16 addr, U8 *data_in, U16 clust, zdo_req_t *req)
 /**************************************************************************/
 /*!
         Parse the raw data response frame and fill out the response structure that
-        was passed into the frame. Return the status of the response parsing 
+        was passed into the frame. Return the status of the response parsing
         operation.
 */
 /**************************************************************************/

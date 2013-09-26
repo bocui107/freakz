@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -36,7 +36,7 @@
 /*!
     \file test_zcl.c
     \ingroup test_sim
- 
+
     This file is meant to test the ZCL functionality of the stack.
 */
 /**************************************************************************/
@@ -111,11 +111,11 @@ static zcl_clust_t *test_zcl_clust_list[] =
     &id_clust,
     &level_clust,
     NULL
-}; 
+};
 
 /**************************************************************************/
 /*!
-    
+
 */
 /**************************************************************************/
 void test_zcl_init()
@@ -157,7 +157,7 @@ void test_zcl_rx_handler(U8 *data, U8 len, U16 src_addr, U8 src_ep, U16 clust_id
 
     zcl_parse_hdr(data, len, &hdr);
     debug_dump_zcl_frm(data, &hdr, clust_id);
-    
+
     if (hdr.frm_ctrl.frm_type == ZCL_FRM_TYPE_GENERAL)
     {
         zcl_cmd_handler(resp, &resp_len, src_addr, src_ep, TEST_ZCL_STACK_PROF_HA, clust, &hdr);
@@ -170,7 +170,7 @@ void test_zcl_rx_handler(U8 *data, U8 len, U16 src_addr, U8 src_ep, U16 clust_id
         }
     }
 
-    // if resp_len is zero, that probably means we got a write attrib no response command. in that case, don't 
+    // if resp_len is zero, that probably means we got a write attrib no response command. in that case, don't
     // return a response.
     if (resp_len)
     {
@@ -295,7 +295,7 @@ void test_zcl_read_attrib(U8 argc, char **argv)
     hdr.seq_num                 = zcl_get_seq_num();
     hdr.cmd                     = ZCL_CMD_READ_ATTRIB;
     len = zcl_gen_read_attrib(data_out, &hdr, attrib_list, argc-3);
-    af_tx(data_out, len, TEST_ZCL_EP, dest_addr, TEST_ZCL_EP, clust_id, TEST_ZCL_STACK_PROF_HA, APS_DEST_ADDR_16_EP_PRESENT, 0, ZIGBEE_DEFAULT_RADIUS, af_handle_get()); 
+    af_tx(data_out, len, TEST_ZCL_EP, dest_addr, TEST_ZCL_EP, clust_id, TEST_ZCL_STACK_PROF_HA, APS_DEST_ADDR_16_EP_PRESENT, 0, ZIGBEE_DEFAULT_RADIUS, af_handle_get());
 }
 
 /**************************************************************************/
@@ -346,7 +346,7 @@ void test_zcl_write_attrib(U8 argc, char **argv)
     hdr.seq_num                 = zcl_get_seq_num();
     hdr.cmd                     = ZCL_CMD_WRITE_ATTRIB;
     len = zcl_gen_write_attrib(data_out, &hdr, attrib_list, j);
-    af_tx(data_out, len, TEST_ZCL_EP, dest_addr, TEST_ZCL_EP, clust_id, TEST_ZCL_STACK_PROF_HA, APS_DEST_ADDR_16_EP_PRESENT, 0, ZIGBEE_DEFAULT_RADIUS, af_handle_get()); 
+    af_tx(data_out, len, TEST_ZCL_EP, dest_addr, TEST_ZCL_EP, clust_id, TEST_ZCL_STACK_PROF_HA, APS_DEST_ADDR_16_EP_PRESENT, 0, ZIGBEE_DEFAULT_RADIUS, af_handle_get());
 }
 
 /**************************************************************************/
@@ -379,7 +379,7 @@ void test_zcl_disc_attrib(U8 argc, char **argv)
     hdr.seq_num                 = zcl_get_seq_num();
     hdr.cmd                     = ZCL_CMD_DISC_ATTRIB;
     len = zcl_gen_disc_attrib(data_out, &hdr, start_id, max_attribs);
-    af_tx(data_out, len, TEST_ZCL_EP, 0, TEST_ZCL_EP, clust_id, TEST_ZCL_STACK_PROF_HA, APS_DEST_ADDR_16_EP_PRESENT, 0, ZIGBEE_DEFAULT_RADIUS, af_handle_get()); 
+    af_tx(data_out, len, TEST_ZCL_EP, 0, TEST_ZCL_EP, clust_id, TEST_ZCL_STACK_PROF_HA, APS_DEST_ADDR_16_EP_PRESENT, 0, ZIGBEE_DEFAULT_RADIUS, af_handle_get());
 }
 
 /**************************************************************************/
@@ -419,7 +419,7 @@ void test_zcl_config_rpt(U8 argc, char **argv)
     hdr.seq_num                 = zcl_get_seq_num();
     hdr.cmd                     = ZCL_CMD_CONFIG_REPORT;
     len = zcl_gen_config_rpt(data_out, &hdr, clust, attrib_id, 0, timeout, 0);
-    af_tx(data_out, len, TEST_ZCL_EP, dest_addr, TEST_ZCL_EP, clust_id, TEST_ZCL_STACK_PROF_HA, APS_DEST_ADDR_16_EP_PRESENT, 0, ZIGBEE_DEFAULT_RADIUS, af_handle_get()); 
+    af_tx(data_out, len, TEST_ZCL_EP, dest_addr, TEST_ZCL_EP, clust_id, TEST_ZCL_STACK_PROF_HA, APS_DEST_ADDR_16_EP_PRESENT, 0, ZIGBEE_DEFAULT_RADIUS, af_handle_get());
 }
 
 /**************************************************************************/
@@ -450,7 +450,7 @@ void test_zcl_on_off_req(U8 argc, char **argv)
     hdr.seq_num                 = zcl_get_seq_num();
 
     len = zcl_on_off_gen_req(data_out, &hdr);
-    af_tx(data_out, len, TEST_ZCL_EP, dest_addr, TEST_ZCL_EP, ZCL_ON_OFF_CLUST_ID, TEST_ZCL_STACK_PROF_HA, APS_DEST_ADDR_16_EP_PRESENT, 0, ZIGBEE_DEFAULT_RADIUS, af_handle_get()); 
+    af_tx(data_out, len, TEST_ZCL_EP, dest_addr, TEST_ZCL_EP, ZCL_ON_OFF_CLUST_ID, TEST_ZCL_STACK_PROF_HA, APS_DEST_ADDR_16_EP_PRESENT, 0, ZIGBEE_DEFAULT_RADIUS, af_handle_get());
 }
 
 /**************************************************************************/
@@ -481,7 +481,7 @@ void test_zcl_id_req(U8 argc, char **argv)
     hdr.seq_num                 = zcl_get_seq_num();
 
     len = zcl_id_gen_req(data_out, &hdr, timeout);
-    af_tx(data_out, len, TEST_ZCL_EP, dest_addr, TEST_ZCL_EP, ZCL_IDENTIFY_CLUST_ID, TEST_ZCL_STACK_PROF_HA, APS_DEST_ADDR_16_EP_PRESENT, 0, ZIGBEE_DEFAULT_RADIUS, af_handle_get()); 
+    af_tx(data_out, len, TEST_ZCL_EP, dest_addr, TEST_ZCL_EP, ZCL_IDENTIFY_CLUST_ID, TEST_ZCL_STACK_PROF_HA, APS_DEST_ADDR_16_EP_PRESENT, 0, ZIGBEE_DEFAULT_RADIUS, af_handle_get());
 }
 
 /**************************************************************************/
@@ -517,7 +517,7 @@ void test_zcl_level_move_to_req(U8 argc, char **argv)
     req.move_to_level.trans_time    = trans_time;
 
     len = zcl_level_gen_req(data_out, &hdr, &req);
-    af_tx(data_out, len, TEST_ZCL_EP, dest_addr, TEST_ZCL_EP, ZCL_LEVEL_CLUST_ID, TEST_ZCL_STACK_PROF_HA, APS_DEST_ADDR_16_EP_PRESENT, 0, ZIGBEE_DEFAULT_RADIUS, af_handle_get()); 
+    af_tx(data_out, len, TEST_ZCL_EP, dest_addr, TEST_ZCL_EP, ZCL_LEVEL_CLUST_ID, TEST_ZCL_STACK_PROF_HA, APS_DEST_ADDR_16_EP_PRESENT, 0, ZIGBEE_DEFAULT_RADIUS, af_handle_get());
 }
 
 /**************************************************************************/
@@ -553,7 +553,7 @@ void test_zcl_level_move_req(U8 argc, char **argv)
     req.move.rate   = rate;
 
     len = zcl_level_gen_req(data_out, &hdr, &req);
-    af_tx(data_out, len, TEST_ZCL_EP, dest_addr, TEST_ZCL_EP, ZCL_LEVEL_CLUST_ID, TEST_ZCL_STACK_PROF_HA, APS_DEST_ADDR_16_EP_PRESENT, 0, ZIGBEE_DEFAULT_RADIUS, af_handle_get()); 
+    af_tx(data_out, len, TEST_ZCL_EP, dest_addr, TEST_ZCL_EP, ZCL_LEVEL_CLUST_ID, TEST_ZCL_STACK_PROF_HA, APS_DEST_ADDR_16_EP_PRESENT, 0, ZIGBEE_DEFAULT_RADIUS, af_handle_get());
 }
 
 /**************************************************************************/
@@ -591,7 +591,7 @@ void test_zcl_level_step_req(U8 argc, char **argv)
     req.step.trans_time = trans_time;
 
     len = zcl_level_gen_req(data_out, &hdr, &req);
-    af_tx(data_out, len, TEST_ZCL_EP, dest_addr, TEST_ZCL_EP, ZCL_LEVEL_CLUST_ID, TEST_ZCL_STACK_PROF_HA, APS_DEST_ADDR_16_EP_PRESENT, 0, ZIGBEE_DEFAULT_RADIUS, af_handle_get()); 
+    af_tx(data_out, len, TEST_ZCL_EP, dest_addr, TEST_ZCL_EP, ZCL_LEVEL_CLUST_ID, TEST_ZCL_STACK_PROF_HA, APS_DEST_ADDR_16_EP_PRESENT, 0, ZIGBEE_DEFAULT_RADIUS, af_handle_get());
 }
 
 /**************************************************************************/
@@ -621,5 +621,5 @@ void test_zcl_level_stop_req(U8 argc, char **argv)
     hdr.seq_num                 = zcl_get_seq_num();
 
     len = zcl_level_gen_req(data_out, &hdr, NULL);
-    af_tx(data_out, len, TEST_ZCL_EP, dest_addr, TEST_ZCL_EP, ZCL_LEVEL_CLUST_ID, TEST_ZCL_STACK_PROF_HA, APS_DEST_ADDR_16_EP_PRESENT, 0, ZIGBEE_DEFAULT_RADIUS, af_handle_get()); 
+    af_tx(data_out, len, TEST_ZCL_EP, dest_addr, TEST_ZCL_EP, ZCL_LEVEL_CLUST_ID, TEST_ZCL_STACK_PROF_HA, APS_DEST_ADDR_16_EP_PRESENT, 0, ZIGBEE_DEFAULT_RADIUS, af_handle_get());
 }

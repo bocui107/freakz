@@ -62,7 +62,7 @@
 /*============================ MACROS ========================================*/
 
 // TEST CODE
-#define TRIG1 DDRB |= 0x04, PINB |= 0x04 	///< Trigger for oscope channel 1   
+#define TRIG1 DDRB |= 0x04, PINB |= 0x04 	///< Trigger for oscope channel 1
 #define TRIG2 DDRD |= 0x80, PIND |= 0x80	///< Trigger for oscope channel 2
 
 /** \name This is the list of pin configurations needed for a given platform.

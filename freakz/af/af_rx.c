@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -47,9 +47,9 @@
 /*!
         List head for the AF RX queue. Mainly used to provide a break in the receive path so
         that the MCU won't get hogged processing the rx frame. Otherwise, since
-        I have no control over the application code that processes the incoming 
+        I have no control over the application code that processes the incoming
         frame, it could end up using up a lot of MCU time and causing problems.
-*/      
+*/
 /**************************************************************************/
 LIST(af_rx_queue);
 
@@ -115,7 +115,7 @@ void af_rx_add(buffer_t *buf, const aps_hdr_t *hdr)
         RX_ENTRY(mem_ptr)->dest_ep  = hdr->dest_ep;
         RX_ENTRY(mem_ptr)->clust_id = hdr->clust_id;
         RX_ENTRY(mem_ptr)->grp_id   = hdr->grp_addr;
-        RX_ENTRY(mem_ptr)->grp_mode = (hdr->aps_frm_ctrl.delivery_mode == APS_GROUP); 
+        RX_ENTRY(mem_ptr)->grp_mode = (hdr->aps_frm_ctrl.delivery_mode == APS_GROUP);
     }
 }
 

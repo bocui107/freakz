@@ -83,7 +83,7 @@ void drvr_at86_reset()
 /**************************************************************************/
 /*!
     Reset the finite state machine inside the AT86RF23x device. The timing
-    is required as mentioned in the datasheet. 
+    is required as mentioned in the datasheet.
 */
 /**************************************************************************/
 void drvr_reset_fsm()
@@ -267,7 +267,7 @@ U8 drvr_get_channel()
     amount of delay as the hardware and PLL sync up to the new channel. This
     function also returns a status in case the channel change was unsuccessful.
     In a normal case, this would probably only happen if the channel that was
-    set is outside the 16 channels supported by 802.15.4. 
+    set is outside the 16 channels supported by 802.15.4.
 */
 /**************************************************************************/
 U8 drvr_set_channel(U8 channel)
@@ -308,7 +308,7 @@ void drvr_set_coord(bool coord)
 
 /**************************************************************************/
 /*!
-    Get the coordinator bit from the hardware. 
+    Get the coordinator bit from the hardware.
 */
 /**************************************************************************/
 bool drvr_get_coord()
@@ -457,7 +457,7 @@ void drvr_set_ext_addr(U64 addr)
 
 /**************************************************************************/
 /*!
-    Get the extended address. 
+    Get the extended address.
 */
 /**************************************************************************/
 U64 drvr_get_ext_addr()
@@ -477,7 +477,7 @@ U64 drvr_get_ext_addr()
     Configure the CSMA. This consists of setting the number of frame retries (in case
     of tx failure)...actually, it's not part of CSMA but thought it should go in here,
     the max CSMA retries (ie: number of CSMA backoffs allowed), the min backoff exponent,
-    and the CSMA seeds. When two devices try to transmit at the same time, 
+    and the CSMA seeds. When two devices try to transmit at the same time,
 */
 /**************************************************************************/
 U8 drvr_config_csma(U8 seed0, U8 seed1, U8 min_be, U8 frame_retries, U8 csma_retries)
@@ -538,7 +538,7 @@ U8 drvr_get_cca()
 
 /**************************************************************************/
 /*!
-        Get the energy detection value for the current channel. This normally 
+        Get the energy detection value for the current channel. This normally
         used in network formation to find a channel with low activity.
 */
 /**************************************************************************/
@@ -553,8 +553,8 @@ U8 drvr_get_ed()
 
 /**************************************************************************/
 /*!
-        Set the TX/RX state machine state. Some manual manipulation is required 
-        for certain operations. Check the datasheet for more details on the state 
+        Set the TX/RX state machine state. Some manual manipulation is required
+        for certain operations. Check the datasheet for more details on the state
         machine and manipulations.
 */
 /**************************************************************************/
@@ -722,16 +722,16 @@ void drvr_init()
 
 /**************************************************************************/
 /*!
-        The Contiki driver process will poll this function constantly. The poll 
-        function does two things: 
+        The Contiki driver process will poll this function constantly. The poll
+        function does two things:
         1) Check for received data
         2) Check for the status after a transmission
 
-        The received data flag will trigger the MAC layer to pick up the frame 
+        The received data flag will trigger the MAC layer to pick up the frame
         from the queue and start to process it.
 
         If a transmit status is available, then it will generate a confirm that
-        gets propagated up the stack.  
+        gets propagated up the stack.
 */
 /**************************************************************************/
 static void pollhandler()
@@ -770,7 +770,7 @@ static void pollhandler()
 /**************************************************************************/
 /*!
         The main process for the driver. Actually this process doesn't do anything
-        other than call the polling function. 
+        other than call the polling function.
 
         According to the Contiki documentation, an ISR cannot signal a process event
         directly, so a polling function needs to be used.

@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -230,7 +230,7 @@ void zcl_scenes_rx_handler(U8 *resp, U8 *resp_len, U16 addr, U8 ep, zcl_clust_t 
         entry.id = *data_ptr++;
         entry.trans_time = *(U16 *)data_ptr;
         data_ptr += sizeof(U16);
-        
+
         // copy name only if its less than the max name size
         if ((len = strlen(data_ptr)) < ZCL_SCENES_NAME_MAX_LEN)
         {
@@ -242,13 +242,13 @@ void zcl_scenes_rx_handler(U8 *resp, U8 *resp_len, U16 addr, U8 ep, zcl_clust_t 
         len = hdr->payload_len - (data_ptr - hdr->payload);
 
         // limit the max len of the extension fields
-        entry.ext_len = (len > ZCL_SCENES_EXT_MAX_LEN) ? ZCL_SCENES_EXT_MAX_LEN : len; 
+        entry.ext_len = (len > ZCL_SCENES_EXT_MAX_LEN) ? ZCL_SCENES_EXT_MAX_LEN : len;
         if (entry.ext_len)
         {
             memcpy(entry.ext_field, data_ptr, entry.ext_len);
             data_ptr += entry.ext_len;
         }
-        
+
         // add to the scene table
         status = zcl_scenes_tbl_add(entry);
 
@@ -266,7 +266,7 @@ void zcl_scenes_rx_handler(U8 *resp, U8 *resp_len, U16 addr, U8 ep, zcl_clust_t 
 
     case ZCL_SCENES_CMD_VEIW:
         entry.id = *data_ptr++;
-        
+
         // gen response hdr
         resp_hdr.cmd = ZCL_SCENES_CMD_VIEW_RESP;
         len = zcl_gen_hdr(resp_ptr, &resp_hdr);
@@ -289,7 +289,7 @@ void zcl_scenes_rx_handler(U8 *resp, U8 *resp_len, U16 addr, U8 ep, zcl_clust_t 
         *resp_ptr++ = entry.id;
         *(U16 *)resp_ptr = ZCL_SCENES_ENTRY(mem_ptr)->trans_time;
         resp_ptr += sizeof(U16);
-        
+
         // copy in the name
         len = strlen(ZCL_SCENES_ENTRY(mem_ptr)->name);
         memcpy(resp_ptr, ZCL_SCENES_ENTRY(mem_ptr)->name, len);
@@ -300,7 +300,7 @@ void zcl_scenes_rx_handler(U8 *resp, U8 *resp_len, U16 addr, U8 ep, zcl_clust_t 
         memcpy(resp_ptr, ZCL_SCENES_ENTRY(mem_ptr)->ext_field, len);
         resp_ptr += len;
         break;
-            
+
     case ZCL_SCENES_CMD_REM:
         entry.id = *data_ptr++;
         status = zcl_scenes_tbl_rem(entry.grp_id, entry.id);
@@ -316,7 +316,7 @@ void zcl_scenes_rx_handler(U8 *resp, U8 *resp_len, U16 addr, U8 ep, zcl_clust_t 
         resp_ptr += sizeof(U16);
         *resp_ptr++ = entry.id;
         break;
-             
+
     case ZCL_SCENES_CMD_REM_ALL:
         status = zcl_scenes_tbl_clear(entry.grp_id);
 
@@ -330,7 +330,7 @@ void zcl_scenes_rx_handler(U8 *resp, U8 *resp_len, U16 addr, U8 ep, zcl_clust_t 
         *(U16 *)resp_ptr = entry.grp_id;
         resp_ptr += sizeof(U16);
         break;
-         
+
     case ZCL_SCENES_CMD_STORE:
         // need to handle this one in the action_handler
         entry.id = *data_ptr++;
@@ -357,7 +357,7 @@ void zcl_scenes_rx_handler(U8 *resp, U8 *resp_len, U16 addr, U8 ep, zcl_clust_t 
 
         if (!hdr->frm_ctrl.dis_def_resp)
         {
-            // gen the status. we don't get the status returned to us from the action handler so we have to figure 
+            // gen the status. we don't get the status returned to us from the action handler so we have to figure
             // it out for ourselves
             status = (zcl_scenes_tbl_find(entry.grp_id, entry.id) == NULL) ? ZCL_STATUS_NOT_FOUND : ZCL_STATUS_SUCCESS;
             len = zcl_gen_def_resp(resp_ptr, status, hdr);
@@ -400,7 +400,7 @@ void zcl_scenes_rx_handler(U8 *resp, U8 *resp_len, U16 addr, U8 ep, zcl_clust_t 
 /**************************************************************************/
 U8 zcl_scenes_gen_req(U8 *data, zcl_hdr_t *hdr, zcl_scenes_entry_t *entry)
 {
-    U8 len, *data_ptr; 
+    U8 len, *data_ptr;
 
     // gen the zcl hdr first
     data_ptr = data;

@@ -40,7 +40,7 @@
 void
 init_net(void)
 {
-    
+
 
 /*  uip_ipaddr_t ipprefix;
 
@@ -48,5 +48,5 @@ init_net(void)
 
   uip_netif_addr_add(&ipprefix, UIP_DEFAULT_PREFIX_LEN, 0, AUTOCONF);
   uip_nd6_prefix_add(&ipprefix, UIP_DEFAULT_PREFIX_LEN, 0);
-*/    
+*/
 }

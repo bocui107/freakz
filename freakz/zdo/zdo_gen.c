@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -52,7 +52,7 @@
 /*!
     This is where all the requests in the ZDO are generated. A request structure
     and dest address is passed in. From there, the request is generated and
-    sent out. 
+    sent out.
 */
 /**************************************************************************/
 U8 zdo_gen_req(U16 dest_addr, zdo_req_t *params)
@@ -64,52 +64,52 @@ U8 zdo_gen_req(U16 dest_addr, zdo_req_t *params)
 
     switch (params->clust)
     {
-    /************************************************************************/    
-    // ZDO Discovery Manager requests    
-    /************************************************************************/    
+    /************************************************************************/
+    // ZDO Discovery Manager requests
+    /************************************************************************/
     case NWK_ADDR_REQ_CLUST:
-        *(U64 *)req = params->type.nwk_addr.ext_addr; 
+        *(U64 *)req = params->type.nwk_addr.ext_addr;
         req += sizeof(U64);
         *req++ = params->type.nwk_addr.req_type;
         *req++ = params->type.nwk_addr.start_index;
         break;
 
     case IEEE_ADDR_REQ_CLUST:
-        *(U16 *)req = params->type.ieee_addr.nwk_addr; 
+        *(U16 *)req = params->type.ieee_addr.nwk_addr;
         req += sizeof(U16);
         *req++ = params->type.ieee_addr.req_type;
         *req++ = params->type.ieee_addr.start_index;
         break;
 
-    case NODE_DESC_REQ_CLUST:  
+    case NODE_DESC_REQ_CLUST:
     case PWR_DESC_REQ_CLUST:
-    case ACTIVE_EP_REQ_CLUST: 
-        *(U16 *)req = params->type.node_desc.nwk_addr; 
+    case ACTIVE_EP_REQ_CLUST:
+        *(U16 *)req = params->type.node_desc.nwk_addr;
         req += sizeof(U16);
-        break;   
+        break;
 
-    case SIMPLE_DESC_REQ_CLUST:   
-        *(U16 *)req = params->type.simple_desc.nwk_addr; 
+    case SIMPLE_DESC_REQ_CLUST:
+        *(U16 *)req = params->type.simple_desc.nwk_addr;
         req += sizeof(U16);
-        *req++ = params->type.simple_desc.ep; 
-        break;     
+        *req++ = params->type.simple_desc.ep;
+        break;
 
     case DEV_ANNCE_REQ_CLUST:
-        *(U16 *)req = params->type.dev_annce.nwk_addr; 
+        *(U16 *)req = params->type.dev_annce.nwk_addr;
         req += sizeof(U16);
-        *(U64 *)req = params->type.dev_annce.ext_addr; 
+        *(U64 *)req = params->type.dev_annce.ext_addr;
         req += sizeof(U64);
         *req++ = params->type.dev_annce.capab_info;
         break;
 
-    /************************************************************************/    
-    // ZDO Network Manager requests    
-    /************************************************************************/    
+    /************************************************************************/
+    // ZDO Network Manager requests
+    /************************************************************************/
     case NWK_DISC_REQ_CLUST:
-        *(U32 *)req = params->type.nwk_disc.scan_channels; 
+        *(U32 *)req = params->type.nwk_disc.scan_channels;
         req += sizeof(U32);
         *req++ = params->type.nwk_disc.scan_duration;
-        *req++ = params->type.nwk_disc.start_index;  
+        *req++ = params->type.nwk_disc.start_index;
         break;
 
     case NWK_LQI_REQ_CLUST:
@@ -136,10 +136,10 @@ U8 zdo_gen_req(U16 dest_addr, zdo_req_t *params)
         device/s to add or remove channels to the mask.
         - Energy scan. Scan the network and report back the energy conditions on each
         channel. The info can then be used to see if a channel switch is necessary
-        (freq agility) and which channel to switch to.     
-        */ 
+        (freq agility) and which channel to switch to.
+        */
 
-        *(U32 *)req = params->type.nwk_update.scan_channels; 
+        *(U32 *)req = params->type.nwk_update.scan_channels;
         req += sizeof(U32);
         *req++ = params->type.nwk_update.scan_duration;
 
@@ -152,7 +152,7 @@ U8 zdo_gen_req(U16 dest_addr, zdo_req_t *params)
         {
             // requesting a new channel mask and nwk manager address
             *req++ = params->type.nwk_update.nwk_update_id;
-            *(U16 *)req = params->type.nwk_update.nwk_mngr_addr; 
+            *(U16 *)req = params->type.nwk_update.nwk_mngr_addr;
             req += sizeof(U16);
         }
         else if (params->type.nwk_update.scan_duration <= 5)
@@ -161,32 +161,32 @@ U8 zdo_gen_req(U16 dest_addr, zdo_req_t *params)
         }
         break;
 
-    /************************************************************************/    
-    // ZDO Binding Manager requests    
-    /************************************************************************/    
+    /************************************************************************/
+    // ZDO Binding Manager requests
+    /************************************************************************/
     case END_DEV_BIND_REQ_CLUST:
-        *(U16 *)req = params->type.ed_bind.target;       
+        *(U16 *)req = params->type.ed_bind.target;
         req += sizeof(U16);
-        *(U64 *)req = params->type.ed_bind.src_ext_addr; 
+        *(U64 *)req = params->type.ed_bind.src_ext_addr;
         req += sizeof(U64);
         *req++ = params->type.ed_bind.src_ep;
-        *(U16 *)req = params->type.ed_bind.prof_id;      
+        *(U16 *)req = params->type.ed_bind.prof_id;
         req += sizeof(U16);
         *req++ = params->type.ed_bind.num_in_clust;
-        memcpy(req, params->type.ed_bind.in_clust, params->type.ed_bind.num_in_clust * 2); 
-        req += 2 * params->type.ed_bind.num_in_clust; 
+        memcpy(req, params->type.ed_bind.in_clust, params->type.ed_bind.num_in_clust * 2);
+        req += 2 * params->type.ed_bind.num_in_clust;
         *req++ = params->type.ed_bind.num_out_clust;
-        memcpy(req, params->type.ed_bind.out_clust, params->type.ed_bind.num_out_clust * 2); 
+        memcpy(req, params->type.ed_bind.out_clust, params->type.ed_bind.num_out_clust * 2);
         req += 2 * params->type.ed_bind.num_out_clust;
         break;
 
     case BIND_REQ_CLUST:
     case UNBIND_REQ_CLUST:
         // bind and unbind requests have the same format. The only difference is the target cluster.
-        *(U64 *)req = params->type.bind.src_addr;    
+        *(U64 *)req = params->type.bind.src_addr;
         req += sizeof(U64);
-        *req++ = params->type.bind.src_ep; 
-        *(U16 *)req = params->type.bind.clust;       
+        *req++ = params->type.bind.src_ep;
+        *(U16 *)req = params->type.bind.clust;
         req += sizeof(U16);
         *req++ = params->type.bind.dest_addr.mode;
 
@@ -195,13 +195,13 @@ U8 zdo_gen_req(U16 dest_addr, zdo_req_t *params)
         if (params->type.bind.dest_addr.mode == BIND_GRP_ADDR)
         {
             // if the dest addr is for group addr, then don't include the dest ep
-            *(U16 *)req = params->type.bind.dest_addr.short_addr; 
+            *(U16 *)req = params->type.bind.dest_addr.short_addr;
             req += sizeof(U16);
         }
         else if (params->type.bind.dest_addr.mode == BIND_EXT_ADDR)
         {
             // if the dest addr is an extended one, then include the dest ep
-            *(U64 *)req = params->type.bind.dest_addr.long_addr;  
+            *(U64 *)req = params->type.bind.dest_addr.long_addr;
             req += sizeof(U64);
             *req++ = params->type.bind.dest_ep;
         }

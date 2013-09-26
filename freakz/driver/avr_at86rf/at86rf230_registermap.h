@@ -1,7 +1,7 @@
 /**
  * @file at86rf230_registermap.h
  * @brief Register definitions for the AT86RF230
- * 
+ *
  * \ingroup atdrvr
  */
 /*   Copyright (c) 2008, Swedish Institute of Computer Science

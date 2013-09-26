@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -106,7 +106,7 @@ void zcl_level_rx_handler(U8 *resp, U8 *resp_len, U16 addr, U8 ep, zcl_clust_t *
         return;
     }
     curr_level = *(U8 *)attrib->data;
-    
+
     // if bit 2 is set, then that means we need to integrate the command with the on/off cluster.
     // so first we need to detect whether or not this is the case.
     if (hdr->cmd & 0x4)
@@ -142,7 +142,7 @@ void zcl_level_rx_handler(U8 *resp, U8 *resp_len, U16 addr, U8 ep, zcl_clust_t *
 
         // calculate the remainder term. this will be used to track how much roundoff error in the
         // accumulator and adjust the step size to get to the target level within the transition time
-        rem = ((intv % trans_time) << 8) / trans_time;  
+        rem = ((intv % trans_time) << 8) / trans_time;
 
         // add the new timer
         zcl_level_tmr_add((U8 *)attrib->data, trans_time, step, rem, dir, with_on_off, clust->action_handler);
@@ -155,14 +155,14 @@ void zcl_level_rx_handler(U8 *resp, U8 *resp_len, U16 addr, U8 ep, zcl_clust_t *
         data_ptr += sizeof(U16);
 
         // calculate the step that we're going to move at. The minimum step size
-        // is 1 unit per tenth of a second. 
+        // is 1 unit per tenth of a second.
         step = (rate < 10) ? 1 : rate/10;
 
         // add the new timer
         zcl_level_tmr_add((U8 *)attrib->data, 0xffff, step, 0, dir, with_on_off, clust->action_handler);
         break;
-                             
-    case ZCL_LEVEL_CMD_STEP: 
+
+    case ZCL_LEVEL_CMD_STEP:
     case ZCL_LEVEL_CMD_STEP_WITH_ON_OFF:
         dir = *(bool *)data_ptr++;
         step = *data_ptr++;
@@ -171,13 +171,13 @@ void zcl_level_rx_handler(U8 *resp, U8 *resp_len, U16 addr, U8 ep, zcl_clust_t *
 
         // add the new timer
         zcl_level_tmr_add((U8 *)attrib->data, trans_time, step, 0, dir, with_on_off, clust->action_handler);
-        break;                     
+        break;
 
-    case ZCL_LEVEL_CMD_STOP:            
+    case ZCL_LEVEL_CMD_STOP:
     case ZCL_LEVEL_CMD_STOP_WITH_ON_OFF:
         // clear the tmr table. all actions will be stopped.
         zcl_level_tmr_clear();
-        break;                     
+        break;
     }
 
     // generate the default response
@@ -313,20 +313,20 @@ void zcl_level_tmr_periodic(void *ptr)
         dir         = ZCL_LEVEL_TMR(mem_ptr)->dir;
         rem         = ZCL_LEVEL_TMR(mem_ptr)->rem;
 
-        if (rem_time == 0) 
+        if (rem_time == 0)
         {
             // adjust the level value so that any small offset will be adjusted in the last step.
             *ZCL_LEVEL_TMR(mem_ptr)->level = level;
-            
+
             // handle any actions by sending a refresh command to the action handler
             ZCL_LEVEL_TMR(mem_ptr)->action_handler(ZCL_LEVEL_ACTION_REFRESH, mem_ptr);
 
             // the time for this operation has expired. free the timer.
             zcl_level_tmr_free(mem_ptr);
         }
-        else if ((level == 0xff) && (dir == ZCL_LEVEL_MODE_UP)) 
+        else if ((level == 0xff) && (dir == ZCL_LEVEL_MODE_UP))
         {
-            // we've reached the max level. inform the action handler in case any action is 
+            // we've reached the max level. inform the action handler in case any action is
             // to be taken. then free the timer.
             ZCL_LEVEL_TMR(mem_ptr)->action_handler(ZCL_LEVEL_ACTION_MAX_LEVEL, mem_ptr);
             zcl_level_tmr_free(mem_ptr);
@@ -343,7 +343,7 @@ void zcl_level_tmr_periodic(void *ptr)
             // now adjust the level. we need to handle the roundoff error first, otherwise we run
             // the risk of overflowing.
 
-            // this part is to handle the roundoff error accumulation. 
+            // this part is to handle the roundoff error accumulation.
             // add the remainder term to the accumulator to accumulate the roundoff error.
             // when it exceeds 0x7fff, then we will add one to the level. Just a note, the accumulator
             // is the fractional portion of the step size and it is normalized so that 0x8000 = 1. so
@@ -354,7 +354,7 @@ void zcl_level_tmr_periodic(void *ptr)
             {
                 // subtract 1 from the accumulator
                 ZCL_LEVEL_TMR(mem_ptr)->acc -= 0x100;
-                
+
                 // adjust the step size
                 level = dir ? level - 1 : level + 1;
             }
@@ -363,7 +363,7 @@ void zcl_level_tmr_periodic(void *ptr)
             if (dir)
             {
                 // we're moving downwards. if the level is less than the step size, then we
-                // will set the level to 0. otherwise, just decrement the step size.  
+                // will set the level to 0. otherwise, just decrement the step size.
                 *ZCL_LEVEL_TMR(mem_ptr)->level = (level < step) ? 0 : (level - step);
             }
             else

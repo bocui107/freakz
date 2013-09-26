@@ -92,7 +92,7 @@ rtimer_arch_init(void)
   ETIMSK &= ~((1 << OCIE3A) | (1 << OCIE3B) | (1 << TOIE3) |
       (1 << TICIE3) | (1 << OCIE3C));
   ETIFR |= (1 << ICF3) | (1 << OCF3A) | (1 << OCF3B) | (1 << TOV3) |
-  (1 << OCF3C); 
+  (1 << OCF3C);
 
   /* Default timer behaviour */
   TCCR3A = 0;

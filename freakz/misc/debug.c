@@ -1,11 +1,11 @@
 /*******************************************************************
     Copyright (C) 2009 FreakLabs
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
- 
+
     1. Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright
@@ -16,7 +16,7 @@
        without specific prior written permission.
     4. This software is subject to the additional restrictions placed on the
        Zigbee Specification's Terms of Use.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
     LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
     OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
     SUCH DAMAGE.
- 
+
     Originally written by Christopher Wang aka Akiba.
     Please post support questions to the FreakLabs forum.
 
@@ -385,7 +385,7 @@ void debug_dump_nbor_tbl()
 #if (DEBUG_NWK == 1)
     U8 i = 0;
     mem_ptr_t *mem_ptr;
-    
+
     DBG_PRINT("\n");
     for (mem_ptr = nwk_neighbor_tbl_get_head(); mem_ptr != NULL; mem_ptr = mem_ptr->next)
     {
@@ -398,8 +398,8 @@ void debug_dump_nbor_tbl()
         {
         case NWK_COORDINATOR:   DBG_PRINT("NBOR ENTRY %02X: DEV_TYPE      = %s.\n", i, "COORDINATOR");       break;
         case NWK_ROUTER:        DBG_PRINT("NBOR ENTRY %02X: DEV_TYPE      = %s.\n", i, "ROUTER");            break;
-        case NWK_END_DEVICE:    DBG_PRINT("NBOR ENTRY %02X: DEV_TYPE      = %s.\n", i, "END DEVICE");        break; 
-        default:                DBG_PRINT("NBOR ENTRY %02X: DEV_TYPE      = %s.\n", i, "INVALID DEVICE");    break; 
+        case NWK_END_DEVICE:    DBG_PRINT("NBOR ENTRY %02X: DEV_TYPE      = %s.\n", i, "END DEVICE");        break;
+        default:                DBG_PRINT("NBOR ENTRY %02X: DEV_TYPE      = %s.\n", i, "INVALID DEVICE");    break;
         }
 
         DBG_PRINT("NBOR ENTRY %02X: RX_ON_IDLE    = %s.\n", i, NBOR_ENTRY(mem_ptr)->rx_on_when_idle ? "TRUE" : "FALSE");
@@ -413,7 +413,7 @@ void debug_dump_nbor_tbl()
         case NWK_PREV_CHILD:    DBG_PRINT("NBOR ENTRY %02X: RELATION      = %s.\n", i, "PREV CHILD"); break;
         default:                DBG_PRINT("NBOR ENTRY %02X: RELATION      = %s.\n", i, "INVALID RELATION"); break;
         }
-        
+
         DBG_PRINT("NBOR ENTRY %02X: CHANNEL       = %02X.\n", i, NBOR_ENTRY(mem_ptr)->channel);
         DBG_PRINT("NBOR ENTRY %02X: DEPTH         = %02X.\n", i, NBOR_ENTRY(mem_ptr)->depth);
         DBG_PRINT("NBOR ENTRY %02X: PERMIT_JOIN   = %s.\n", i, NBOR_ENTRY(mem_ptr)->permit_join ? "TRUE" : "FALSE");
@@ -428,7 +428,7 @@ void debug_dump_nbor_tbl()
 
 /**************************************************************************/
 /*!
-        Converts the network status value into a human readable string for easy 
+        Converts the network status value into a human readable string for easy
         debugging. No more 802.15.4 spec lookups!
 */
 /**************************************************************************/
@@ -438,8 +438,8 @@ static char *debug_dump_nwk_status(U8 status)
     switch (status)
     {
     case NWK_SUCCESS:               return "NWK_SUCCESS";               break;
-    case NWK_INVALID_PARAMETER:     return "NWK_INVALID_PARAMETER";     break;           
-    case NWK_INVALID_REQUEST:       return "NWK_INVALID_REQUEST";       break; 
+    case NWK_INVALID_PARAMETER:     return "NWK_INVALID_PARAMETER";     break;
+    case NWK_INVALID_REQUEST:       return "NWK_INVALID_REQUEST";       break;
     case NWK_NOT_PERMITTED:         return "NWK_NOT_PERMITTED";         break;
     case NWK_STARTUP_FAILURE:       return "NWK_STARTUP_FAILURE";       break;
     case NWK_ALREADY_PRESENT:       return "NWK_ALREADY_PRESENT";       break;
@@ -463,7 +463,7 @@ static char *debug_dump_nwk_status(U8 status)
 
 /**************************************************************************/
 /*!
-        Dump the routing table. 
+        Dump the routing table.
 */
 /**************************************************************************/
 void debug_dump_rte_tbl()
@@ -495,8 +495,8 @@ void debug_dump_bnd_tbl()
 
     for (mem_ptr = aps_bind_get_head(); mem_ptr != NULL; mem_ptr = mem_ptr->next)
     {
-        DBG_PRINT("BIND ENTRY %02X: SRC EP        = %02X.\n", i, BIND_ENTRY(mem_ptr)->src_ep);   
-        DBG_PRINT("BIND ENTRY %02X: CLUST ID      = %04X.\n", i, BIND_ENTRY(mem_ptr)->clust);   
+        DBG_PRINT("BIND ENTRY %02X: SRC EP        = %02X.\n", i, BIND_ENTRY(mem_ptr)->src_ep);
+        DBG_PRINT("BIND ENTRY %02X: CLUST ID      = %04X.\n", i, BIND_ENTRY(mem_ptr)->clust);
         DBG_PRINT("BIND ENTRY %02X: DEST ADDR MDE = %s.\n", i, (BIND_ENTRY(mem_ptr)->dest_addr.mode == SHORT_ADDR) ? "SHORT ADDR" : "LONG ADDR");
         if (BIND_ENTRY(mem_ptr)->dest_addr.mode == SHORT_ADDR)
         {
@@ -506,8 +506,8 @@ void debug_dump_bnd_tbl()
         {
             DBG_PRINT("BIND_ENTRY %02X: DEST_ADDR     = %016llX.\n", i, BIND_ENTRY(mem_ptr)->dest_addr.long_addr);
         }
-           
-        DBG_PRINT("BIND ENTRY %02X: DEST EP       = %02X.\n", i, BIND_ENTRY(mem_ptr)->dest_ep);   
+
+        DBG_PRINT("BIND ENTRY %02X: DEST EP       = %02X.\n", i, BIND_ENTRY(mem_ptr)->dest_ep);
         i++;
     }
 #endif
@@ -806,13 +806,13 @@ static void debug_dump_nbor_entry(zdo_resp_t *resp, U8 *data)
         data += sizeof(U64);
         DBG_PRINT("LIST_ENTRY %02X: NWK ADDR      = %04X.\n", i, *(U16 *)data);
         data += sizeof(U16);
-        
+
         tmp = *data++;
         switch (tmp & 0x3)
         {
-        case 0: DBG_PRINT("LIST_ENTRY %02X: DEV TYPE      = %s.\n", i, "COORDINATOR"); break; 
-        case 1: DBG_PRINT("LIST_ENTRY %02X: DEV TYPE      = %s.\n", i, "ROUTER"); break; 
-        case 2: DBG_PRINT("LIST_ENTRY %02X: DEV TYPE      = %s.\n", i, "END DEVICE"); break; 
+        case 0: DBG_PRINT("LIST_ENTRY %02X: DEV TYPE      = %s.\n", i, "COORDINATOR"); break;
+        case 1: DBG_PRINT("LIST_ENTRY %02X: DEV TYPE      = %s.\n", i, "ROUTER"); break;
+        case 2: DBG_PRINT("LIST_ENTRY %02X: DEV TYPE      = %s.\n", i, "END DEVICE"); break;
         }
 
         DBG_PRINT("LIST_ENTRY %02X: NWK ADDR      = %02X.\n", i, *(U16 *)data);
@@ -826,8 +826,8 @@ static void debug_dump_nbor_entry(zdo_resp_t *resp, U8 *data)
         case 3: DBG_PRINT("LIST_ENTRY %02X: RELATION      = %s.\n", i, "NONE"); break;
         }
 
-        DBG_PRINT("LIST_ENTRY %02X: PERMIT JOIN   = %02X.\n", i, *data & 0x1); 
-        data++;                                   
+        DBG_PRINT("LIST_ENTRY %02X: PERMIT JOIN   = %02X.\n", i, *data & 0x1);
+        data++;
         DBG_PRINT("LIST_ENTRY %02X: DEPTH         = %02X.\n", i, *data);
         data++;
         DBG_PRINT("LIST_ENTRY %02X: LQI           = %02X.\n", i, *data);
@@ -941,7 +941,7 @@ void debug_dump_zdo_resp(zdo_resp_t *resp, U8 *data)
         DBG_PRINT("DUMP_ZDO_RESP: RESP          = %s.\n", "NWK LEAVE RESPONSE");
         DBG_PRINT("DUMP_ZDO_RESP: STATUS        = %s.\n", debug_dump_af_status(resp->type.leave.status));
         break;
-        
+
     case NWK_UPDATE_RESP_CLUST:
         DBG_PRINT("DUMP_ZDO_RESP: RESP          = %s.\n", "NWK UPDATE RESPONSE");
         DBG_PRINT("DUMP_ZDO_RESP: STATUS        = %s.\n", debug_dump_af_status(resp->type.nwk_update.status));
@@ -949,7 +949,7 @@ void debug_dump_zdo_resp(zdo_resp_t *resp, U8 *data)
         DBG_PRINT("DUMP_ZDO_RESP: XMITS         = %04X.\n", resp->type.nwk_update.total_xmits);
         DBG_PRINT("DUMP_ZDO_RESP: XMIT FAILS    = %04X.\n", resp->type.nwk_update.xmit_failures);
         DBG_PRINT("DUMP_ZDO_RESP: LIST COUNT    = %02X.\n", resp->type.nwk_update.scan_channel_list_cnt);
-        
+
         for (i=0; i<resp->type.nwk_update.scan_channel_list_cnt; i++)
         {
             DBG_PRINT_RAW("%02X ", *data);
@@ -997,7 +997,7 @@ void debug_dump_simple_desc(U8 *desc)
 
 /**************************************************************************/
 /*!
-        Decode the attribute type value into human readable form for printing to 
+        Decode the attribute type value into human readable form for printing to
         screen.
 */
 /**************************************************************************/
@@ -1010,8 +1010,8 @@ static void debug_dump_attrib_type(U8 type)
     case ZCL_TYPE_U16:          DBG_PRINT(", TYPE: %s", "UNSIGNED INT");    break;
     case ZCL_TYPE_U32:          DBG_PRINT(", TYPE: %s", "UNSIGNED WORD");   break;
     case ZCL_TYPE_BOOL:         DBG_PRINT(", TYPE: %s", "BOOL");            break;
-    case ZCL_TYPE_CHAR_STRING:  DBG_PRINT(", TYPE: %s", "CHAR STRING");     break; 
-    default:                                                                    break; 
+    case ZCL_TYPE_CHAR_STRING:  DBG_PRINT(", TYPE: %s", "CHAR STRING");     break;
+    default:                                                                    break;
     }
 }
 #endif
@@ -1058,15 +1058,15 @@ static U8 debug_dump_attrib_data(U8 type, U8 *data)
         // byte 0 is the length of the string
         size = *(U8 *)data_ptr++;
 
-        // start the copy from byte 1 
-        memcpy(str_buf, data_ptr, size); 
+        // start the copy from byte 1
+        memcpy(str_buf, data_ptr, size);
         data_ptr += size;
         str_buf[size] = 0;
-        
+
         DBG_PRINT_RAW("DATA: %s", str_buf);
-        break; 
+        break;
     default:
-        break; 
+        break;
     }
     return data_ptr - data;
 }
@@ -1107,26 +1107,26 @@ char *debug_dump_zcl_status(U8 status)
 #if (DEBUG_ZCL == 1)
     switch (status)
     {
-    case ZCL_STATUS_SUCCESS:                return "ZCL SUCCESS";                
-    case ZCL_STATUS_FAIL:                   return "ZCL FAIL";                    
-    case ZCL_STATUS_MALFORMED_CMD:          return "ZCL MALFORMED CMD";           
-    case ZCL_STATUS_UNSUP_CLUST_CMD:        return "ZCL UNSUP CLUST CMD";         
-    case ZCL_STATUS_UNSUP_GEN_CMD:          return "ZCL UNSUP GEN CMD";           
-    case ZCL_STATUS_UNSUP_MANUF_CLUST_CMD:  return "ZCL UNSUP MANUF CLUST CMD";   
-    case ZCL_STATUS_UNSUP_MANUF_GEN_CMD:    return "ZCL UNSUP MANUF GEN CMD";     
-    case ZCL_STATUS_INVALID_FIELD:          return "ZCL INVALID FIELD";           
-    case ZCL_STATUS_UNSUP_ATTRIB:           return "ZCL UNSUP ATTRIB";            
-    case ZCL_STATUS_INVALID_VALUE:          return "ZCL INVALID VALUE";           
-    case ZCL_STATUS_READ_ONLY:              return "ZCL READ ONLY";               
-    case ZCL_STATUS_INSUFF_SPACE:           return "ZCL INSUFF SPACE";            
-    case ZCL_STATUS_DUPE_EXISTS:            return "ZCL DUPE EXISTS";             
-    case ZCL_STATUS_NOT_FOUND:              return "ZCL NOT FOUND";               
-    case ZCL_STATUS_UNREPORTABLE_ATTRIB:    return "ZCL UNREPORTABLE ATTRIB";     
-    case ZCL_STATUS_INVALID_TYPE:           return "ZCL INVALID TYPE";            
-    case ZCL_STATUS_HW_FAIL:                return "ZCL HW FAIL";                 
-    case ZCL_STATUS_SW_FAIL:                return "ZCL SW FAIL";                 
-    case ZCL_STATUS_CALIB_ERR:              return "ZCL CALIB ERR";               
-    default:                                return "ZCL UNKNOWN STATUS";          
+    case ZCL_STATUS_SUCCESS:                return "ZCL SUCCESS";
+    case ZCL_STATUS_FAIL:                   return "ZCL FAIL";
+    case ZCL_STATUS_MALFORMED_CMD:          return "ZCL MALFORMED CMD";
+    case ZCL_STATUS_UNSUP_CLUST_CMD:        return "ZCL UNSUP CLUST CMD";
+    case ZCL_STATUS_UNSUP_GEN_CMD:          return "ZCL UNSUP GEN CMD";
+    case ZCL_STATUS_UNSUP_MANUF_CLUST_CMD:  return "ZCL UNSUP MANUF CLUST CMD";
+    case ZCL_STATUS_UNSUP_MANUF_GEN_CMD:    return "ZCL UNSUP MANUF GEN CMD";
+    case ZCL_STATUS_INVALID_FIELD:          return "ZCL INVALID FIELD";
+    case ZCL_STATUS_UNSUP_ATTRIB:           return "ZCL UNSUP ATTRIB";
+    case ZCL_STATUS_INVALID_VALUE:          return "ZCL INVALID VALUE";
+    case ZCL_STATUS_READ_ONLY:              return "ZCL READ ONLY";
+    case ZCL_STATUS_INSUFF_SPACE:           return "ZCL INSUFF SPACE";
+    case ZCL_STATUS_DUPE_EXISTS:            return "ZCL DUPE EXISTS";
+    case ZCL_STATUS_NOT_FOUND:              return "ZCL NOT FOUND";
+    case ZCL_STATUS_UNREPORTABLE_ATTRIB:    return "ZCL UNREPORTABLE ATTRIB";
+    case ZCL_STATUS_INVALID_TYPE:           return "ZCL INVALID TYPE";
+    case ZCL_STATUS_HW_FAIL:                return "ZCL HW FAIL";
+    case ZCL_STATUS_SW_FAIL:                return "ZCL SW FAIL";
+    case ZCL_STATUS_CALIB_ERR:              return "ZCL CALIB ERR";
+    default:                                return "ZCL UNKNOWN STATUS";
     }
 #endif // DEBUG_FRMS
     return NULL;
@@ -1188,7 +1188,7 @@ void debug_dump_zcl_frm(U8 *data, zcl_hdr_t *hdr, U16 clust)
                 if (status == ZCL_STATUS_SUCCESS)
                 {
                     // since the data is variable, there is a special function to handle dumping it.
-                    // just pass in the type and the data ptr. then increment the data ptr when 
+                    // just pass in the type and the data ptr. then increment the data ptr when
                     // we're done.
                     type = *data_ptr++;
                     len = debug_dump_attrib_data(type, data_ptr);
@@ -1208,7 +1208,7 @@ void debug_dump_zcl_frm(U8 *data, zcl_hdr_t *hdr, U16 clust)
                 data_ptr += sizeof(U16);
 
                 // since the data is variable, there is a special function to handle dumping it.
-                // just pass in the type and the data ptr. then increment the data ptr when 
+                // just pass in the type and the data ptr. then increment the data ptr when
                 // we're done.
                 type = *data_ptr++;
                 len = debug_dump_attrib_data(type, data_ptr);
@@ -1310,7 +1310,7 @@ void debug_dump_zcl_frm(U8 *data, zcl_hdr_t *hdr, U16 clust)
                     DBG_PRINT("DUMP_ZCL_FRM: CMD            = %s.\n", "IDENTIFY");
                     DBG_PRINT("DUMP_ZCL_FRM: TIMEOUT        = %04X.\n", *(U16 *)data_ptr);
                     break;
-    
+
                 case ZCL_ID_CMD_ID_QUERY:
                     DBG_PRINT("DUMP_ZCL_FRM: CMD            = %s.\n", "IDENTIFY QUERY");
                     break;
@@ -1326,7 +1326,7 @@ void debug_dump_zcl_frm(U8 *data, zcl_hdr_t *hdr, U16 clust)
                 }
             }
             break;
-            
+
         case ZCL_ON_OFF_CLUST_ID:
             switch (hdr->cmd)
             {

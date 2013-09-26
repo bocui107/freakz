@@ -46,7 +46,7 @@
 void
 mtarch_init(void)
 {
-  
+
 }
 /*--------------------------------------------------------------------------*/
 void
@@ -85,7 +85,7 @@ mtarch_start(struct mtarch_thread *t,
   /* Register r0-r23 in t->stack[MTARCH_STACKSIZE -  5] to
    *  t->stack[MTARCH_STACKSIZE -  28].
    *
-   * Per calling convention, the argument to the thread handler function 
+   * Per calling convention, the argument to the thread handler function
    *  (i.e. the 'data' pointer) is passed via r24-r25.
    * See http://www.nongnu.org/avr-libc/user-manual/FAQ.html#faq_reg_usage) */
   t->stack[MTARCH_STACKSIZE - 29] = (unsigned char)((unsigned short)data) & 0xff;
@@ -207,13 +207,13 @@ mtarch_yield(void)
 void
 mtarch_pstop(void)
 {
-  
+
 }
 /*--------------------------------------------------------------------------*/
 void
 mtarch_pstart(void)
 {
-  
+
 }
 /*--------------------------------------------------------------------------*/
 int
