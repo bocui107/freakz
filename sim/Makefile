@@ -15,5 +15,5 @@ $(EXE): $(OBJECTS)
 	$(CC) $(CFLAGS) $< -o $@
 
 clean:
-	rm -rf *.o
-	rm -rf ../test/test_sim/sim
+	rm -rf *.o $(EXE)
+	rm -rf ../test/test_sim/$(EXE)
