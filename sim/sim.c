@@ -161,7 +161,7 @@ void *sim_cmd_out_thread(void *node)
         printf("DEBUG: ");
         if (nd.cmdbuf[0] == 0xff)
         {
-            printf(cli_buf->buf);
+            printf("%s", cli_buf->buf);
         }
         else
         {
