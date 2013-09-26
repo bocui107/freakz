@@ -46,19 +46,19 @@
 
 typedef struct
 {
-    char *cmd;
-    void (*func)(char *);
+	char *cmd;
+	void (*func)(char *);
 } cmd_t;
 
-typedef struct
+struct cli_buf_t
 {
-    pthread_mutex_t mutex;
-    pthread_cond_t  cond;
-    U8              buf[128];
-    bool            data;
-} cli_buf_t;
+	pthread_mutex_t mutex;
+	pthread_cond_t  cond;
+	U8              buf[128];
+	bool            data;
+};
 
-cli_buf_t *cli_buf_get();
+struct cli_buf_t *cli_buf_get();
 void send_data(char *msg);
 void send_cmd(char *msg);
 void add_node(char *str);
@@ -67,6 +67,3 @@ void list_nodes(char *str);
 void process_script(char *str);
 void quit_sim(char *str);
 #endif
-
-
-

@@ -120,7 +120,7 @@ void *sim_cmd_out_thread(void *node)
     sim_node_t nd;
     sim_node_t *sibling;
     U8 len;
-    cli_buf_t *cli_buf = cli_buf_get();
+    struct cli_buf_t *cli_buf = cli_buf_get();
 
     // copy the node data into the node structure.
     memcpy(&nd, node, sizeof(sim_node_t));

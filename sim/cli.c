@@ -59,7 +59,7 @@
 
 // main file pointer to the current script
 FILE *fp;
-static cli_buf_t cli_buf =
+static struct cli_buf_t cli_buf =
 {
     PTHREAD_MUTEX_INITIALIZER,
     PTHREAD_COND_INITIALIZER,
@@ -154,7 +154,7 @@ Function Name: cli_buf_get
 Description:
 
 **************************************************************************/
-cli_buf_t *cli_buf_get()
+struct cli_buf_t *cli_buf_get()
 {
     return &cli_buf;
 }
