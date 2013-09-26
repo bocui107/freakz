@@ -8,7 +8,7 @@ EXE = sim.exe
 all: $(SOURCES) $(EXE)
 
 $(EXE): $(OBJECTS)
-	$(CC) -lpthread $(OBJECTS) -o $@
+	$(CC) $(OBJECTS) -o $@ -lpthread
 	cp sim.exe ../test/test_sim
 
 %.o:%.c
