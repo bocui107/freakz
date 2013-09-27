@@ -44,9 +44,9 @@
 #include "type.h"
 #include "cli.h"
 
-#define MSGBUFSIZE 512
-#define ARGVMAX 128
-#define MAXNODES 7
+#define MSGBUFSIZE	512
+#define ARGVMAX		128
+#define MAXNODES	7
 
 typedef struct
 {
@@ -57,7 +57,7 @@ typedef struct
 
 typedef struct _sim_node_t
 {
-	struct _sim_node_t  *next;
+	struct _sim_node_t *next;
 	int	pid;
 	int	index;
 	U16	addr;

@@ -116,6 +116,9 @@ void parse_string(char *str)
 	char *cmd;
 	U8 i = 0;
 
+	/*
+	 * strtpl is to split the string. the second parameter is the delimiter.
+	 */
 	cmd = strtok(str, " ");
 
 	for (i = 0; cmd_tbl[i].cmd != NULL; i++)
@@ -154,10 +157,27 @@ void cli()
 	while (1)
 	{
 		printf("FreakZim>> ");
+		/*
+		 * fflush: Clean the buf of the file. If the
+		 * file is opened according the write mode,
+		 * Write the data of the buffer to the file.
+		 */
 		fflush(stdout);
+
+		/*
+		 * fgets read the data from stdin to msg,
+		 * the size is sizeof(msg) - 1.
+		 */
 		fgets(msg, sizeof(msg), stdin);
 
-		if ((msg_ptr = strchr(msg, '\n')) != NULL)
+		/*
+		 * Search the first '\n' in the string of the msg
+		 * and return the location of the first character.
+		 *
+		 * If the msg is NULL, return the NULL.
+		 */
+		msg_ptr = strchr(msg, '\n');
+		if (msg_ptr)
 			*msg_ptr = '\0';
 
 		/* if msg ptr is empty, then */
@@ -178,6 +198,10 @@ void send_cmd(char *str)
 
         num = strtok(str, " ");
         msg = str + strlen(num) + 1;
+	/*
+	 * strtol to convert the string to the long int type. base can be
+	 * choiced 8, 10 and 16.
+	 */
         index = strtol(num, NULL, 10);
         sim_send_cmd(msg, index);
 }
@@ -213,7 +237,8 @@ void kill_node(char *str)
 	sim_node_t *nd;
 	char *tmp;
 
-	if ((tmp = strtok(str, " ")) == NULL)
+	tmp = strtok(str, " ");
+	if (tmp == NULL)
 	{
 		printf("Please add an index number after the 'add' command.\n");
 		return;

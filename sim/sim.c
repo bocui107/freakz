@@ -66,41 +66,39 @@ static U8 conn_map[MAXNODES][MAXNODES] = {
 
 void *sim_data_out_thread(void *node)
 {
-    sim_node_t nd;
-    sim_node_t *sibling;
+	sim_node_t nd;
+	sim_node_t *sibling;
+	U8 i;
 
-    // copy the node data into the node structure.
-    memcpy(&nd, node, sizeof(sim_node_t));
-    while (1)
-    {
-        if (read(nd.data_out.pipe, nd.buf, sizeof(nd.buf)) == -1) perror("read pipe");
+	/* copy the node data into the node structure. */
+	memcpy(&nd, node, sizeof(sim_node_t));
+	while (1)
+	{
+		if (read(nd.data_out.pipe, nd.buf, sizeof(nd.buf)) == -1)
+			perror("read pipe");
 
-        // create a separate statement block to print out the contents of the data to the
-        // sim console.
-        {
-            U8 i;
-            printf("SIM: Data out from node %d.\n", nd.index);
-            for (i=0; i<nd.buf[0]; i++)
-            {
-                printf("%02x ", nd.buf[i]);
-            }
-            printf("\n");
-        }
+		/*
+		 * create a separate statement block to print out
+		 * the contents of the data to the sim console.
+		 */
+		printf("SIM: Data out from node %d.\n", nd.index);
+		for (i=0; i<nd.buf[0]; i++)
+			printf("%02x ", nd.buf[i]);
+		printf("\n");
 
-        // this is where the magic happen
-        for (sibling = node_list_get_head(); sibling != NULL; sibling = sibling->next)
-        {
-            // if the indices are less than maxnodes, then process them according to the connection map
-            // otherwise, just skip over them.
-            if ((nd.index-1 <= MAXNODES) && (sibling->index-1 <= MAXNODES))
-            {
-                if (conn_map[nd.index-1][sibling->index-1])
-                {
-                    if ((write(sibling->data_in.pipe, nd.buf, nd.buf[0])) == -1) perror("write");
-                }
-            }
-        }
-    }
+		/* this is where the magic happen */
+		for (sibling = node_list_get_head(); sibling != NULL; sibling = sibling->next)
+		{
+			/*
+			 * if the indices are less than maxnodes, then process them
+			 * according to the connection map otherwise, just skip over them.
+			 */
+			if ((nd.index-1 <= MAXNODES) && (sibling->index-1 <= MAXNODES))
+				if (conn_map[nd.index-1][sibling->index-1])
+					if ((write(sibling->data_in.pipe, nd.buf, nd.buf[0])) == -1)
+						perror("write");
+		}
+	}
 }
 
 void *sim_cmd_out_thread(void *node)
@@ -134,7 +132,8 @@ void *sim_cmd_out_thread(void *node)
 		 * once thats finished, signal the cli that data has arrived
 		 * and then unlock the mutex
 		 */
-		if ((status = pthread_mutex_lock(&cli_buf->mutex)) != 0)
+		status = pthread_mutex_lock(&cli_buf->mutex);
+		if (status)
 			perror("cmd out lock mutex");
 
 		/*
@@ -218,8 +217,9 @@ void sim_add_node(U8 index)
 
 	memset(nd, 0, sizeof(sim_node_t));
 
-	// fork the process
+	/* fork the process */
 	pid = fork();
+
 	switch (pid)
 	{
 	case -1:
@@ -228,7 +228,6 @@ void sim_add_node(U8 index)
 		break;
 	case 0:
 		sprintf(msg, "xterm -title 'Node %d' -e ./test_sim.native %d", index, index, index);
-		//sprintf(msg, "cmd /c start main.native %d", index);
 		system(msg);
 		exit(EXIT_SUCCESS);
 		break;
@@ -241,15 +240,15 @@ void sim_add_node(U8 index)
 
 		close(pp.pipe);
 
-		// write the pid contents to the node struct
+		/* write the pid contents to the node struct */
 		nd->pid = strtol(msg, NULL, 10);
 		nd->index = index;
 		printf("PID = %d. Index = %d.\n", nd->pid, nd->index);
 
-		// delay for one second so that node can create the pipes
+		/* delay for one second so that node can create the pipes */
 		sleep(1);
 
-		// open the pipes for the child node
+		/* open the pipes for the child node */
 		sprintf(nd->data_in.name, "./fifo/fifo_in_%d", nd->pid);
 		if ((nd->data_in.pipe = open(nd->data_in.name, O_WRONLY)) < 0)
 			perror("data_in open pipe");
@@ -266,7 +265,7 @@ void sim_add_node(U8 index)
 		if ((nd->cmd_out.pipe = open(nd->cmd_out.name, O_RDONLY)) < 0)
 			perror("cmd_out open pipe");
 
-		// create read thread for the child node's out pipe
+		/* create read thread for the child node's out pipe */
 		if (pthread_create(&nd->data_out.thread, NULL, sim_data_out_thread, nd) > 0)
 			perror("pthread_create");
 		if (pthread_create(&nd->cmd_out.thread, NULL, sim_cmd_out_thread, nd) > 0)
