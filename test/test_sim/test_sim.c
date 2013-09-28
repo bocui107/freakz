@@ -65,8 +65,7 @@ static char cmd[BUFSIZE];
 FILE *fp;
 FILE *fout;
 
-/*---------------------------------------------------------------------------*/
-// Threads to handle the pipe communications
+/* Threads to handle the pipe communications */
 
 /**************************************************************************
 Function Name: sim_data_in_thread
@@ -78,17 +77,21 @@ CAUTION: Threads should only call reentrant functions or else bad things can hap
 **************************************************************************/
 static void *sim_data_in_thread(void *dummy)
 {
-    static char msg[BUFSIZE];
+	static char msg[BUFSIZE];
 
-    while (1)
-    {
-        if (read(node.data_in.pipe, msg, BUFSIZE) == -1) perror("sim_data_in_thread");
+	while (1)
+	{
+		if (read(node.data_in.pipe, msg, BUFSIZE) == -1)
+			perror("sim_data_in_thread");
 
-        // write the received data into the input buffer of the stack and trigger the isr
-        drvr_write_rx_buf((U8 *)msg, msg[0]);
-        drvr_rx_isr();
-    }
-    return NULL;
+		/*
+		 * write the received data into the input buffer
+		 * of the stack and trigger the isr
+		 */
+		drvr_write_rx_buf((U8 *)msg, msg[0]);
+		drvr_rx_isr();
+	}
+	return NULL;
 }
 
 /**************************************************************************
@@ -103,65 +106,52 @@ CAUTION: Threads should only call reentrant functions or else bad things can hap
 **************************************************************************/
 static void *sim_cmd_in_thread(void *dummy)
 {
-    while (1)
-    {
-        if (read(node.cmd_in.pipe, cmd, sizeof(cmd)) == -1) perror("sim_cmd_in_thread");
-        test_app_parse(cmd);
-    }
-    return NULL;
+	while (1)
+	{
+		if (read(node.cmd_in.pipe, cmd, sizeof(cmd)) == -1)
+			perror("sim_cmd_in_thread");
+		test_app_parse(cmd);
+	}
+	return NULL;
 }
 
-/**************************************************************************
-Function Name: sim_pipe_data_out
-
-Description:
-Send the tx to the data_out pipe.
-**************************************************************************/
+/* Send the tx to the data_out pipe */
 void sim_pipe_data_out(U8 *data, U8 len)
 {
-    if (write(node.data_out.pipe, data, len) == -1) perror("sim_pipe_data_out");
-    usleep(30);
+	if (write(node.data_out.pipe, data, len) == -1)
+		perror("sim_pipe_data_out");
+	usleep(30);
 }
 
-/**************************************************************************
-Function Name: sim_pipe_cmd_out
-
-Description:
-Send the cmd to the cmd_out pipe.
-**************************************************************************/
+/* Send the cmd to the cmd_out pipe */
 void sim_pipe_cmd_out(U8 *data, U8 len)
 {
-    if (write(node.cmd_out.pipe, data, len) == -1) perror("sim_pipe_cmd_out");
+	if (write(node.cmd_out.pipe, data, len) == -1)
+		perror("sim_pipe_cmd_out");
 }
 
-/**************************************************************************
-Function Name: sigint_handler
-
-Description:
-Take care of the signals that come in.
-**************************************************************************/
+/* Take care of the signals that come in */
 static void sigint_handler()
 {
-    switch (errno)
-    {
-    case EEXIST:
-        perror("node eexist");
-        break;
-    case EINTR:
-        close(node.data_in.pipe);
-        close(node.data_out.pipe);
-        close(node.cmd_in.pipe);
-        pthread_cancel(node.data_in.thread);
-        pthread_cancel(node.data_out.thread);
-        pthread_cancel(node.cmd_in.thread);
-        pthread_cancel(node.cmd_out.thread);
-        fclose(fp);
-        exit(EXIT_SUCCESS);
-        break;
-    default:
-        perror("node other");
-        break;
-    }
+	switch (errno) {
+	case EEXIST:
+		perror("node eexist");
+		break;
+	case EINTR:
+		close(node.data_in.pipe);
+		close(node.data_out.pipe);
+		close(node.cmd_in.pipe);
+		pthread_cancel(node.data_in.thread);
+		pthread_cancel(node.data_out.thread);
+		pthread_cancel(node.cmd_in.thread);
+		pthread_cancel(node.cmd_out.thread);
+		fclose(fp);
+		exit(EXIT_SUCCESS);
+		break;
+	default:
+		perror("node other");
+		break;
+	}
 }
 
 /**************************************************************************
@@ -183,93 +173,90 @@ Description:
 **************************************************************************/
 static void sigkill_handler()
 {
-    close(node.data_in.pipe);
-    close(node.data_out.pipe);
-    close(node.cmd_in.pipe);
-    pthread_cancel(node.data_in.thread);
-    pthread_cancel(node.data_out.thread);
-    pthread_cancel(node.cmd_in.thread);
-    pthread_cancel(node.cmd_out.thread);
-    fclose(fp);
-    exit(EXIT_SUCCESS);
+	close(node.data_in.pipe);
+	close(node.data_out.pipe);
+	close(node.cmd_in.pipe);
+	pthread_cancel(node.data_in.thread);
+	pthread_cancel(node.data_out.thread);
+	pthread_cancel(node.cmd_in.thread);
+	pthread_cancel(node.cmd_out.thread);
+	fclose(fp);
+	exit(EXIT_SUCCESS);
 }
 
-/**************************************************************************
-Function Name: main
-**************************************************************************/
 int main(int argc, char *argv[])
 {
-    char msg[BUFSIZE];
-    int index = strtol(argv[1], NULL, 10);
+	char msg[BUFSIZE];
+	int index = strtol(argv[1], NULL, 10);
 
-    sprintf(msg, "./log/node_%03d.txt", index);
-    fp = fopen(msg, "w");
+	sprintf(msg, "./log/node_%03d.txt", index);
+	fp = fopen(msg, "w");
 
-    sprintf(msg, "./log/node_%03d_data.txt", index);
-    fout = fopen(msg, "w");
+	sprintf(msg, "./log/node_%03d_data.txt", index);
+	fout = fopen(msg, "w");
 
-    sprintf(msg, "./log/node_%03d_err.txt", index);
-    freopen(msg, "w", stderr);
+	sprintf(msg, "./log/node_%03d_err.txt", index);
+	freopen(msg, "w", stderr);
 
+	/* opening public fifo */
+	strcpy(pp.name, "./fifo/PUBLIC");
+	pp.pipe = open(pp.name, O_WRONLY);
+	if (pp.pipe == -1)
+		perror("open public pipe");
 
-    // opening public fifo
-    strcpy(pp.name, "./fifo/PUBLIC");
-    if ((pp.pipe = open(pp.name, O_WRONLY)) == -1) perror("open public pipe");
+	/* sending pid to public fifo */
+	sprintf(msg, "%d", getpid());
+	if (write(pp.pipe, msg, strlen(msg) + 1) == -1)
+		perror("write");
 
-    // sending pid to public fifo
-    sprintf(msg, "%d", getpid());
-    if (write(pp.pipe, msg, strlen(msg)+1) == -1) perror("write");
+	/* initialize the communication pipes */
+	/* making private fifos */
+	sprintf(node.data_in.name, "./fifo/fifo_in_%d", getpid());
+	if (mknod(node.data_in.name, S_IFIFO | 0666, 0) < 0)
+		perror("mknod");
 
-    // ----------- initialize the communication pipes
-    // making private fifos
-    sprintf(node.data_in.name, "./fifo/fifo_in_%d", getpid());
-    if (mknod(node.data_in.name, S_IFIFO | 0666, 0) < 0)
-    {
-        perror("mknod");
-    }
+	sprintf(node.data_out.name, "./fifo/fifo_out_%d", getpid());
+	if (mknod(node.data_out.name, S_IFIFO | 0666, 0) < 0)
+		perror("mknod");
 
-    sprintf(node.data_out.name, "./fifo/fifo_out_%d", getpid());
-    if (mknod(node.data_out.name, S_IFIFO | 0666, 0) < 0)
-    {
-        perror("mknod");
-    }
+	sprintf(node.cmd_in.name, "./fifo/fifo_cmd_in_%d", getpid());
+	if (mknod(node.cmd_in.name, S_IFIFO | 0666, 0) < 0)
+		perror("mknod");
 
-    sprintf(node.cmd_in.name, "./fifo/fifo_cmd_in_%d", getpid());
-    if (mknod(node.cmd_in.name, S_IFIFO | 0666, 0) < 0)
-    {
-        perror("mknod");
-    }
+	sprintf(node.cmd_out.name, "./fifo/fifo_cmd_out_%d", getpid());
+	if (mknod(node.cmd_out.name, S_IFIFO | 0666, 0) < 0)
+		perror("mknod");
 
-    sprintf(node.cmd_out.name, "./fifo/fifo_cmd_out_%d", getpid());
-    if (mknod(node.cmd_out.name, S_IFIFO | 0666, 0) < 0)
-    {
-        perror("mknod");
-    }
+	/* opening private fifos */
+	if ((node.data_in.pipe  = open(node.data_in.name,   O_RDONLY)) == -1)
+		perror("open data_in pipe");
+	if ((node.cmd_in.pipe   = open(node.cmd_in.name,    O_RDONLY)) == -1)
+		perror("open cmd_in pipe");
+	if ((node.data_out.pipe = open(node.data_out.name,  O_WRONLY)) == -1)
+		perror("open data_out pipe");
+	if ((node.cmd_out.pipe  = open(node.cmd_out.name,   O_WRONLY)) == -1)
+		perror("open cmd_out pipe");
 
-    // opening private fifos
-    if ((node.data_in.pipe  = open(node.data_in.name,   O_RDONLY)) == -1) perror("open data_in pipe");
-    if ((node.cmd_in.pipe   = open(node.cmd_in.name,    O_RDONLY)) == -1) perror("open cmd_in pipe");
-    if ((node.data_out.pipe = open(node.data_out.name,  O_WRONLY)) == -1) perror("open data_out pipe");
-    if ((node.cmd_out.pipe  = open(node.cmd_out.name,   O_WRONLY)) == -1) perror("open cmd_out pipe");
+	/* start a thread to wait for incoming messages */
+	if (pthread_create(&node.data_in.thread, NULL, sim_data_in_thread, NULL) > 0)
+		perror("pthread_create");
 
-    // start a thread to wait for incoming messages
-    if (pthread_create(&node.data_in.thread, NULL, sim_data_in_thread, NULL) > 0) perror("pthread_create");
-    if (pthread_create(&node.cmd_in.thread, NULL, sim_cmd_in_thread, NULL) > 0) perror("pthread_create");
+	if (pthread_create(&node.cmd_in.thread, NULL, sim_cmd_in_thread, NULL) > 0)
+		perror("pthread_create");
 
-    // register the signal handler
-    signal(SIGINT, sigint_handler);
-    signal(SIGKILL, sigkill_handler);
+	/* register the signal handler */
+	signal(SIGINT, sigint_handler);
+	signal(SIGKILL, sigkill_handler);
 
-    // set up node parameters
-    node.pid = getpid();
-    node.index = index;
+	/* set up node parameters */
+	node.pid = getpid();
+	node.index = index;
 
-    // jump to the main contiki loop
-    sprintf(msg, "node %d added\n", node.index);
-    format_cmd_str((U8 *)msg);
-    sim_pipe_cmd_out((U8 *)msg, strlen(msg) + 1);
+	/* jump to the main contiki loop */
+	sprintf(msg, "node %d added\n", node.index);
+	format_cmd_str((U8 *)msg);
+	sim_pipe_cmd_out((U8 *)msg, strlen(msg) + 1);
 
-    contiki_main();
-    return 0;
+	contiki_main();
+	return 0;
 }
-

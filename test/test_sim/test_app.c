@@ -362,7 +362,3 @@ static void test_app_rem_grp(U8 argc, char **argv)
     ep = strtol(argv[2], NULL, 16);
     aps_grp_rem(id, ep);
 }
-
-
-
-

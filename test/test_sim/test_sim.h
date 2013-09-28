@@ -52,26 +52,25 @@
 
 typedef struct
 {
-    int pipe;
-    char name[NAMESIZE];
-    pthread_t thread;
+	int pipe;
+	char name[NAMESIZE];
+	pthread_t thread;
 } pipe_t;
 
 typedef struct _sim_node_t
 {
-    struct _sim_node_t  *next;
-    int                 pid;
-    int                 index;
-    U16                 addr;
-    pipe_t              data_in;
-    pipe_t              data_out;
-    pipe_t              cmd_in;
-    pipe_t              cmd_out;
-    U8                  buf[BUFSIZE];
+	struct _sim_node_t	*next;
+	int		pid;
+	int		index;
+	U16		addr;
+	pipe_t		data_in;
+	pipe_t		data_out;
+	pipe_t		cmd_in;
+	pipe_t		cmd_out;
+	U8		buf[BUFSIZE];
 } sim_node_t;
 
 void sim_pipe_data_out(U8 *data, U8 len);
 void sim_pipe_cmd_out(U8 *data, U8 len);
 sim_node_t *node_get();
 #endif
-
