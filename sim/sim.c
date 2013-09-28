@@ -227,7 +227,8 @@ void sim_add_node(U8 index)
 		exit(13);
 		break;
 	case 0:
-		sprintf(msg, "xterm -title 'Node %d' -e ./test_sim.native %d", index, index, index);
+		sprintf(msg, "xterm -title 'Node %d' -e ./test_sim.native %d", index, index);
+		/* system: run the shell script */
 		system(msg);
 		exit(EXIT_SUCCESS);
 		break;
@@ -334,15 +335,26 @@ int main (int argc, char *argv[])
 	char msg[50];
 
 	node_list_init();
+
+	/*
+	 * register the abort function
+	 */
 	atexit(sim_kill_nodes);
 	signal(SIGINT, sim_kill_nodes);
 	signal(SIGCHLD, sigchld_handler);
 
 	sprintf(msg, "./log/sim.txt");
+	/*
+	 * reallocal the file point or redirect the point.
+	 */
 	freopen(msg, "w", stderr);
 
 	/* create the  public pipe and open it for reading */
 	strcpy(pp.name, "./fifo/PUBLIC");
+
+	/*
+	 * mknod: Create a pipe of the name
+	 */
 	if (mknod(pp.name, S_IFIFO | 0666, 0) == -1)
 		perror("mknod");
 

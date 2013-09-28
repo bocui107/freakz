@@ -1,2 +1,86 @@
 1. mac_gen_header
 一边计算长度一边填充缓冲区
+
+2.
+
+int pthread_create(pthread_t*restrict tidp,const pthread_attr_t *restrict_attr,
+void*(*start_rtn)(void*),void *restrict arg);
+返回值: 若成功则返回0，否则返回出错编号
+
+返回成功时, 由tidp指向的内存单元被设置为新创建线程的线程ID. attr参数用于指定各种不同的线程属性.
+新创建的线程从start_rtn函数的地址开始运行, 该函数只有一个万能指针参数arg,
+如果需要向start_rtn函数传递的参数不止一个, 那么需要把这些参数放到一个结构中,
+然后把这个结构的地址作为arg的参数传入.
+
+解决了一个隐蔽的内存泄漏——pthread_create后没有detach导致内存持续增长
+
+昨天解决了一个隐蔽的内存泄漏问题，原因是pthread_create后的僵死线程没有释放导致的内存持续增长。
+现象是这样的: 短时间内程序运行正常, 但跑了12小时左右, 用top查看其内存占用居然高达2G,
+于是马上意识到有内存泄漏.
+
+最先想到的是malloc/free, new/delete没有配对, 申请的内存没有释放. 于是写了个跟踪malloc/free调用的模块,
+不过检查中并没有找到未释放的内存. 之后怀疑是不是free then malloc导致的内存管理错误(事实证明虽然free后
+不是立即回收内存, 但是接连调用free & malloc并不会影响操作系统的内存管理), 不过写了个小程序发现并不是
+这么回事.
+
+陷入窘境了, 只好用最小系统法把功能部分和内存分配都给屏蔽掉, 这时发现内存泄漏依然存在！仔细看top的输出,
+几乎是每次创建线程时内存就往上涨一点，只是增长速度不是很快, 看来是线程的问题了. 仔细分析发现,
+之前图简单 pthread_create (&thread, NULL, &thread_function, NULL); 就这么写了,
+参数2没有设置线程结束后自动detach, 并且没有使用pthread_join或pthread_detach释放执行结束后线程的空间.
+
+
+Linux man page 里有已经说明了这个问题:
+    When a joinable thread terminates, its memory resources (thread descriptor and stack) are not deallocated until another thread performs pthread_join on it. Therefore, pthread_join must be called  once  for each joinable thread created to avoid memory leaks.
+
+也就说线程执行完后如果不join的话，线程的资源会一直得不到释放而导致内存泄漏！一时的图快后患无穷啊。
+
+
+3. 进程间通信--命名管道
+一. 命名管道的概念
+管道的一个不足之处是没有名字, 因此只能用于具有亲缘关系的进程间通信, 在命名管道(named pipe或FIFO)
+提出后, 该限制得到了克服. FIFO不同于管道之处在于它提供一个路径名与之关联, 以FIFO的文件形式存储于
+文件系统中. 命名管道是一个设备文件, 因此即使进程与创建FIFO的进程不存在亲缘关系, 只要可以访问该路径,
+就能够通过FIFO相互通信. 值得注意的是, FIFO(first input first output)总是按照先进先出的原则工作,
+第一个被写入的数据将首先从管道中读出.
+
+二. 命名管道的创建与读写
+
+Linux下有两种方式创建命名管道. 一是在Shell下交互地建立一个命名管道, 二是在程序中使用系统函数建立
+命名管道. Shell方式下可使用mknod或mkfifo命令, 下面命令使用mknod创建了一个命名管道:
+mknod namedpipe
+
+创建命名管道的系统函数有两个: mknod和mkfifo. 两个函数均定义在头文件sys/stat.h，函数原型如下：
+#include <sys/types.h>
+#include <sys/stat.h>
+int mknod(const char *path, mode_t mod, dev_t dev);
+int mkfifo(const char *path, mode_t mode);
+
+函数mknod参数中path为创建的命名管道的全路径名: mod为创建的命名管道的模式, 指明其存取权限;
+dev为设备值, 该值取决于文件创建的种类, 它只在创建设备文件时才会用到.
+
+这两个函数调用成功都返回0, 失败都返回 -1. 下面使用mknod函数创建了一个命名管道:
+umask(0);
+if (mknod("/tmp/fifo", S_IFIFO | 0666) == -1)
+{
+	perror("mkfifo error");
+	exit(1);
+}
+
+函数mkfifo前两个参数的含义和mknod相同. 下面是使用mkfifo的示例代码:
+umask(0);
+if (mkfifo("/tmp/fifo", S_IFIFO|0666) == -1)
+{
+	perror("mkfifo error!");
+	exit(1);
+}
+
+"S_IFIFO | 0666" 指明创建一个命名管道且存取权限为0666, 即创建者, 与创建者同组的用户,
+其他用户对该命名管道的访问权限都是可读可写.
+
+命名管道创建后就可以使用了, 命名管道和管道的使用方法基本是相同的. 只是使用命名管道时,
+必须先调用open()将其打开. 因为命名管道是一个存在于硬盘上的文件，而管道是存在于内存中
+的特殊文件.
+
+需要注意的是, 调用open()打开命名管道的进程可能会被阻塞. 但如果同时用读写方式(O_RDWR)打开,
+则一定不会导致阻塞; 如果以只读方式(O_RDONLY)打开, 则调用open()函数的进程将会被阻塞直到有
+写方打开管道; 同样以写方式(O_WRONLY)打开也会阻塞直到有读方式打开管道.
