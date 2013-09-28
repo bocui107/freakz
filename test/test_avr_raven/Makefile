@@ -2,6 +2,7 @@ CONTIKI = ../../os
 ZIGBEE_PATH = ../../freakz
 ROOT_DIR = ../..
 TEST_RAVEN = 1
+TARGET = avr-raven
 
 all: test_avr_raven
 

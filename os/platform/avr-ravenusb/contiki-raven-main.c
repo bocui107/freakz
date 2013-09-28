@@ -39,6 +39,7 @@
  *         Simon Barner <barner@in.tum.de
  */
 
+#include <avr/pgmspace.h>
 #include <avr/fuse.h>
 #include <stdio.h>
 
