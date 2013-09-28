@@ -72,6 +72,7 @@ void *sim_data_out_thread(void *node)
 
 	/* copy the node data into the node structure. */
 	memcpy(&nd, node, sizeof(sim_node_t));
+
 	while (1)
 	{
 		if (read(nd.data_out.pipe, nd.buf, sizeof(nd.buf)) == -1)
@@ -271,6 +272,7 @@ void sim_add_node(U8 index)
 			perror("pthread_create");
 		if (pthread_create(&nd->cmd_out.thread, NULL, sim_cmd_out_thread, nd) > 0)
 			perror("pthread_create");
+
 		node_list_add(nd);
 		break;
 	}
@@ -340,7 +342,17 @@ int main (int argc, char *argv[])
 	 * register the abort function
 	 */
 	atexit(sim_kill_nodes);
+
+	/*
+	 * When the program is abort(interrupt) signal, the user input
+	 * INTR character(Ctrl + c) to notify the font process group.
+	 */
 	signal(SIGINT, sim_kill_nodes);
+
+	/*
+	 * When a thread is stop or abort, the thread will send
+	 * the SIGCHLD to it's parent
+	 */
 	signal(SIGCHLD, sigchld_handler);
 
 	sprintf(msg, "./log/sim.txt");
