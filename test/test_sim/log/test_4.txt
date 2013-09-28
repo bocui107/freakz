@@ -1,0 +1,109 @@
+First, the program in Listing 13.1 checks the value of argc to see if there is a command-line argument.
+If there isn't, the program prints a usage message and exits. The string argv[0] is the name of the program.
+Using argv[0] instead of the program name explicitly causes the error message to change automatically if
+you change the name of the executable file. This feature is also handy in environments like UNIX that
+permit multiple names for a single file. But beware¡ªsome operating systems, such as pre MS-DOS 3.0,
+don't recognize argv[0], so this usage is not completely portable.
+
+C has many operators, such as the assignment and arithmetic operators discussed in this chapter. In general, an
+operator operates on one or more operands to produce a value. Operators that take one operand, such as the minus
+sign and sizeof, are termed unary operators. Operators requiring two operands, such as the addition and the multiplication
+operators, are called binary operators.
+
+Expressions are combinations of operators and operands. In C, every expression has a value, including assignment
+expressions and comparison expressions. Rules of operator precedence help determine how terms are grouped when
+expressions are evaluated. When two operators share an operand, the one of higher precedence is applied first. If the
+operators have equal precedence, the associativity (left-right or right-left) determines which operator is applied first.
+
+Statements are complete instructions to the computer and are indicated in C by a terminating semicolon. So far, you
+have worked with declaration statements, assignment statements, function call statements, and control statements.
+Statements included within a pair of braces constitute a compound statement, or block. One particular control statement
+is the while loop, which repeats statements as long as a test condition remains true.
+
+In C, many type conversions take place automatically. The char and short types are promoted to type int
+whenever they appear in expressions or as function arguments. The float type is promoted to type double when
+used as a function argument. Under K&R C (but not ANSI C), float is also promoted to double when used in an expression.
+When a value of one type is assigned to a variable of a second type, the value is converted to the same type as the variable.
+When larger types are converted to smaller types (long to short or double to float, for example), there might be a loss of
+data. In cases of mixed arithmetic, smaller types are converted to larger types following the rules outlined in this chapter.
+
+When you define a function that takes an argument, you declare a variable, or formal argument, in the function definition.
+Then the value passed in a function call is assigned to this variable, which can now be used in the function.
+
+A file is an area of memory in which information is stored. Normally, a file is kept in some sort of permanent memory, such as a
+floppy disk, a hard disk, or a tape. You are doubtless aware of the importance of files to computer systems. For example, your
+C programs are kept in files, and the programs used to compile your programs are kept in files. This last example points out
+that some programs need to be able to access particular files. When you compile a program stored in a file called echo.c, the
+compiler opens the echo.c file and reads its contents. When the compiler finishes, it closes the file. Other programs, such as
+word processors, not only open, read, and close files, they also write to them.
+
+C, being powerful, flexible, and so on, has many library functions for opening, reading, writing, and closing files. On one level,
+it can deal with files by using the basic file tools of the host operating system. This is called low-level I/O. Because of the
+many differences among computer systems, it is impossible to create a standard library of universal low-level I/O functions,
+and ANSI C does not attempt to do so; however, C also deals with files on a second level called the standard I/O package. This
+involves creating a standard model and a standard set of I/O functions for dealing with files. At this higher level, differences
+between systems are handled by specific C implementations so that you deal with a uniform interface.
+
+What sort of differences are we talking about? Different systems, for example, store files differently. Some store the
+file contents in one place and information about the file elsewhere. Some build a description of the file into the file
+itself. In dealing with text, some systems use a single newline character to mark the end of a line. Others might use
+ the combination of the carriage return and linefeed characters to represent the end of a line. Some systems measure file
+  sizes to the nearest byte; some measure in blocks of bytes.
+
+When you use the standard I/O package, you are shielded from these differences. Therefore, to check for a newline, you can use
+if (ch == '\n'). If the system actually uses the carriage-return/linefeed combination, the I/O functions automatically translate
+ back and forth between the two representations.
+
+Conceptually, the C program deals with a stream instead of directly with a file. A stream is an idealized flow of data to
+which the actual input or output is mapped. That means various kinds of input with differing properties are represented by
+streams with more uniform properties. The process of opening a file then becomes one of associating a stream with the file,
+and reading and writing take place via the stream.
+
+Chapter 13 discusses files in greater detail. For this chapter, simply note that C treats input and output devices the
+same as it treats regular files on storage devices. In particular, the keyboard and the display device are treated as
+files opened automatically by every C program. Keyboard input is represented by a stream called stdin, and output to
+the screen (or teletype, or other output device) is represented by a stream called stdout. The getchar(), putchar(),
+printf(), and scanf() functions are all members of the standard I/O package, and they deal with these two streams.
+
+One implication of all this is that you can use the same techniques with keyboard input as you do with files. For example, a
+program reading a file needs a way to detect the end of the file so that it knows where to stop reading. Therefore, C input
+functions come equipped with a built-in, end-of-file detector. Because keyboard input is treated like a file, you should be
+able to use that end-of-file detector to terminate keyboard input, too. Let's see how this is done, beginning with files.
+
+Now that you are about to learn how to program in C, you probably should know a little about how computers work. This knowledge
+will help you understand the connection between writing a program in C and what eventually takes place when you run that program.
+
+Modern computers have several components. The central processing unit, or CPU, does most of the computing work. The random-access
+memory, or RAM, serves as a workspace to hold programs and files. The permanent memory, typically a hard disk, remembers those
+programs and files, even if the computer is turned off. And various peripherals¡ªsuch as the keyboard, mouse, and monitor
+provide for communication between the computer and you. The CPU processes your programs, so let's concentrate on its role.
+
+The life of a CPU, at least in this simplistic account, is quite simple. It fetches an instruction from memory and executes
+it. It fetches the next instruction from memory and executes it, and so on. (A gigahertz CPU can do this about a billion times a
+second, so the CPU can lead its boring life at a tremendous pace.) The CPU has its own small workspace, consisting of several
+registers, each of which can hold a number. One register holds the memory address of the next instruction, and the CPU uses
+this information to fetch the next instruction. After it fetches an instruction, the CPU stores the instruction in another
+register and updates the first register to the address of the next instruction. The CPU has a limited repertoire of instructions
+(the instruction set) that it understands. Also, these instructions are rather specific; many of them ask the computer to move a
+number from one location to another, for example, from a memory location to a register.
+
+There are a couple of interesting points that go along with this account. First, everything stored in a computer is stored as a
+number. Numbers are stored as numbers. Characters, such as the alphabetical characters you use in a text document, are stored as
+numbers; each character has a numeric code. The instructions that a computer loads into its registers are stored as numbers;
+each instruction in the instruction set has a numeric code. Second, computer programs ultimately have to be expressed in this
+numeric instruction code, or what is called machine language.
+
+One consequence of how computers work is that if you want a computer to do something, you have to feed a particular list of
+instructions (a program) telling it exactly what to do and how to do it. You have to create the program in a language that
+the computer understands directly (machine language). This is a detailed, tedious, exacting task. Something as simple as
+adding two numbers together would have to be broken down into several steps:
+Copy the number in memory location 2000 to register 1.
+Copy the number in memory location 2004 to register 2.
+Add the contents of register 2 to the contents of register 1 leaving the answer in register 1.
+Copy the contents of register 1 to memory location 2008.
+And you would have to represent each of these instructions with a numeric code!
+If writing a program in this manner sounds like something you'd like to do, you'll be sad to learn that the golden age of
+machine-language programming is long past. But if you prefer something a little more enjoyable, open your heart to high-level
+programming languages.
+
+

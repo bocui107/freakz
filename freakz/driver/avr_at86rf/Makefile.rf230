@@ -1,0 +1,5 @@
+
+CONTIKI_TARGET_SOURCEFILES += hal.c drvr_avr_at86.c mac_hw.c
+
+APPDIRS += $(ZIGBEE_PATH)/driver/avr_at86rf
+

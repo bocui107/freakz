@@ -1,0 +1,20 @@
+ZIGBEE  = freakz.c \
+	  zcl.c zcl_parse.c zcl_gen.c zcl_rpt.c zcl_basic.c zcl_on_off.c zcl_id.c zcl_level.c \
+	  zdo.c zdo_nwk_mgr.c zdo_disc.c zdo_cfg.c zdo_gen.c zdo_parse.c zdo_bind_mgr.c \
+	  af.c af_ep.c af_conf.c af_conf_tbl.c af_rx.c af_tx.c \
+	  aps.c aps_gen.c aps_parse.c aps_retry.c aps_dupe.c aps_bind.c aps_grp.c \
+	  nwk.c nwk_gen.c nwk_parse.c nwk_reset.c nwk_sync.c \
+	  nwk_rte_mesh.c nwk_rte_disc_tbl.c nwk_rte_tbl.c nwk_pend.c nwk_form.c nwk_permit_join.c \
+	  nwk_neighbor_tbl.c nwk_rte_tree.c nwk_brc.c nwk_disc.c nwk_join.c nwk_leave.c nwk_addr_map.c \
+	  mac.c mac_gen.c mac_parse.c mac_indir.c mac_queue.c mac_start.c mac_reset.c \
+	  mac_scan.c mac_assoc.c mac_poll.c mac_retry.c \
+	  buf.c debug.c misc.c slow_clock.c mem_heap.c \
+
+ZIGBEE_SOURCEFILES += $(ZIGBEE)
+ZIGBEEDIRS += $(ZIGBEE_PATH) $(TEST_DIR) ${addprefix $(ZIGBEE_PATH)/, af zdo aps nwk mac test misc zcl zcl/general}
+ZIGBEE_OBJECTFILES = ${addprefix $(OBJECTDIR)/,${call oname, $(ZIGBEE_SOURCEFILES)}}
+
+SOURCEDIRS += $(ZIGBEEDIRS)
+CONTIKI_SOURCEFILES += $(ZIGBEE_SOURCEFILES)
+PROJECT_OBJECTFILES += $(ZIGBEE_OBJECTFILES)
+CONTIKIDIRS += $(ZIGBEEDIRS)

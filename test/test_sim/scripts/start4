@@ -1,0 +1,19 @@
+send add 1
+wait node 1 added
+send cmd 1 zs c
+wait node 1 nwk form success
+send add 2
+wait node 2 added
+send cmd 2 zs
+wait node 2 nwk disc success
+wait node 2 nwk join success
+send add 3
+wait node 3 added
+send cmd 3 zs
+wait node 3 nwk disc success
+wait node 3 nwk join success
+send add 4
+wait node 4 added
+send cmd 4 zs
+wait node 4 nwk disc success
+wait node 4 nwk join success

@@ -1,0 +1,1291 @@
+// Main page for Doxygen documentation
+
+/************************************************************************/
+/*!
+    \mainpage
+	- Originally written by Christopher Wang (Akiba), FreakLabs, 
+2008-09-27 
+	- Updated 2009-04-11 for FreakZ v0.7
+
+    \section freakz_intro Introduction to FreakZ
+    FreakZ is an open source Zigbee stack licensed under the modified BSD. It uses intellectual property in
+the form of the Zigbee 2007 specification which is available from the Zigbee Alliance and can be
+downloaded from their webpage. There is an additional restriction imposed on the software in which
+it is subject to the Terms of Use of the Zigbee Specification. The TOU can be found at the front 
+of the Zigbee spec.
+
+   \section freakz_bg   Background
+   This project originally came from a stupidly ignorant boast to my sister's husband that I would
+make him a wireless beer fermentation monitor so that he can check the fermentation
+temperature of his beer in their basement.
+
+I was brought into the Zigbee world by one of my previous mentors, Dr. Jing Wang. He was a former
+professor at the University of California, Riverside and started a company called Transdimension
+that I was part of. During a management shakeup by the VCs that funded the company, the founders
+were ousted and Dr. Wang started a solo venture focused on Zigbee. At that time (2004), the IEEE
+802.15.4 spec had just came out and everyone was buzzing about Zigbee. I was helping him market his
+802.15.4 hardware and software solution to some of the large Japanese companies and in the process,
+learned about the protocol. However since the specification was not publicly available, we never got
+a chance to take a look at.
+
+Around 2006, the Zigbee spec became available for public download. That was around the same time
+that I had said I would make the beer fermentation monitor so I figured that I could turn it
+into a Zigbee project. According to the marketing tagline, Zigbee was "Wireless control that simply
+works" or something like that. I figured how hard could it be?
+
+After two failed attempts at half-heartedly writing a Zigbee stack, I had basically given up
+on the project. One of my mentors and good friends, Masanori Sugane, would always chide me that my
+attention span lasted a maximum of three months for any one thing. That really pissed me off so I
+told him that I would write a full Zigbee stack no matter how long it took. Uhhh...its taking
+pretty long.
+
+As an aside, that guy was the former Japan president of ITT Semiconductor, Siemens, and then
+Infineon. Now that he's not running such big organizations, his hobby seems to be hanging out at
+coffee shops, pachinko, and complaining about everything around him. That's probably why we get
+along so well...minus the pachinko part.
+
+This project started around February 2008. I actually got so involved with it that I quit my job in
+April so that I could work on it full time. The money part of things kind of worried me, but it was
+fun and my first open source project. I eventually cut a deal with the company to work for them part
+time two days a week so at least my rent and bills were covered.
+
+About seven months later, I had an argument with myself and pressured me into releasing the software
+early. I guess that brings me to this release.
+
+    \section freakz_comments Comments
+This stack is still in a very early stage and is still being built out. There are many features
+missing from it and it hasn't been fully tested. That being said, it feels like I finally got the
+architecture kind of right. All of the code was rewritten and reorganized many times as my
+understanding of the protocol and data flow slowly evolved. The current organization of the code and
+the layers feels pretty right and I'm hoping it won't change much.
+
+I think this version is mostly so that people can see and touch the code. I wouldn't recommend
+actually using it unless you're extremely brave or an expert debugger. I'll be working to improve
+the code and fix the bugs as the rest of the stack is being built out. And I'm hoping that someday,
+I can say that the code is stable. In the meantime, you can post any comments or questions to the
+forum and I or hopefully somebody will try to help out.
+
+Here is a list of the main issues with the stack right now:
+- The top issue is that all list, table, and queue elements are statically declared. This is a
+horribly inefficient use of RAM. One of the top priorities is to implement dynamic memory
+allocation that doesn't fragment.
+- The APS retry queue doesn't need to be there. I will be removing this in future versions and APS
+level retries will need to be handled by the application.
+- I need to figure out a way to determine the path cost. Right now, I'm just using static path
+costs, but its not a reliable way to route, and there's no way to pass compliance that way.
+- Security is not implemented yet.
+- The Zigbee Cluster Library is not implemented yet.
+
+Good luck. And I hope you don't think the stack sucks.
+*/
+
+/************************************************************************/
+/*!
+    \page freakz_license License
+    The FreakZ stack is currently licensed under the modified BSD with an 
+    additional restriction (#4) that it is subject to the terms of use 
+    of the Zigbee specification.
+
+    \verbatim
+    Copyright (C) 2009 FreakLabs
+    All rights reserved.
+    
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions
+    are met:
+ 
+    1. Redistributions of source code must retain the above copyright
+       notice, this list of conditions and the following disclaimer.
+    2. Redistributions in binary form must reproduce the above copyright
+       notice, this list of conditions and the following disclaimer in the
+       documentation and/or other materials provided with the distribution.
+    3. Neither the name of the the copyright holder nor the names of its contributors
+       may be used to endorse or promote products derived from this software
+       without specific prior written permission.
+    4. This software is subject to the additional restrictions placed on the
+       Zigbee Specification's Terms of Use.
+    
+    THIS SOFTWARE IS PROVIDED BY THE THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
+    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED.  IN NO EVENT SHALL THE INSTITUTE OR CONTRIBUTORS BE LIABLE
+    FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+    OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+    LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+    OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+    SUCH DAMAGE.
+ 
+    Originally written by Christopher Wang aka Akiba.
+    Please post support questions to the FreakLabs forum.
+    \endverbatim
+
+    The FreakZ stack runs on top of Contiki which is licensed under the modified BSD license. A copy
+of the license header is below:
+
+    \verbatim
+    Copyright (c) 2002, Adam Dunkels.
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions
+    are met:
+    1. Redistributions of source code must retain the above copyright
+       notice, this list of conditions and the following disclaimer.
+    2. Redistributions in binary form must reproduce the above
+       copyright notice, this list of conditions and the following
+       disclaimer in the documentation and/or other materials provided
+       with the distribution.
+    3. The name of the author may not be used to endorse or promote
+       products derived from this software without specific prior
+       written permission.
+
+    THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS
+    OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+    DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+    GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+    WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    \endverbatim
+*/
+
+/************************************************************************/
+/*!
+\page freakz_architecture MAC Layer
+
+\section freakz_mac MAC Layer
+The MAC layer comes from the IEEE 802.15.4 specification. Zigbee doesn't use the full MAC
+specification since most implementations are run in non-beacon mode. That simplifies the MAC layer
+very much, since a lot of the complexity is on how to handle the timing of the beacons and the
+timeslots.
+
+For the FreakZ stack, the MAC layer can be separated into three parts: RX data path, TX data path,
+and management.
+
+In v0.70, the MAC was split into two different parts: the hardware 
+specific part and the hardware agnostic part. This separation was mainly 
+because the stack was being ported to hardware and many of the 802.15.4 
+radios on the market contain MAC features that are built into the 
+hardware. The hardware agnostic MAC file is still in the same place and 
+called mac.c, however the hardware specific MAC file is located in the 
+individual radio driver directory and is called mac_hw.c. 
+
+\section freakz_drvr_interface MAC Driver Interface
+The MAC interfaces directly to the radio driver that is being used. On the transmit side, the MAC
+will directly call the driver's transmit function. For the simulated driver included with this
+release, the function is:
+
+\code
+drvr_tx(U8 *data, U8 len)
+\endcode
+
+The transmit function takes a pointer to the start of the data that is to be transmitted and also
+requires the amount of data to be sent. This will probably change as the stack gets moved into real
+hardware.
+
+The receive side is a bit more complicated. When a received frame comes into the driver, the driver
+will allocate a frame buffer and copy the data into the buffer. Once the data is copied, it will put
+the frame buffer into the receive queue and signal the driver process data was received. The
+driver process will then post an rx_event to the MAC process.
+
+Complicated, right? The reason we want to do it this way is because we want to spend as little time
+in the interrupt service routine as possible. With this setup, we can just throw the data into the
+receive queue and get ready for another frame to come in.
+
+The simulated driver source code also handles other things that are not part of the stack and should
+be taken care of in hardware. This includes changing the channel, generating a random number (either
+by a random number generator in the radio, a free-running counter, or whatever other method you
+like), doing clear channel assessment, etc. A quick browse through the source code will probably
+easily identify other functions that should be taken care of at the driver level.
+
+<HR>
+\image html mac_data.jpg "MAC TX and RX Data Path Diagram" width=5cm
+<HR>
+
+\section freakz_mac_rx MAC RX
+As mentioned previously, when a frame arrives into the driver, it is thrown into a frame buffer and
+put in the receive queue. The MAC process will receive an rx_event informing it that there is data
+waiting in the queue.
+
+At that point, the MAC's receive eventhandler takes over. The eventhandler will retrieve the data
+from the receive queue, and then parse the MAC header. Based on the header, the eventhandler can
+tell if its a data, command, or ACK frame.
+
+In the case of a data frame, it will be passed up to the next higher layer, which of course is the
+Zigbee networking layer.
+
+A command frame will be passed to the command handler, where the command data will be parsed. Once
+the command ID and arguments are known, the command can be handled. The current command frames that
+are supported are:
+    - Association request - to request to join a node
+    - Association response - response from the node you want to join
+    - Beacon request - to scan for networks and nodes within listening range
+    - Orphan notification - for an orphaned node to search for its parent (awww...how sad..)
+    - Coordinator realignment - for a parent to notify an orphan its still there
+
+An ACK frame is immediately handled. Once we get an ACK, we check to see if any transmitted frames
+require an ACK and have the matching sequence number. If we find a frame that matches our
+requirements, then we mark the transmission as successful and free that frame.
+
+\section freakz_mac_tx MAC TX
+The MAC transmit data path is fairly straightforward, but with some minor complications. The network
+layer calls the MAC's data request function and passes the data and other arguments to it. The MAC
+header is then slapped on to the frame and then it's basically ready to go out.
+
+Here's where the minor complications comes in. If the frame is marked as an indirect transmission,
+then instead of being transmitted immediately, it will get sent to the MAC's indirect queue. The
+indirect queue will hold the frame for a certain amount of time and wait for the child device to
+check if there's any data for it. It's kind of like a post office box, where you have to
+periodically check it for received mail.
+
+In a real implementation, most of the end devices will be sleeping most of the time. And in a
+beaconless network, there's no way to know if the child is sleeping or awake. Hence we keep the data
+and wait for the child to ask for it. According to 802.15.4, this is called an indirect
+transmission and it exists so that end devices can sleep during their idle time and save power.
+
+The other complication is that most data transmissions will require an ACK, at least for Zigbee
+frames. If an ACK doesn't arrive, then the frame will need to be re-sent up to the maximum number of
+retries that you specify. Because of that requirement, a retry list was implemented.
+
+If a frame doesn't require an ACK, the frame buffer will immediately be freed after the data is
+sent. However if an ACK is needed, the frame gets sent to the retry list in the case that no ACK
+comes back. If this occurs, the frame can be re-sent to the MAC's transmit function again, up
+until the maximum retries, or an ACK is received. If either occurs, the frame buffer will be
+freed and we'll return a confirmation with the status of SUCCESS.
+
+\section freakz_mac_mgmt MAC Management
+Along with the data path, the MAC supports certain management functions. As mentioned previously,
+Zigbee does not use all the services supported by the MAC. So the only supported MAC management
+services for this stack are the following:
+- MAC Scan - Three different scan types are supported:
+    - Energy: Energy scans are used to check the noise levels on each channel and report them to
+    the upper layers for evaluation.
+    - Active (Network): Active scans scan for networks and nodes within listening range. A beacon
+    request command frame is generated and broadcasted (MAC layer broadcast) out to the network. Any
+    node within listening range will then send its beacon back to the node. The beacon is then parsed
+    and the info is stuffed into a PAN descriptor list. After all the channels have been scanned, the
+    PAN descriptor list is passed up to the upper layers for evaluation.
+    - Orphan: When a node fails multiple times at sending frames to its parent, then it will assume
+    its an orphan. It will then perform an orphan scan in an attempt to locate its parent. The orphan
+    scan is the same as an active scan, except instead of sending out beacon requests, orphan
+    notifications are sent out. If the parent sees an orphan notification from one of its children, it
+    will send it a coordinator realignment frame which will stop the orphan scan and rejoin the orphan
+    to the network.
+- MAC Poll
+    - Remember when we were talking about the indirect queue and mailboxes? The MAC poll service
+    generates a data request command frame to extract indirect data from the parent node.
+- MAC Association
+    - This is the process of joining with another node on the network. Once a node is
+    located for joining, an association request command frame is generated and sent to that node. The
+    potential parent node will get the association request and evaluate if it can allow the requesting
+    node to join. In either case, an association response is sent indirectly. That means that the
+    requesting node will need to send a data request command frame to extract the association response
+    from the potential parent. Once the association response is received, that node is either joined to
+    the network or rejected miserably.
+- MAC Reset
+    - As the name implies, this resets the MAC layer.
+- MAC Start
+    - As the name implies, this starts the MAC layer.
+
+*/
+
+/************************************************************************/
+/*!
+\page freakz_nwk_arch NWK Layer
+The Zigbee network layer is probably the most complicated layer in the Zigbee stack. At least
+complicated to write. The application layer is probably the most complicated to understand.
+
+The network layer performs many functions such as routing, route discovery, broadcast management,
+data forwarding, network management, and your basic transmit and receive handling. Thus its a fairly
+busy part of the stack.
+
+<HR>
+\image html nwk_data_path.jpg "NWK TX and RX Data Path Diagram" width=5cm
+<HR>
+
+\section freakz_nwk_rx  NWK RX
+The network receive data path starts at the MAC data indication service. As mentioned in the MAC
+section, when a data frame comes into the MAC, it will get sent up to the next higher layer. The
+frame gets sent by calling the MAC data indication, signalling the next higher layer that data has
+arrived.
+
+Once at the network layer, the data frame will get parsed and then will either be handled as a data
+frame or a network command frame.
+
+If its a network data frame, then it can be handled according to three different conditions:
+- The destination address is the same as our address
+    - This means that the frame was meant to us. This is an easy case because we just pass it on to
+the next higher layer, which is the Application Sub-Layer.
+- The destination address is a broadcast address
+    - In this case, we need to start off a broadcast operation. Network broadcasting is a bit
+different from MAC broadcasting because when you receive a broadcast frame, you also need to relay
+it. Its actually a bit dangerous because its easy to set off a broadcast storm that spirals out of
+control. If that happens, then its possible to crash all of your nodes. Fun!
+    Anyways, the point is that if we receive a broadcast, we need to start off a broadcast
+operation, and then relay the frame. I'll talk more about broadcasting later.
+- And finally, if the destination is not the same as ours, and the its not a broadcast frame
+    - In this case, we need to forward the frame. The frame is passed to an intermediate function
+whose main purpose is to figure out where to forward a frame. That function is called nwk_fwd and
+is shared by both the TX and RX data paths.
+
+<HR>
+\image html nwk_data_fwd.jpg "NWK RX Data Forwarding" width=5cm
+<HR>
+
+If its a network command frame, then we need to handle it according to its command ID. Currently
+only three command frame types are supported for the network layer:
+- Route request
+    - This is required for route discovery. The route request is broadcasted out to the network and
+continues until it finds the destination.
+- Route reply
+    - This is required for route discovery. Once the route request finds its destination, the route
+reply is unicast back to the sender. This continues until it reaches the originator of the route
+request.
+- Network Leave
+    - This is to force a child or a child's children to leave the network. Zigbee uses network
+commands to force children off the network instead of the MAC disassociate service.
+
+Once the command frame is parsed, it will get passed to the corresponding handler and processed from
+there.
+
+\section freakz_nwk_tx NWK TX
+The transmit data path starts at the network data request function. This function gets called by the
+Application Sub-Layer (APS) with the frame buffer and the request arguments. The network data
+request function will take the arguments and load them into a network header data structure. It then
+passes the data and the header structure to the nwk_fwd function.
+
+As mentioned previously, the nwk_fwd function's main purpose is to figure out where to forward a
+frame to. It accepts frames from both the receive data path and the transmit data path. Once in this
+function, it will decide where to send the frame to according to the following rules:
+- If its a broadcast, then send it out to the MAC with a destination address equal to the MAC
+broadcast address.
+- If the network destination address is in our neighbor table, then send it to the neighbor.
+- If the destination address is in our routing tables, then send it to the next hop address in the
+routing table.
+- If its not in our routing table, but the discover route flag is enabled in the header, then buffer
+the frame in a temporary holding queue (network pending queue) and start a route discovery
+operation. Once the route is discovered, then we will forward the frame to the next hop on the
+discovered route.
+- If its not in our routing table, and discover route is disabled, then send it via tree routing.
+    - Tree routing is based on the addresses of the nodes and the destination. Using the destination
+address of the frame and the current node's address, the next hop can be calculated. Once
+calculated, the frame will be forwarded there.
+
+Once the forwarding decision is made and the MAC destination address has been added, the frame will
+be sent out to the MAC data service and finally transmitted out.
+
+\section freakz_nwk_routing NWK Routing
+The Zigbee network layer supports two types of routing: mesh routing and tree routing.
+
+Mesh routing is based on an algorithm called AODV or Ad-hoc On-demand Distance Vector routing.
+Although it sounds pretty academic, the concept is quite simple. A route request is broadcast to the
+whole network. Each node that receives the route request will record the following information in
+its route discovery table:
+- The originating node
+- The node that relayed the route request
+- The final destination
+- The path cost
+
+Once the route request reaches the destination, the destination node will send a route reply back to
+the node that relayed the route request. This is the first hop route reply and that node can just
+check its discovery table entry to find the node that previously relayed the route request to it.
+The route reply then gets forwarded to that node. That is the second hop route reply. This continues
+until the route reply reaches the originating node.
+
+At that point, the route is established. Any other route replies that are received will be evaluated
+based on the path cost. If the path cost is better than the current one, then that path will be used
+instead.
+
+Tree routing is based on the addresses of the nodes. Every node that joins the network is given an
+address based on the distributed address assignment algorithm in the Zigbee specification. You
+basically just need to follow the formula in the spec and it can be found in section 3.6.16 of the
+Zigbee 2007 specification.
+
+To summarize what the distributed address assignment algorithm does, it basically assigns an address
+range to each node. For example, node A has an address range of 1 to 21. That means that all nodes
+below node A will have an address somewhere within this range. If a frame arrives and the
+destination address is 20, then the node will know to forward the frame down to one of its children.
+If a frame arrives whose address is 22, then the frame will know that it needs to forward it up to
+its parent since the destination address is outside its allocated address range.
+*/
+
+/************************************************************************/
+/*!
+\page freakz_aps_layer APS Layer
+The Application Sub-Layer (APS) is the workhorse of the application layer. All endpoint client and
+server functionality is handled by the APS data service, however the data path is pretty straight
+forward. The one hitch in the data path is that there are also APS level acknowledgements that are
+available, in addition to the MAC level ACKs. We'll be discussing that later.
+
+It should also be mentioned that the APS layer handles source binding and grouping. These functions
+have not been implemented yet, but they will be implemented in some later version some
+day...hopefully...(The binding table is already written and tested, but I need to understand more
+about how binding operates before I can implement the feature).
+
+<HR>
+\image html aps_data.jpg "APS TX and RX Data Path" width=5cm
+<HR>
+
+\section freakz_aps_rx APS_RX
+When a frame is received into the APS, the first thing that gets done is that the frame is
+parsed. The APS header data is extracted and put into a header data structure. After that, it will
+make a decision on what to do with the frame based on its type:
+- Data frame
+    - First we need to check to see if the frame requires an ACK. If it does, we send out the ACK
+immediately. After the ACK is sent out, we then send the frame to the next higher layer which would
+be the Application Framework.
+- ACK frame
+    - If its an ACK frame, then we need to send it to the APS ACK handler. This is part of the retry
+queue. The APS retry queue operates in a similar fashion to the MAC retry queue. If a frame requires
+an ACK, then it will be buffered in the retry queue. In the case that no ACK is received, the frame
+can then easily be re-sent.
+    When an ACK arrives, the ACK handler will check the APS retry queue for a frame with the
+same signature (endpoint, cluster, and APS counter) as the ACK. If a frame is found that matches the
+signature, then that frame is removed from the retry queue and a data confirmation is sent with a
+status of SUCCESS.
+- Command frame
+    - The Zigbee 2007 specification does not support any non-security related command frames.
+
+\section freakz_aps_tx APS_TX
+The APS TX datat path is invoked from the next higher layer, the Application Framework (AF). The AF
+will call the APS data request function with the frame data and request arguments. Once inside the
+APS data request function, the request arguments will be assembled into a header data struct. The
+main tricky part of the APS data request service is the addressing. Four addressing modes are
+supported:
+- Indirect
+    - Indirect addressing means that no address is passed to the function. In this case, the address
+will need to be looked up in the binding table, referenced by the source endpoint and the cluster
+ID. Once the binding entry is located, the frame will be sent to every binding pair in the entry.
+- Unicast 16-bit
+    - This just means that we're sending the frame out with a 16-bit destination address. This is
+the most common scenario.
+- Unicast 64-bit
+    - If a 64-bit IEEE destination address is given, then we look up the corresponding 16-bit
+address in the network address map. After that, we just send the frame out with a 16-bit destination
+address.
+- Group
+    - This is currently not supported, but group addressing is a form of multi-casting. At the APS
+level, a frame will be unicast to each member of a group. This is in contrast to a multi-cast at the
+NWK layer, where a frame is broadcast and its ignored by anyone that doesn't have the proper group
+ID.
+
+Once the addresses are determined, the data gets passed down to the NWK data request service.
+
+\section freakz_aps_bind APS Binding
+The binding functionality has not been implemented yet.
+
+\section freakz_aps_group APS Groups
+The group functionality has not been implemented yet.
+*/
+
+/************************************************************************/
+/*!
+\page freakz_af AF Layer
+The application framework (AF) is like the railroad switching station. It routes the received frames
+and the data confirmations to the proper endpoint. The transmit path of the AF is just a wrapper
+function and the transmit data and arguments get passed directly to the APS layer.
+
+The application framework is the gateway to the user application. Zigbee profiles and custom
+profiles sit inside endpoints (one endpoint per profile) on top of the AF and use its services to
+transmit and receive data. When a profile is implemented, it needs to register itself with the
+application framework. To do this, it calls the af_ep_register function and tells the AF the
+following information:
+- Endpoint number
+    - This is the endpoint number that the profile can be found at.
+- Simple descriptor
+    - This is a description of the endpoint. It contains the profile ID, input cluster list, output
+cluster list, and other information needed for operation.
+- Receive callback
+    - This is the receive function that is implemented by the profile for received data. A function
+    pointer will point to this function and any received data with the corresponding endpoint
+    number will be passed to it.
+- Confirm callback
+    - This is the data confirmation function that is implemented by the profile. After data is
+transmitted, a confirmation is issued and passed up the stack with the status of the transfer. The
+status will inform the profile if the operation was successful or not.
+
+Once these functions are registered, then the endpoint becomes active and data and confirmations can
+be passed in and out of the profile.
+
+One of the major functions implemented in the application framework architecture is to queue all
+incoming and outgoing data. It serves as a breaking point to cut down on the latency of the data
+path operations. It's impossible to know how the user applications will be implemented and if the
+latency on either the transmit or receive side of the user application is too long, it could have
+adverse effects on the stack. By queueing all the data at the AF, we can provide a break in the
+latency so that the MCU won't be hogged by any transmit or receive operation.
+
+<HR>
+\image html af_data_rx.jpg "AF RX Data Path" width=5cm
+<HR>
+\section freakz_af_rx AF RX
+
+When data is received into the AF, it is sent to the AF's receive queue. An event is then posted to
+the AF process. Some time later, the event will be handled by the af_rx_handler. The handler will
+fetch the received frame buffer from the queue and then, based on the endpoint, call the
+corresponding receive callback function for that endpoint.
+
+<HR>
+\image html af_data_tx.jpg "AF TX Data Path" width=5cm
+<HR>
+\section freakz_af_tx AF TX
+
+When outbound data enters the AF from the endpoint, it is thrown into the AF's transmit queue and an
+event is posted. When the event is handled, the af_tx_handler will fetch the frame from the queue
+and send it to the APS data request service.
+
+\section freakz_af_conf AF Confirm
+When an inbound data confirmation enters the AF, it is thrown into the AF's confirm queue and an
+event is posted. When the event is handled, the af_conf_handler will fetch the confirm data from the
+queue and call the corresponding confirm callback function for that endpoint.
+*/
+
+
+/************************************************************************/
+/*!
+\page freakz_zdo ZDO Layer
+
+The Zigbee Device Object (ZDO) is actually not a layer in itself, but more of an application that is inserted into one of the endpoint slots created 
+by the application framework (AF). It is a required application on all Zigbee devices and will always reside on endpoint 0. It's main purpose is 
+initialize the device and manage its operation. The management portion is divided into the following categories:
+	-# Device and service discovery
+	-# Network management
+	-# Security 
+	-# Binding 
+	-# Grouping
+
+\section freakz_zdo_operation ZDO Operation
+
+The ZDO operates as any other standardized Zigbee application. It is divided into clusters and each cluster performs a  certain function. Some 
+functions act as a server and respond to requests by a remote device and some clusters act as clients and process responses 
+from a server. This may seem a bit weird, and it was definitely that way for me when I first tried to get a handle on it. the best way to think about 
+it is to think of endpoints as TCP ports. Each port houses a different application such as port 80 housing web servers and communications, port 21 for 
+ftp, port 25 for SMTP email sending, etc. As for clusters, they end up simply being functions that are referred to by a number (16-bit cluster ID 
+actually).
+
+The reason why the cluster ID's exist is to assist in identify the incoming frame and how to decode it. When a ZDO frame comes into the device, it 
+first gets sent all the way up to the AF layer. At the AF layer, it will see that the target endpoint is EP 0 which is the standard ZDO endpoint for all devices. 
+The AF will then look up EP 0 in its endpoint table and call the receive function for that endpoint with the frame and cluster ID as its arguments. 
+
+At this point, the frame is in the ZDO, more specifically the ZDO's Rx handler function. This handler is the main entry point into the ZDO and will 
+use the cluster ID that was passed in to look up where to send the incoming frame. Inside the ZDO is a table that contains all of the cluster 
+IDs that are supported in the stack and the corresponding function pointers. Once the receive handler locates the proper ID, it calls the 
+function pointer and passes in the data. After this, the frame will be inside the specific target cluster (ie: function) where it will be decoded and 
+processed. 
+
+The files in the ZDO are split up by management object. Hence, the discovery functions will be in the zdo_disc.c file, the network management 
+functions will be in the zdo_nwk_mgr.c file, etc...
+
+\section freakz_zdo_discovery Device and Service Discovery
+Device discovery is the ability to query other devices to find out what their capabilities are. The ZDO defines standard request and response behavior 
+that allow it to discover the capabilities of other devices in the network. The information is contained in a set of standard and optional 
+descriptors. The standard descriptors are the:
+	-# Node descriptor: 
+		- This contains information about the capabilities of the node such as the node type, optional descriptors available, capability 
+info, min and max buffer sizes available for incoming traffic 	
+	-# Node power descriptor: 
+		- This contains information about the node's power sources.
+	-# Simple descriptor: 
+		- This contains information about the particular endpoint that is being queried. Zigbee devices will have one simple 
+descriptor per endpoint which describes the endpoint and what clusters it supports.
+
+The device and service discovery are performed by sets of request and response functions that are accessed by their specific cluster IDs. The ones 
+that are currently supported in the stack are the:
+	-# IEEE and network address request - Request the extended or network address for a particular device
+	-# Node descriptor request - Request the node descriptor for a device
+	-# Power descriptor request - Request the power descriptor for a device
+	-# Simple descriptor request - Request the simple descriptor for a device
+	-# Active endpoint request - Finds all active endpoints on a device
+	-# Match descriptor request - Finds all devices with clusters that match that device's clusters
+	-# End device announce - Announces a new device to the network
+
+\section freakz_zdo_network Network Management
+The ZDO network manager has the responsibility to initialize the device, networking, and APS layers. It will also handle network formation, initiate 
+network joining, decide on which channel to operate on, decide which parent to join, and pass all indications and confirms to the user application via 
+callbacks. 
+
+In addition to this, it can request and respond to remote operations that utilize the networking layer such as performing channel scans or requesting 
+a remote device to ask its children to leave the network. It also responds to the network manager when the network manager decides to switch channels. 
+This is known as frequency agility and would usually occur if the channel becomes noisy enough that proper operation of the network becomes 
+problematic.
+
+The supported requests in the network manager are:
+	-# Network discovery request - Request a device to perform a network scan and return the results
+	-# Network LQI request - Request a device to send its neighbor table which includes the link quality indicator (LQI)
+	-# Network leave request - Request a device to issue a leave request to one of its children
+	-# Network permit join request - Request a device to permit joining
+	-# Network update request/notify - Request a device to change its channel, channel mask, or perform an energy scan
+
+The majority of the requests and responses will most likely be used by a commissioning device, although it may be possible for other devices to access 
+these functions as well. In a future revision, I'll build in some access control so that if a device gets access to the network, they can't go crazy 
+and force random devices to leave the network or request information from other devices. 
+
+\section freakz_zdo Binding Management
+The ZDO binding manager handles binding and unbinding requests and responses. Binding is used to simplify the address management of the application so 
+that it can just simply handle requests and responses without caring about the addresses that it comes from. In a typical use case, a commissioning 
+device will set up a link between two devices. The normal example is a light switch and a light, however you can also use the same case for a light 
+switch and multiple lights. When these devices are bound, any frames that originates from the specified endpoint and cluster in the binding table will
+automatically get sent to the destinations that are contained in the binding entry. 
+
+Needless to say, the main client that will use the binding management functions would be a commissioning device. A commissioning device is basically a 
+device that sets up the network and defines how devices will interact. It's probably something that a home installer would use if they set up some 
+type of home automation network in your house. 
+
+Anyways, a commissioning device would issue binding requests to a device and upon receiving those requests, the device will enter the binding entries 
+into its binding table. Unbind requests are also supported in the stack.
+
+One of the more complex operations is the end device binding. This is binding without a commissioning device. The spec authors wanted to handle a case 
+where a commissioning device would not be available such as in a low cost wireless sensor network kit. So they implemented a feature called end device 
+bind, where the binding between two devices is facilitated by a third device. The case scenario would be two end devices and the binding would be 
+performed by some router or the coordinator.
+
+Here's how it works. An end device wants to bind with another end device. To use the tired old light switch/light socket example, say you want to bind 
+those two without a commissioning device. You would push a button on the light switch. This would send an end device bind request to the network 
+coordinator. The network coordinator would then start a timer for something like 30 seconds. Within that time, another end device bind request needs 
+to come from the binding partner, ie: the light socket. So the user would push a button on the light socket and it would send the request. Once the 
+coordinator has both requests, it will process them, look for matching clusters, and issue binding requests to each device for all the matched 
+clusters. Hence the two devices would be completely bound to each other. The end device binding would work with more complex scenarios as well such as 
+multiple light switches, one on each endpoint being bound to different lights. However in cases of increasing complexity, I would hope that the person 
+would use a commissioning device instead.
+
+So it looks like an open source commissioning device may be on the horizon as well...
+
+The binding requests that are currently supported are:
+	-# End device bind request
+	-# Bind request
+	-# Unbind request 
+
+\section freakz_zdo_grouping Group Table Management
+
+To Be Added
+
+\section freaKz_zdo_security Security Management
+
+To Be Added
+
+*/
+
+/************************************************************************/
+/*!
+\page freakz_zcl ZCL
+
+The Zigbee Cluster Library (ZCL) is a set of cluster definitions that can  
+be re-used across the different device profile specifications. It's original
+intent was to save code space if multiple device types were implemented  
+on a single device. They are extremely important for Zigbee whose main 
+benefit is device interoperability and all device profiles use the Zigbee 
+Cluster Library as much as possible.
+
+\section freakz_zcl_general General Info about the ZCL
+The cluster library is set up in a way that is similar to classes in 
+object oriented programming. Each cluster has attributes which contain
+information about the cluster, and commands which take some type of 
+action for the cluster. For those that are familiar with OOP, this is 
+similar in functionality to class variables and methods. The cluster 
+libraries are grouped based on the functionality of the clusters, hence 
+there are cluster libraries for HVAC, lighting, smart energy, etc.
+Each device profile uses clusters from the library whenever possible and 
+may also define their own implementation specific clusters.
+
+If a device is being created based on a standard device profile, then it is best to use the cluster libraries, and the clusters that are required 
+will be defined in the profile spec. However if the device does not need to conform to a standard profile, then the user is free to define their own 
+clusters and behavior. 
+
+\section freakz_zcl_cluster What is a Cluster?
+
+The ZCL is set up with a client/server model in mind. This means that there are client clusters which initiate requests and handle responses and 
+server clusters which react to the incoming requests. A cluster is a set of related attributes and commands which are grouped together 
+to provide a specific function. An attribute is essentially a variable that holds some kind of data or status for the cluster. 
+
+A simple example of a cluster would be the On/Off cluster which defines 
+how an on/off switch behaves (yeah, I know its strange that you almost 
+need a computer science degree to implement an
+on/off switch...). In the on/off cluster, there is one attribute which is 
+strangely called the on/off attribute. The attribute holds the state of 
+the	switch and can either be on (1) or off (0). There are also three 
+defined commands for this cluster. One command is called "off" and is 
+used to set the attribute to off. Another command is called "on" and is 
+used to set the attribute to on. And finally, there is a "toggle" 
+command. You probably think I'm being inane right now, and you'd be right 
+:) Anyways, the concept is fairly simple once you get the hang of it. It's just an abstracted way to
+deal with device functionality. 
+
+\section freakz_zcl_general_commands ZCL General Commands
+Common to all ZCL implementations are the general commands. These are the basic commands for manipulating attributes and is supported by all clusters. 
+There are a few of them and you can get an exact list in the spec. However some of them are redundant or useless so I'll only list the main commands 
+here:
+	- Read attribute
+		- This reads the value of an attribute or a list of attributes and returns them in the response.
+	- Write attribute
+		- This writes a value to an attribute or a list of attributes and returns the status of the write operation in the response. Whenever 
+possible, the cluster for modifying a particular attribute should be used rather than writing directly to it. Otherwise, it could lead to strange 
+behavior or a loss of synchronization of state information.
+	- Configure reporting
+		- This is quite an interesting function. You can configure an attribute to report its status at some pre-defined interval. You can also 
+configure the attribute to only report if the change in state was bigger than some value that you specify. 
+	- Discover attributes
+		- A device can discover attributes on a specific cluster of another device by sending a discover attribute request. You just specify the 
+starting attribute ID (ie: 0) and what value you want to end the discovery with. The response will contain all of the attributes that exist within the 
+interval that you provide.
+
+\section freakz_zcl_datatypes ZCL Data Types
+Adding to the confusion in the ZCL is the fact that they abstracted the 
+data types so that one generic attribute container can handle any data. 
+Of course this type of simplicity makes things more compliacted for the 
+programmer. Inside the attribute, the data type must be stored along with 
+its associated data. Anything that accesses the attribute first 
+needs to check the data type so that it knows how to decode the 
+info in the attribute's data pointer. It's really rather clever. Too 
+clever in fact and makes understanding and programming the ZCL more 
+difficult. 
+
+Anyways, since you need to know about the ZCL data types if you deal with 
+the ZCL and its attributes, here it is. Each attribute is actually a
+generic structure that contains at least the following:
+	- Attribute ID
+	- Data type
+	- Access rights
+	- Data pointer
+
+The data type is required to access the data pointer and is an enumerated 
+value defined in the ZCL specification. Once we know the data type, then 
+we can de-reference the 'void' data pointer and extract the correct value. 
+
+\section freakz_zcl_further Further Info on the ZCL
+Unfortunately, there aren't many good resources on the ZCL other than the 
+Zigbee ZCL specification. A full discussion on the ZCL would require going 
+into each of the cluster libraries, and this document probably isn't 
+appropriate to tackle that. 
+
+One thing that is important is to understand how to build an application 
+using the ZCL and I'll be providing information on how to do that later on 
+in the documentation.
+
+\section zcl_general_usage ZCL Usage
+The Zigbee Cluster Library defines a generic interface to the Zigbee stack and 
+consists of attributes and commands. The attributes contain data about that interface, 
+and the commands initiate actions for it. An example is the ZCL's level control 
+cluster. The "current level" attribute contains the data value that represents 
+the current level of something, ie: a dimmable light. The "move to level" command 
+initiates an action, where the current level will transition to a new level specified 
+in the command's arguments. That example pretty much summarizes the functionality of 
+the Zigbee Cluster Library.
+
+The difficulty with the ZCL, and the part that I get a lot of questions about, is 
+that it is a completely generic interface. All clusters have the same interface, 
+in that they can contain both attributes and commands. The attributes are also 
+generic, meaning that an attribute can contain any type of data. One attribute 
+could be a character string and another attribute can be an unsigned integer. In 
+object oriented terms, an attribute exhibits polymorphism where an unsigned char 
+attribute can be used like a string attribute. In C, this is not so easy to accomplish.
+
+Before we get into the details of the FreakZ implementation, it might be good to get 
+an idea visually of what the ZCL is. Here's a diagram that illustrates how a device 
+profile is put together using clusters from the ZCL.
+
+<HR>
+\image html zcl_overview.jpg "Zigbee Device Block Diagram - ZCL/APP View" width=5cm
+<HR>
+
+From the diagram you can see all the basic building blocks. The most basic block 
+is the attribute. Multiple attributes are aggregated into an attribute list. 
+Clusters consist of attribute lists and command parsers. Groups of clusters are 
+aggregated into a cluster list. And finally, the cluster list is tied together by 
+the simple descriptor and the frame handler to create a device. Each device is 
+located on a separate endpoint. 
+
+To build up a Zigbee application for a standard device profile, you would need to 
+create a file that contains the following structures:
+- A simple descriptor - Defines the endpoint, clusters, and profile of the endpoint/device.
+- A cluster list - Contains the clusters that the device uses.
+- Clusters - the instantiation of the clusters in the cluster list
+- Attribute lists - the attributes that are contained in each of the defined clusters
+
+This is a bit complicated so let's take a look at an example:
+
+Simple Descriptor:
+\code
+static U8 simple_desc[] = {
+    TEST_ZCL_EP,                // ep
+    0x04,                       // profile id
+    0x01,
+    TEST_ZCL_DEV_ID_ON_OFF,     // dev id
+    TEST_ZCL_DEV_VER,           // dev ver
+    2,                          // num in clusters
+    ZCL_BASIC_CLUST_ID,         // in clusters
+    ZCL_ON_OFF_CLUST_ID,
+    1,                          // num out clusters
+    ZCL_ON_OFF_CLUST_ID
+};
+\endcode
+
+This is the simple descriptor for the test ZCL endpoint in the command line application I wrote. 
+It defines the endpoint, profile, device, and clusters. This descriptor gets registered with the 
+application layer so that if any frames arrive for this endpoint, they will be forwarded here. 
+Also, if other devices inquire about what services this endpoint supports, the application will 
+reply with the info provided by this descriptor.
+
+/code
+static zcl_basic_attrib_list_t basic_attrib_list;
+static zcl_clust_t basic_clust;
+/endcode
+
+There are two instantiations that are required to implement a cluster. In this case, it's the ZCL's basic 
+cluster. The first instantiation is the attribute list. This is a structure defined in the basic cluster 
+source file (zcl_basic.h) which contains all of the attributes required for the basic cluster. We will be 
+examining the attribute list structure in more detail later. The second instantiation is for the cluster 
+itself. We'll also be examining the cluster structure later on.
+
+Along with the basic cluster, other clusters are also defined and they use the same format where they 
+require instantiating the attribute list and the cluster. Once all the clusters are defined, we get to 
+the cluster list:
+
+\code
+static zcl_clust_t *test_zcl_clust_list[] =
+{
+    &basic_clust,
+    &on_off_clust,
+    &id_clust,
+    &level_clust,
+    NULL
+};
+\endcode
+
+The cluster list is a pointer array which just contains pointers to each of the clusters you defined. When 
+a frame is received, it is checked against this list and the appropriate cluster is extracted based on the 
+cluster ID of the frame. 
+
+\code
+void test_zcl_init()
+{
+    // init the clusters with the proper data
+    zcl_set_clust(&basic_clust, …);
+    zcl_set_clust(&on_off_clust, …);
+    zcl_set_clust(&id_clust, …);
+    zcl_set_clust(&level_clust, …);
+
+    // init the attributes
+    zcl_basic_init(&basic_attrib_list);
+    zcl_on_off_init(&on_off_attrib_list);
+    zcl_id_init(&id_attrib_list);
+    zcl_level_init(&level_attrib_list);
+
+    // register the endpoint as a ZCL endpoint
+    af_ep_add(TEST_ZCL_EP, simple_desc,…);
+}
+\endcode
+
+Finally, we get to the endpoint initialization routine. The initialization routine starts off by initializing 
+the cluster fields such as the endpoint that this instance belongs to, the cluster's ID, the address of its 
+attribute list, and handlers for received frames and user actions. This needs to be performed for each cluster. 
+One thing to also note is that all the instantiations are specific to this endpoint only. You can create a new 
+endpoint in a separate file and have a new instantiation of the same cluster, ie: the basic cluster which will 
+be unique to that endpoint. One of the questions I get asked often is how to have multiple instantiations of the 
+same cluster on different endpoints. Well, there's your answer.
+
+After the clusters are initialized, then we need to initialize the attribute lists. Initializing the attributes 
+consists of linking the attribute to its data container (it's variable), setting the data type, and initializing 
+the value to its default. Each cluster file defines an init function which handles the initialization specifically 
+for that cluster.
+
+And finally, we register the endpoint with the application layer, the Application Framework to be exact. Once 
+it's registered, the AF will forward any frames addressed to this endpoint to the rx handler in this file. 
+
+Now that we have the high level overview of how the clusters and attributes are used to define a device, let's take 
+a more detailed look at how the attributes and clusters are actually implemented. It's probably best to start at the 
+bottom with the attributes. As an example, I'll use the ZCL's level cluster which can be found in zcl_level.c/h. 
+
+The level cluster's attributes are defined in the header file. At the top of the file, you can see a list of definitions 
+for attribute IDs, command IDs, and arguments. These should be pretty self explanatory. Below that, you'll see a 
+structure called zcl_level_data_t:
+
+\code
+typedef struct zcl_level_data_t
+{
+    U8  curr_level;
+    U16 on_off_trans_time;
+    U8  on_level;
+} zcl_level_data_t;
+\endcode
+
+This is the structure that holds the containers for the attribute data. Each attribute holds data, however the attribute 
+data type is generic so it's not possible to define a single type for the attribute that can cover all the possibilities. 
+Hence, the data field in a generic attribute is just a void pointer that points to a container which holds the actual data. 
+This structure is the container and contains one variable for every attribute. In general, each cluster file will have an 
+attribute data container called "zcl_<cluster name>_data_t". 
+
+Before we get to the attribute list structure, I'd like to explain a bit about the generic attribute structure, since 
+it might be useful. Here's the definition of the attribute structure in FreakZ: zcl_attrib_t:
+
+\code
+typedef struct _zcl_attrib_t
+{
+    U16         id;             ///< Attrib ID
+    U8          type;           ///< Attrib data type
+    U8          access;         ///< Attrib data access privileges
+    void        *data;          ///< Ptr to data
+    mem_ptr_t   *rpt;           ///< Placeholder in case this attrib requires a report
+} zcl_attrib_t;
+\endcode
+
+The generic attribute type is basically the same as the one defined in the Zigbee spec. Each attribute has an attribute ID 
+used for identification, a data type to specify what kind of data it holds, access rights for that attribute, and a void 
+pointer to it's data container. I also added an additional field for the ZCL reporting purposes.
+
+With an understanding of the attribute data container and the attribute structure, we can now take a look at how 
+the attribute list is defined:
+
+\code
+typedef struct _zcl_level_attrib_list_t
+{
+    zcl_attrib_t        list[ZCL_LEVEL_ATTRIB_LIST_SZ];
+    zcl_level_data_t    data;
+} zcl_level_attrib_list_t;
+\endcode
+
+You can see that the attribute list contains two fields. The first field is an array of generic attributes. This is the actual 
+attribute list. The second field is the data container structure. When the attribute list is initialized, the attribute's data 
+pointer will point to it's corresponding field in the data container. 
+
+Hopefully, that wasn't too confusing. That's how the attribute list is generated and initialized. Now let's take a look at a 
+generic cluster. Here's the definition for a cluster from the FreakZ stack:
+
+\code
+typedef struct _zcl_clust_t
+{
+    U8 ep;                      ///< Endpoint that cluster belongs to
+    U16 clust_id;               ///< Cluster ID
+    zcl_attrib_t *attrib_list;  ///< Cluster attribute list
+
+     void (*rx_handler)(U8 *resp, U8 *resp_len, U16 addr, U8 ep, struct _zcl_clust_t *clust, zcl_hdr_t *hdr);
+
+    void (*action_handler)(U8 action, void *data);
+} zcl_clust_t;
+\endcode
+
+In the generic cluster listing above, you can see that a cluster contains the endpoint of the instance of that cluster, the cluster ID, 
+a pointer to the attribute list, and two function pointers. The endpoint is needed because you may have multiple instances of clusters 
+with the same ID, but on different endpoints. Hence the endpoint can be used for identification and to retrieve required info.
+
+The attrib list pointer should now be self-explanatory, but it just gets initialized with the attribute list that we just looked at. 
+The two function pointers are actually pretty interesting.
+
+You can break down a Zigbee cluster's behavior into two parts: (1) an action specified by ZCL spec (2) an action defined by the user. 
+In the case of a command going into the on/off cluster to turn on a light, the ZCL action is that a response needs to be generated and sent 
+back to the originating device. The user defined action is that a pin on one of the GPIO ports needs to be set high to turn on the light. 
+Hence, the two function pointers are required.
+
+The cluster's rx_handler is the action defined by the ZCL spec. This function will be initialized to the matching function inside the cluster's 
+source file. For example, the rx_handler for an on/off cluster will be defined in the zcl_on_off source file. Basically, this is the part that 
+I take care of. 
+
+On the other hand, the user will need to write an action_handler function of their own and this will define what user-defined action to take for that cluster. 
+
+<HR>
+\image html zcl_processing_sequence.jpg "Zigbee Processing Sequence for an Incoming Frame" width=5cm
+<HR>
+
+For example, let's take the case where a frame arrives and is addressed to the on/off cluster of endpoint 1 with a command to turn 
+on a light. When the frame arrives at the endpoint, the endpoint will see that the frame is cluster specific with the on/off cluster 
+ID. It will then forward the frame to the on/off cluster's rx_handler via the cluster's function pointer. Incidentally, this is the 
+rx_handler in zcl_on_off.c. In the rx_handler, the command gets parsed, the on/off attribute gets set to "on" and a response is sent. 
+After that, the control passes over to the action handler which is called via the "action_handler" function pointer. The action handler 
+is written by the user and is just one line which sets a GPIO bit to HIGH on the microcontroller. This will turn on the light.
+
+*/
+
+
+/************************************************************************/
+/*!
+\page freaks_install Installing and Building the Code
+This section deals primarily with building the code. The installation part happens if you're using
+Windows since Linux already has all of the tools (make, gcc, and xterm) built into the operating
+system.
+
+\section freakz_install_installing Installing Cygwin (for Windows Users Only)
+The first part of building the code is setting up the environment. If you're on Linux, then chances
+are that you're environment already exists or you know how to set up make and gcc. If xterm isn't
+there, you have a serious problem.
+
+So for all you Windows users (me included), you'll need Cygwin. It has all the great features of
+Linux and runs slow as hell on Windows. To set up Cygwin, you need to do the following:
+
+1) Download the setup file. Don't think I'm being inane for saying this. Some people don't know
+where to get cygwin.
+<HR>
+\image html cygwin_download.jpg "Cygwin Download Page" width=5cm
+<HR>
+
+2) Click on setup.exe. Ha ha ha. Couldn't resist that one. At the setup screen, click on 'install
+from internet'.
+<HR>
+\image html cygwin_install_1.jpg "Cygwin Setup Screen - Install options 1" width=5cm
+<HR>
+
+3) There are even more install options after that. I just leave them as default, but you can choose
+to set it up however you want.
+<HR>
+\image html cygwin_install_2.jpg "Cygwin Setup Screen - Install options 2" width=5cm
+<HR>
+
+4) A Cygwin setup is a little different than a regular setup.exe file. You need to select the server
+that you want to download the packages from. In my case, I just use the one they choose for me or a
+server in the country I'm in.
+<HR>
+\image html cygwin_install_3.jpg "Cygwin Setup Screen - Install options 3" width=5cm
+<HR>
+
+4) Then you need to start selecting the packages you want to install. There are a buttload of
+packages and you don't want all of them. You basically want the following:
+
+- make: Used for build control
+- gcc-core: Used to compile the code
+- Xfree86: Installs xtern which is a terminal window used to run the simulator
+
+That will give you enough tools to build the code. If you want more, feel free to install to your
+heart's content. Since you're probably going to be developing software (if you're even reading
+this), you may want to install Subversion which is a kick-ass source code version control system.
+It's like having a giant UNDO button whenever you do something stupid with your code.
+<HR>
+\image html cygwin_selection_1.jpg "Cygwin Setup - Available Packages" width=5cm
+<HR>
+
+<HR>
+\image html cygwin_selection_2.jpg "Cygwin Setup - Code Development Packages" width=5cm
+<HR>
+
+<HR>
+\image html cygwin_selection_3.jpg "Cygwin Setup - GCC and GDB Package Selection" width=5cm
+<HR>
+
+<HR>
+\image html cygwin_selection_5.jpg "Cygwin Setup - MAKE Package Selection" width=5cm
+<HR>
+
+<HR>
+\image html cygwin_selection_4_2.jpg "Cygwin Setup - XWin Package Selection" width=5cm
+<HR>
+
+5) Click next and wait a couple of minutes.
+
+6) The last thing you want to do is make sure your PATH environment variable is set to point to the
+\\cygwin\\bin folder. Otherwise, you won't be able to find gcc and make when you want to build the
+code. On XP, you right click on My Computer/Properties. Then you go to the Advanced tab and click on
+Environment Variables. Not sure how it works on Vista.
+
+Of you can always do it the old school way. Go to the DOS(cmd) prompt and type:
+
+\code
+path=%PATh;x:\\cygwin\\bin;
+\endcode
+
+Where x:\\cygwin is the root directory of your Cygwin installation.
+There...you're done.
+
+\section freakz_install_build Building the Code
+Now for the fun part...
+If the source files are extracted, and GCC and MAKE are installed correctly, and the makefiles are
+working correctly, and the directory structure is okay, then there is a slim possibility that the
+code building will be pulled off successfully.
+
+Just kidding. I'm hoping its not too painful, but trying to rebuild code is surprisingly one of the
+most difficult parts of working with software. Countless issues crop up with things like PC
+configuration, conflicting paths, conflicting versions of Make or GCC, etc... I'm hoping you won't
+fall victim to that...
+
+Here we go:
+1) Start up an xterm window. You can also do the code building from a command prompt (DOS or bash).
+For xterm, the initial cygwin install is going to hide the xterm startup file deep inside the cygwin
+directory. Its probably best to create a shortcut to this file once you locate it. In a normal
+system, the Xwin batch file is located at
+\code
+x:/cygwin/bin/startxwin.bat
+\endcode
+<HR>
+\image html xwin_start_2.jpg "Digging for the Xwin startup batch file" width=5cm
+<HR>
+
+2) Once you located it, just start the batch file by either double clicking on it, or typing its
+name. Remember, if this is a pain in the ass, you can build from the DOS prompt too. However the
+simulator requires an X-window.
+
+3) Next, we're going to build the simulator. Go to the FreakZ project root directory and then the
+'sim' directory. Type 'make' directly or optionally, you can do a 'make clean' first to clean up any
+debris from a previous build that you might have done. This will build the simulator code. Once the
+simulator is built, the executable will automatically be copied over to the test directory where it
+will be used.
+<HR>
+\image html prep_sim_1.jpg "Getting ready to build the simulator" width=5cm
+<HR>
+
+4) If all went well, the simulator code built successfully and got copied over to the test
+directory. Now we're going to the test directory which will build all the source files (OS and
+FreakZ stack) and also include the hooks for the simulator to communicate with it.
+
+Go to the FreakZ project root directory and this time, switch to the 'test' directory, and then the
+'test_sim' directory. You should be here:
+\code
+<FreakZ project root>/test/test_sim
+\endcode
+
+Once there, type 'make TARGET=native'. The 'TARGET = native' line is because there are different
+targets defined for the Contiki operating system. You can specify an embedded target like the
+TMOTESKY or a Commodore 64 platform (remember those?). The native target just means that it will
+create and x86 executable. Once again, if there is alot of debris from a previous build, you can
+also do a 'make clean' first but the subsequent build is gonna take a long time.
+<HR>
+\image html prep_sim_2.jpg "Getting ready to build the OS and FreakZ stack" width=5cm
+<HR>
+
+If that is successful, then you have just built the whole source tree and can begin simulating. The
+executable file will be called 'test_sim.native' and will automatically get called from the
+simulator.
+*/
+
+/************************************************************************/
+/*!
+\page freakz_running Running the Code
+Currently the FreakZ stack is only running inside the simulator. The simulator is kind of a kludge-y
+thing that was built just to test out the operation of the stack in a safe environment. It runs each
+node instance in its own process, so they behave similarly to independent nodes. They communicate
+with the main simulator which acts as the wireless medium for all the nodes and also provides a
+command line to issue instructions to each individual node.
+
+\note Hmmm...I should mention that there's no safe way to stop the simulator. I tried adding an exit
+command but it crashes all the nodes and the simulator. Currently I use ctrl-c to break out of the
+sim command line and then clean up the crashed processes manually. Any suggestions?
+
+Okay. Let's start up the simulator:
+
+1) Start an xterm window and go to the test_sim directory:
+\code
+<FreakZ project root>/test/test_sim
+\endcode
+Once there, type 'sim'.
+
+2) This will bring you into the FreakZ simulator commmand line. From there, we're going to add three nodes, 
+start them up, and issue commands to them. To add nodes 1, 2, 3, type the following at the command line:
+\code
+add 1
+add 2
+add 3
+\endcode
+Then that will create three new nodes. 
+<HR>
+\image html start_sim_1.jpg "Starting the simulator" width=5cm
+<HR>
+
+3) After creating the nodes, we need to start them up. We're going to start up node 1 as a coordinator
+and nodes 2 and 3 as routers. To do that, type the following at the command line. For information on the
+simulator command usage, please see the Simulator user manual which should be in the distro in pdf format.
+You can also download it from the Projects page on my site, www.freaklabs.org.
+
+To start the nodes, type the following:
+\code
+cmd 1 zs c
+cmd 2 zs
+cmd 3 zs
+\endcode
+
+<HR>
+\image html start_sim_2.jpg "Starting the nodes" width=5cm
+<HR>
+
+4) Now you can do some transfers if you'd like. The syntax for issuing a command to an individual
+node is:
+\code
+'cmd <node_index> <node_cmd> <node_address> [opt data]'
+\endcode
+
+From here, it's probably best to refer to the simulator command line user guide for the most current commands
+that are available to you. Please take a look at it and you can play around with issuing nodes to each of the devices.
+
+\section freakz_sim_background A Word About the Simulator
+There are two types of commands: simulator commands and node commands.
+For the simulator, its structured so that each node has an index and a process ID (PID). I
+originally had each node addressed by the PID but that  became confusing because the PID changes
+each time you run the sim. So I added indices for the nodes so that they are easier to address. The
+node indices run from 1 to 7.
+
+The reason the indices run from 1 to 7 is because the simulator implements a fixed 7x7 network
+connection map. The map specifies which nodes are in range of other nodes and is based on the
+indices. Since its a 7x7 map, only 7 nodes are supported. In the current configuration, the
+connection map looks like this:
+<HR>
+\image html sim_conn_map.jpg "Simulator connection map" width=5cm
+<HR>
+*/
+
+/************************************************************************/
+/*!
+\page freakz_impl Implementing Custom Profiles
+
+A custom profile only needs four elements:
+- Endpoint number
+    - Just select one off the top of your head. Your valid choices are 1-240. Don't select 0 (ZDO)
+and anything above 240 (illegal). Also, make sure that the endpoint is free.
+- A simple descriptor
+    - This is a descriptor that describes your endpoint. It has information such as the profile ID
+(in case you use a Zigbee standard profile), manufacturer ID, endpoint number, and version. It also
+has a list of the input and output cluster numbers that your profile supports.
+- Receive data callback function
+    - Data headed to your profile needs to be sent to the receive function that you implement. The
+receive data needs to follow this format in order to be registered with the AF:
+\code
+void your_rx_func_name(U8 *data, U8 len, U16 src_addr, U8 src_ep, U16 clust_id)
+\endcode
+- Confirm callback function
+    - You also need to be able to handle confirmations because they are useful to know when an
+operation was finished and what the status of that operation was. Here is the format you need in
+order to be registered with the AF:
+\code
+void your_conf_func_name(U8 status, U8 handle)
+\endcode
+
+If you have these four elements, then you're ready to register your endpoint with the AF. This is
+done by a simple call to the af_ep_reg() function.
+
+One important thing to note is that within your profile, you will have clusters. Each cluster should
+have a specific function, ie:
+- Cluster 1 = Identification request
+- Cluster 2 = Temperature Reading Request
+- Cluster 3 = Temperature Reading Response
+
+That way, it makes the cluster handling much easier. A simple RX handler would look something like
+this:
+\code
+void my_prof_rx_handler(U8 *data, U8 len, U16 src_addr, U8 src_ep, U16 clust_id)
+{
+    switch (clust_id)
+    {
+    case ID_REQ_CLUST:
+        // src_addr and src_ep used to prepare the response
+        my_id_req_handler(src_addr, src_ep);
+        break;
+
+    case TEMP_READ_REQ_CLUST:
+        // src_addr and src_ep used to prepare the response
+        read_temp_handler(src_addr, src_ep);
+        break;
+
+    case TEMP_READ_RESP_CLUST:
+        send_data_to_pc(data, len);
+        break;
+
+    default:
+        break;
+    }
+}
+\endcode
+
+The confirmation handler is implementation dependent. Some apps may not need confirmations, others
+may use them heavily.
+*/
+
+
+

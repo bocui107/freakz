@@ -1,0 +1,35 @@
+CONTIKI_TARGET_DIRS = . rf230 apps net loader
+CONTIKI_CORE=contiki-raven-main
+CONTIKI_TARGET_MAIN = ${CONTIKI_CORE}.o
+CONTIKIAVR=$(CONTIKI)/cpu/avr
+
+# Source for FreakUSB
+include $(FREAKUSB_PATH)/demo/contiki_usb/Makefile.freakusb
+
+include $(CONTIKIAVR)/Makefile.avr
+
+# Source for AT86RF230
+include $(ZIGBEE_PATH)/driver/avr_at86rf/Makefile.rf230
+
+CONTIKI_TARGET_SOURCEFILES +=   mmem.c contiki-raven-default-init-lowlevel.c contiki-raven-main.c
+
+CONTIKIBOARD=.
+
+CONTIKI_PLAT_DEFS = -DF_CPU=8000000UL -DAVRGCC -DAUTO_CRC_PADDING=2 -DJACKDAW=1 -DAT86RF=1
+
+MCU=at90usb1287
+AVRDUDE_PROGRAMMER=jtag2
+
+# For usb devices, you may either use PORT=usb, or (e.g. if you have more than one
+# programmer connected) you can use the following trick to find out the serial number:
+#
+# The example is for an JTAGICE mkII used to program an ATmega128:
+# avrdude -v -P usb:xxxx -c jtag2 -p atmega128
+AVRDUDE_PORT=usb:00B000000D79
+
+# Additional avrdude options
+# Verify off
+AVRDUDE_OPTIONS=-V
+
+
+

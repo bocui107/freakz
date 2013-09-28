@@ -1,0 +1,53 @@
+Release Notes 
+
+#########################################################################
+v0.52
+
+This release was basically made due to differences in behavior of the simulator found between Linux and Cygwin. Things should now run okay under
+Linux as well as Cygwin. 
+#########################################################################
+- Changed types in misc.c/h, zdo_nwk_mgr.c, and test_sim.c from unsigned char to char to remove warnings of 'signedness' differences. Going from unsigned
+to signed should only affect the stack behavior in the sim, and mostly just used for printing out character messages.
+- Added headers to remove compiler warnings (string.h, signal.h, sys/stat.h, sys/wait.h, fstat.h)
+- Added -lpthread switch to LDFLAGS in the Makefile in /platform/cpu/native so that pthreads can be used in Linux
+- Changed the order of fifo opening in test_sim.c so that the public fifo is created and opened first. The order of opening fifos needs to match the
+simulator due to the blocking behavior when opening the fifos. Also changed the order of private fifo opening.
+- Added 1 second delay in sim_add_node because it was trying to open pipes before the node could create them.
+- Added short delay after writing to the private fifo in sim_pipe_data_out() in test_sim.c. During association, two frames are written almost simultaneously
+to the fifo and one frame gets lost. The short delay allows the simulator to process one frame, and then get the next one.
+- Replaced gets() with fgets() in cli.c. Compiler complains about using gets due to security issues (and rightly so).
+
+#########################################################################
+v0.52b
+#########################################################################
+- Added #include <stdlib.h> in node_list.c for simulator.  
+
+#########################################################################
+v0.70
+#########################################################################
+- Upgraded memory handling to non-fragmenting dynamic memory allocation
+- Added hardware driver for AVR Raven and Jackdaw boards (AT86RF230 and AVR drivers)
+- Integrated FreakUSB device stack for AVR Jackdaw board
+- Implemented new client/server handlers in ZDO required for certification
+- Implemented ZCL architecture and framework
+- Implemented some of ZCL basic clusters and main foundation commands
+- Implemented ZCL reporting
+- Added binding table
+- Added end device binding
+- Added group and group ID tables
+- Added new debug dump functions for simulator debugging and ability to turn on/off debug dumps by layer
+
+#########################################################################
+v0.75
+#########################################################################
+- Licensing changed to modified BSD
+- Added ZCL General Commands
+- Added ZCL Basic Cluster
+- Added ZCL Group Cluster
+- Added ZCL Identify Cluster
+- Added ZCL Level Cluster
+- Added ZCL On Off Cluster
+- Added ZCL Scenes Cluster
+- Added enhanced simulator commands and interface
+- Added support for AVR Raven USB
+- Added same command line interface for both RavenUSB and Simulator

@@ -1,0 +1,22 @@
+send add 1
+wait node 1 added
+send cmd 1 zs c
+wait node 1 nwk form success
+send add 2
+wait node 2 added
+send cmd 2 zs
+wait node 2 nwk disc success
+wait node 2 nwk join success
+send add 3
+wait node 3 added
+send cmd 3 zs
+wait node 3 nwk disc success
+wait node 3 nwk join success
+send cmd 2 zud 16 11 22 33 44 55
+wait node 3 data received
+wait 1122334455
+send cmd 2 zurd 16 66 77 88 99 11 22 33
+wait node 3 data received
+wait 66778899112233
+wait node 2 aps ack received
+
