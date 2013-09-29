@@ -116,3 +116,27 @@ FIFO是一种双向通信管道; 也就是说, 可以以读/写模式打开一�
 
 打开一个FIFO时, VFS首先判断到这个文件是特殊的FIFO类型文件, 然后找到针对这种文件
 的操作函数表, 在使用表中对应的函数对FIFO进行操作.
+
+
+pthread_cond_wait() 用于阻塞当前线程, 等待别的线程使用pthread_cond_signal()
+或pthread_cond_broadcast来唤醒它. pthread_cond_wait()必须与pthread_mutex配套使用.
+
+pthread_cond_wait()函数一进入wait状态就会自动release mutex. 当其他线程通过
+pthread_cond_signal()或pthread_cond_broadcast, 把该线程唤醒, 使pthread_cond_wait()
+通过(返回)时, 该线程又自动获得该mutex.
+
+pthread_cond_signal函数的作用是发送一个信号给另外一个正在处于阻塞等待状态的线程,
+使其脱离阻塞状态, 继续执行. 如果没有线程处在阻塞等待状态, pthread_cond_signal也会成功返回.
+
+使用pthread_cond_signal一般不会有"惊群现象"产生, 他最多只给一个线程发信号. 假如有多个
+线程正在阻塞等待着这个条件变量的话，那 么是根据各等待线程优先级的高低确定哪个线程接收
+到信号开始继续执行. 如果各线程优先级相同, 则根据等待时间的长短来确定哪个线程获得信号.
+但无论如何一个pthread_cond_signal调用最多发信一次.
+
+但是pthread_cond_signal在多处理器上可能同时唤醒多个线程, 当你只能让一个线程处理某个
+任务时, 其它被唤醒的线程就需要继续wait, 而且规范要求pthread_cond_signal至少唤醒一个
+pthread_cond_wait上的线程, 其实有些实现为了简单在单处理器上也会唤醒多个线程.
+
+另外, 某些应用, 如线程池, pthread_cond_broadcast唤醒全部线程, 但我们通常只需要一部分
+线程去做执行任务, 所以其它的线程需要继续wait.所以强烈推荐对pthread_cond_wait()
+使用while循环来做条件判断
