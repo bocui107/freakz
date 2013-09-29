@@ -33,9 +33,6 @@
  *
  */
 
-// suppress all lint warnings for this file
-//lint --e{*}
-
 #include <stdio.h>
 #include <sys/select.h>
 #include "contiki.h"
@@ -43,37 +40,35 @@
 
 PROCINIT(&etimer_process);
 
-/*---------------------------------------------------------------------------*/
-
-int
-contiki_main(void)
+int contiki_main(void)
 {
-    process_init();
-    procinit_init();
+	int n;
+	struct timeval tv;
 
-    #if (TEST_SIM == 0)
-    autostart_start((struct process **)autostart_processes);
-    #endif
+	process_init();
+	procinit_init();
 
-    printf("Contiki initiated, now starting process scheduling\n");
+#if (TEST_SIM == 0)
+	autostart_start((struct process **)autostart_processes);
+#endif
 
-    freakz_init();
-    while(1)
-    {
-        int n;
-        struct timeval tv;
+	printf("Contiki initiated, now starting process scheduling\n");
 
-        n = process_run();
-        tv.tv_sec = 0;
-        tv.tv_usec = 1;
-        select(0, NULL, NULL, NULL, &tv);
-        etimer_request_poll();
-    }
+	freakz_init();
 
-    return 0;
+	while(1)
+	{
+		n = process_run();
+		tv.tv_sec = 0;
+		tv.tv_usec = 1;
+		select(0, NULL, NULL, NULL, &tv);
+		etimer_request_poll();
+	}
+
+	return 0;
 }
-/*---------------------------------------------------------------------------*/
+
 void log_message(char *m1, char *m2)
 {
-  printf("%s%s\n", m1, m2);
+	printf("%s%s\n", m1, m2);
 }

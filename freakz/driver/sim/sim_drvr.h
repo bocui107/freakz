@@ -54,7 +54,7 @@
 */
 enum SIM_DRVR_ENUMS
 {
-    SIM_DRVR_MAX_BUF_SIZE = 128  ///< Max buf size for the test bufs
+	SIM_DRVR_MAX_BUF_SIZE = 128  ///< Max buf size for the test bufs
 };
 
 
@@ -76,5 +76,3 @@ void drvr_set_pan_id(U16 pan_id);
 void drvr_set_coord(bool coord);
 
 #endif // SIM_DRVR_H
-
-
