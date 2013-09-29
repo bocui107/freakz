@@ -119,13 +119,11 @@ void add_null_term(U8 *msg)
 /**************************************************************************/
 void format_cmd_str(U8 *msg)
 {
-    U8 tmp[128];
+	U8 tmp[128];
 
-    add_null_term(msg);
-    tmp[0] = 0xff;
-    strcpy((char *)&tmp[1], (char *)msg);
-    strcpy((char *)msg, (char *)tmp);
+	add_null_term(msg);
+	tmp[0] = 0xff;
+	strcpy((char *)&tmp[1], (char *)msg);
+	strcpy((char *)msg, (char *)tmp);
 }
-
 #endif
-

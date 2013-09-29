@@ -44,29 +44,25 @@
 #include "freakz.h"
 
 #if (TEST_SIM == 1)
-    #include "test_app.h"
+	#include "test_app.h"
 #endif
 
-/**************************************************************************/
-/*!
-    Dummy function that just initializes everybody.
-*/
-/**************************************************************************/
+/* Dummy function that just initializes everybody. */
 void freakz_init()
 {
-    drvr_init();
-    mmem_init();
-    ctimer_init();
-    mac_init();
-    nwk_init();
-    aps_init();
-    af_init();
-    zdo_init();
-    buf_init();
-    slow_clock_init();
+	drvr_init();
+	mmem_init();
+	ctimer_init();
+	mac_init();
+	nwk_init();
+	aps_init();
+	af_init();
+	zdo_init();
+	buf_init();
+	slow_clock_init();
 
 #if (TEST_SIM == 1)
-    test_app_init();
+	test_app_init();
 #endif
 }
 

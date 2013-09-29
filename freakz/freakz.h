@@ -47,10 +47,8 @@
 #ifndef FREAKZ_H
 #define FREAKZ_H
 
-
-
 #if (FREAKZ_DEBUG)
-    #include <stdio.h>
+	#include <stdio.h>
 #endif
 
 #include <string.h>
@@ -58,29 +56,29 @@
 #include <assert.h>
 
 #if (TEST_SIM == 1)
-    #include <unistd.h>
-    #include "test_sim.h"
-    #include "sim_drvr.h"
-    #define FREAKZ_DEBUG 1
-    #define DEBUG_FRMS  1
-    #define DEBUG_BUF   1
-    #define DEBUG_MAC   1
-    #define DEBUG_NWK   1
-    #define DEBUG_APS   1
-    #define DEBUG_ZDO   1
-    #define DEBUG_ZCL   1
+	#include <unistd.h>
+	#include "test_sim.h"
+	#include "sim_drvr.h"
+	#define FREAKZ_DEBUG	1
+	#define DEBUG_FRMS	1
+	#define DEBUG_BUF	1
+	#define DEBUG_MAC	1
+	#define DEBUG_NWK	1
+	#define DEBUG_APS	1
+	#define DEBUG_ZDO	1
+	#define DEBUG_ZCL	1
 #endif
 
 #if ((TEST_RAVENUSB == 1) || (TEST_RAVEN == 1))
-    #include "drvr_avr_at86.h"
-    #define FREAKZ_DEBUG 1
-    #define DEBUG_FRMS  0
-    #define DEBUG_BUF   0
-    #define DEBUG_MAC   0
-    #define DEBUG_NWK   0
-    #define DEBUG_APS   0
-    #define DEBUG_ZDO   0
-    #define DEBUG_ZCL   0
+	#include "drvr_avr_at86.h"
+	#define FREAKZ_DEBUG	1
+	#define DEBUG_FRMS	0
+	#define DEBUG_BUF	0
+	#define DEBUG_MAC	0
+	#define DEBUG_NWK	0
+	#define DEBUG_APS	0
+	#define DEBUG_ZDO	0
+	#define DEBUG_ZCL	0
 #endif
 
 #include "constants.h"
@@ -98,21 +96,33 @@
 #include "slow_clock.h"
 #include "mmem.h"
 
-// TEST
+/* TEST */
 #include "mem_heap.h"
-// END TEST
+/* END TEST */
 
-// Events
-process_event_t event_mac_rx;           ///< MAC rx event
-process_event_t event_af_tx;            ///< Application Framework tx event
-process_event_t event_af_rx;            ///< Application Framework rx event
-process_event_t event_af_conf;          ///< Application Framework confirm event
-process_event_t event_drvr_conf;        ///< Driver confirmation available
-process_event_t event_ed_bind_req;      ///< End dev bind request received
-process_event_t event_ed_bind_match;    ///< End dev bind - clust match finished
-process_event_t event_unbind_resp;      ///< End dev bind - Unbind response received
+/* MAC rx event */
+process_event_t event_mac_rx;
+
+/* Application Framework tx event */
+process_event_t event_af_tx;
+
+/* Application Framework rx event */
+process_event_t event_af_rx;
+
+/* Application Framework confirm event */
+process_event_t event_af_conf;
+
+/* Driver confirmation available */
+process_event_t event_drvr_conf;
+
+/* End dev bind request received */
+process_event_t event_ed_bind_req;
+
+/* End dev bind - clust match finished */
+process_event_t event_ed_bind_match;
+
+/* End dev bind - Unbind response received */
+process_event_t event_unbind_resp;
 
 void freakz_init();
-#endif // FREAKZ_H
-
-
+#endif
