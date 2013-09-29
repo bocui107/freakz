@@ -324,7 +324,8 @@ void process_script(char *str)
 			 * if the wait expires, then something went wrong so exit.
 			 * otherwise stay in the wait loop until we get a matching string.
 			 */
-			if ((status = pthread_mutex_lock(&cli_buf.mutex)) != 0)
+			status = pthread_mutex_lock(&cli_buf.mutex);
+			if (status)
 				perror("process script lock mutex");
 
 			while (check_cli_buf(msg))

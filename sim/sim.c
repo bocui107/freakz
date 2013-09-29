@@ -166,7 +166,7 @@ void *sim_cmd_out_thread(void *node)
 		} else {
 			U8 i;
 
-			for (i=0; i<len; i++)
+			for (i = 0; i < len; i++)
 				printf("%02x ", cli_buf->buf[i]);
 		}
 

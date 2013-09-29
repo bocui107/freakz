@@ -154,23 +154,12 @@ static void sigint_handler()
 	}
 }
 
-/**************************************************************************
-Function Name: node_get
-
-Description:
-Get a pointer to the sim node structure
-**************************************************************************/
+/* Get a pointer to the sim node structure */
 sim_node_t *node_get()
 {
-    return &node;
+	return &node;
 }
 
-/**************************************************************************
-Function Name: sigkill_handler
-
-Description:
-
-**************************************************************************/
 static void sigkill_handler()
 {
 	close(node.data_in.pipe);
