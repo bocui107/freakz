@@ -48,34 +48,41 @@
 #include "types.h"
 #include "constants.h"
 
-#define MAX_BUF_POOL_SIZE 6             ///< Define the number of frame buffers here
+/* Define the number of frame buffers here */
+#define MAX_BUF_POOL_SIZE	6
 
-/*! Generic buffer allocate definition*/
-#define BUF_ALLOC(name, txrx)                                   \
-            do                                                  \
-            {                                                   \
-                if ((name = buf_get(txrx)) == NULL)             \
-                {                                               \
-                    printf("No Free Buffers...Hang...\n");   \
-                    while (1);                                  \
-                }                                               \
-            } while (0);                                        \
+/* Generic buffer allocate definition */
+#define BUF_ALLOC(name, txrx)					\
+	do							\
+	{							\
+		if ((name = buf_get(txrx)) == NULL)		\
+		{						\
+			printf("No Free Buffers...Hang...\n");	\
+			while (1);				\
+		}						\
+	} while (0);
 
 
-/**************************************************************************/
-/*!
-    This is the frame buffer data structure that is used for TX and RX.
-*/
-/**************************************************************************/
+/*
+ * This is the frame buffer data structure that is used for TX and RX
+ *
+ * next: Next pointer
+ * alloc: Alloc flag
+ * dptr: Data pointer - points to current position in buffer array
+ * len: Len of the data
+ * lqi: Link quality indicator
+ * index: Index used for buffer tracking and debugging
+ * buf: Main data storage
+ */ 
 typedef struct _buffer_t
 {
-    struct      _buffer_t *next;                ///< Next pointer
-    bool        alloc;                          ///< Alloc flag
-    U8          *dptr;                          ///< Data pointer - points to current position in buffer array
-    U8          len;                            ///< Len of the data
-    U8          lqi;                            ///< Link quality indicator
-    U8          index;                          ///< Index used for buffer tracking and debugging
-    U8          buf[aMaxPHYPacketSize+1];       ///< Main data storage
+	struct      _buffer_t *next;
+	bool        alloc;
+	U8          *dptr;
+	U8          len;
+	U8          lqi;
+	U8          index;
+	U8          buf[aMaxPHYPacketSize + 1];
 } buffer_t;
 
 void   buf_init();
@@ -83,5 +90,3 @@ buffer_t *buf_get(U8 tx_rx);
 void buf_free(buffer_t *buf);
 U8 buf_get_cnt();
 #endif // BUF_H
-
-

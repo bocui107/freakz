@@ -50,46 +50,37 @@
 
 #ifndef DATA_TYPES
 #define DATA_TYPES
-// Standard data types
-typedef uint8_t             U8;     ///< Generic 8 bit unsigned data type
-typedef uint16_t            U16;    ///< Generic 16 bit unsigned data type
-typedef uint32_t            U32;    ///< Generic 32 bit unsigned data type
 
-typedef int8_t              S8;     ///< Generic 8 bit signed data type
-typedef int16_t             S16;    ///< Generic 16 bit signed data type
-typedef int32_t             S32;    ///< Generic 32 bit signed data type
+typedef uint8_t		U8;
+typedef uint16_t	U16;
+typedef uint32_t	U32;
+
+typedef int8_t		S8;
+typedef int16_t		S16;
+typedef int32_t		S32;
 #endif
 
-typedef uint64_t            U64;    ///< Generic 64 bit unsigned data type
+typedef uint64_t	U64;
 
-/**************************************************************************/
-/*!
-    Enumeration of TX and RX used in the stack.
-*/
-/**************************************************************************/
+/* Enumeration of TX and RX used in the stack */
 enum TXRX
 {
-    RX = 0,                     ///< RX enum value
-    TX = 1                      ///< TX enum value
+	RX = 0,	/* RX enum value */
+	TX = 1	/* TX enum value */
 };
 
-/**************************************************************************/
-/*!
-    Address type. This is a union containing both the short and long addresses.
-    They can be differentiated by checking the mode.
-*/
-/**************************************************************************/
+/*
+ * Address type. This is a union containing both the short and long addresses.
+ * They can be differentiated by checking the mode.
+ */
 typedef struct
 {
-    U8 mode;                ///< Address mode: short or long address
-    union
-    {
-        U16 short_addr;     ///< Short address value
-        U64 long_addr;      ///< Long address value
-    };
+	U8 mode;
+	union
+	{
+		U16 short_addr;
+		U64 long_addr;
+	};
 } address_t;
 
 #endif // TYPES_H
-
-
-

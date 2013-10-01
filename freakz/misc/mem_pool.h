@@ -30,7 +30,3 @@
 void *mem_pool_alloc(void *pool, U8 pool_size, U8 entry_size);
 void mem_pool_free(void *entry);
 #endif
-
-
-
-

@@ -33,102 +33,63 @@
     Please post support questions to the FreakLabs forum.
 
 *******************************************************************/
-    /*!
-        \file buf.c
-                \ingroup misc
-        \brief Frame buffer controller
 
-        Manage the frame buffer pool.
-    */
-    /**************************************************************************/
 #include <string.h>
 #include "freakz.h"
 
-static buffer_t buf_pool[MAX_BUF_POOL_SIZE];    ///< Creates the frame buffer pool
+/* Creates the frame buffer pool */
+static buffer_t buf_pool[MAX_BUF_POOL_SIZE];
 
-/**************************************************************************/
-/*!
-    Init the buffer pool.
-*/
-/**************************************************************************/
+/* Init the buffer pool */
 void buf_init()
 {
-    U8 i;
+	U8 i;
 
-    for (i=0; i<MAX_BUF_POOL_SIZE; i++)
-    {
-        memset(&buf_pool[i], 0, sizeof(buffer_t));
-    }
+	for (i = 0; i < MAX_BUF_POOL_SIZE; i++)
+		memset(&buf_pool[i], 0, sizeof(buffer_t));
 }
 
-/**************************************************************************/
-/*!
-    Return the number of bufs currently allocated.
-*/
-/**************************************************************************/
+/* Return the number of bufs currently allocated */
 U8 buf_get_cnt()
 {
-    U8 i;
-    U8 buf_cnt = 0;
+	U8 i;
+	U8 buf_cnt = 0;
 
-    for (i=0; i<MAX_BUF_POOL_SIZE; i++)
-    {
-        if (buf_pool[i].alloc)
-        {
-            buf_cnt++;
-        }
-    }
-    return buf_cnt;
+	for (i = 0; i < MAX_BUF_POOL_SIZE; i++)
+		if (buf_pool[i].alloc)
+			buf_cnt++;
+
+	return buf_cnt;
 }
 
-/**************************************************************************/
-/*!
-    Allocate and return a pointer to a frame buffer.
-*/
-/**************************************************************************/
+/* Allocate and return a pointer to a frame buffer */
 buffer_t *buf_get(U8 tx_rx)
 {
-    U8 i;
-    for (i=0; i<MAX_BUF_POOL_SIZE; i++)
-    {
-        if (!buf_pool[i].alloc)
-        {
-            if (tx_rx)
-            {
-                buf_pool[i].dptr = &buf_pool[i].buf[aMaxPHYPacketSize];
-            }
-            else
-            {
-                buf_pool[i].dptr = &buf_pool[i].buf[0];
-            }
-            buf_pool[i].len = 0;
-            buf_pool[i].index = i;
-            buf_pool[i].alloc = true;
-            return &buf_pool[i];
-        }
-    }
-    return NULL;
+	U8 i;
+
+	for (i = 0; i < MAX_BUF_POOL_SIZE; i++)
+	{
+		if (!buf_pool[i].alloc)
+		{
+			if (tx_rx)
+				buf_pool[i].dptr = &buf_pool[i].buf[aMaxPHYPacketSize];
+			else
+				buf_pool[i].dptr = &buf_pool[i].buf[0];
+
+			buf_pool[i].len = 0;
+			buf_pool[i].index = i;
+			buf_pool[i].alloc = true;
+
+			return &buf_pool[i];
+		}
+	}
+
+	return NULL;
 }
 
-/**************************************************************************/
-/*!
-    Free a buffer that has been allocated.
-*/
-/**************************************************************************/
+/* Free a buffer that has been allocated */
 void buf_free(buffer_t *buf)
 {
-    if (buf)
-    {
-        buf->alloc = false;
-    }
+	if (buf)
+		buf->alloc = false;
 }
-
-
-
-
-
-
-
-
-
-

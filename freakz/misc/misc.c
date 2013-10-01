@@ -41,82 +41,44 @@
 
     Miscellaneous functions used by the stack.
 */
-/**************************************************************************/
+
 #include "freakz.h"
 
-static struct timer tmr;        ///< Just your ol' everyday software timer used for a busy wait
+/* Just your ol' everyday software timer used for a busy wait */
+static struct timer tmr;
 
-/**************************************************************************/
-/*!
-    Perform a busy wait. This wait hogs the CPU while waiting so it shouldn't
-    be used for long periods or too often. The argument is in milliseconds.
-*/
-/**************************************************************************/
+/*
+ * Perform a busy wait. This wait hogs the CPU while waiting so it shouldn't
+ * be used for long periods or too often. The argument is in milliseconds.
+ */
 void busy_wait(U16 msec)
 {
-    timer_set(&tmr, msec);
-    while (!timer_expired(&tmr))
-    {
-        ;
-    }
+	timer_set(&tmr, msec);
+	while (!timer_expired(&tmr))
+		;
 }
-
-///**************************************************************************/
-///*!
-//    Convert a 2-byte array to an int
-//*/
-///**************************************************************************/
-//U16 array2int(U8 *array)
-//{
-//    U16 data = 0;
-//
-//    data = (array[1] << 8) | array[0];
-//    return data;
-//}
-//
-///**************************************************************************/
-///*!
-//    Convert an 8-byte array to an unsigned long long
-//*/
-///**************************************************************************/
-//U64 array2ull(U8 *array)
-//{
-//    U8 i;
-//    U64 data = 0;
-//
-//    for (i=7; i>=0; i--)
-//    {
-//        data |= array[i] << ((8 * i));
-//    }
-//    return data;
-//}
 
 #if (TEST_SIM == 1)
-/**************************************************************************/
-/*!
-    This function is a compile option only if in simulator mode. It adds a
-    null terminator to a string. Assumes that the string is initially terminated
-    with a newline.
-*/
-/**************************************************************************/
+/*
+ * This function is a compile option only if in simulator mode. It adds a
+ * null terminator to a string. Assumes that the string is initially terminated
+ * with a newline.
+ */
 void add_null_term(U8 *msg)
 {
-    U8 *p = msg;
+	U8 *p = msg;
 
-    while (*p != '\n')
-    {
-        p++;
-    }
-    *p = '\0';
+	while (*p != '\n')
+		p++;
+
+	*p = '\0';
 }
 
-/**************************************************************************/
-/*!
-    This is a compile option and is only used for the simulator. Format a
-    string to be sent out the cmd pipe. The first byte must contain the
-    code 0xff and it must be null terminated.
-*/
-/**************************************************************************/
+/*
+ * This is a compile option and is only used for the simulator. Format a
+ * string to be sent out the cmd pipe. The first byte must contain the
+ * code 0xff and it must be null terminated.
+ */
 void format_cmd_str(U8 *msg)
 {
 	U8 tmp[128];

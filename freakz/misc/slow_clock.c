@@ -41,77 +41,57 @@
     The purpose of these functions is to create a slow clock to be used
     by the tables that require periodic but slow checking.
 */
-/**************************************************************************/
 #include "freakz.h"
 #include "zcl_id.h"
 
-static struct ctimer slow_clk;  ///< Callback timer for the slow clock. This is the main timer that drives it.
+/* Callback timer for the slow clock. This is the main timer that drives it */
+static struct ctimer slow_clk;
 
-
-/**************************************************************************/
-/*!
-    These are the callbacks for the slow clock to call every second. The
-    slow clock is used because it saves space from having a dedicated timer
-    for each of these functions. Instead, it's just a free running 1 second timer
-    that will call each of these functions every second. Since it is only
-    used for slow operations, it won't affect performance to call all these
-    functions every second.
-*/
-/**************************************************************************/
+/*
+ * These are the callbacks for the slow clock to call every second. The
+ * slow clock is used because it saves space from having a dedicated timer
+ * for each of these functions. Instead, it's just a free running 1 second timer
+ * that will call each of these functions every second. Since it is only
+ * used for slow operations, it won't affect performance to call all these
+ * functions every second.
+ */
 static void (*timeouts[])(void) =
 {
-    af_conf_tbl_periodic,
-    aps_dupe_periodic,
-    aps_retry_periodic,
-    nwk_brc_periodic,
-    nwk_pend_periodic,
-    nwk_rte_disc_periodic,
-    mac_indir_periodic,
-    zdo_nwk_mgr_periodic,
-    zcl_rpt_periodic,
-    zcl_id_tmr_periodic,
-    NULL
+	af_conf_tbl_periodic,
+	aps_dupe_periodic,
+	aps_retry_periodic,
+	nwk_brc_periodic,
+	nwk_pend_periodic,
+	nwk_rte_disc_periodic,
+	mac_indir_periodic,
+	zdo_nwk_mgr_periodic,
+	zcl_rpt_periodic,
+	zcl_id_tmr_periodic,
+	NULL
 };
 
-/**************************************************************************/
-/*!
-    Initialize the slow clock.
-*/
-/**************************************************************************/
+/* Initialize the slow clock */
 void slow_clock_init()
 {
-    slow_clock_periodic(NULL);
+	slow_clock_periodic(NULL);
 }
 
-/**************************************************************************/
-/*!
-    Turn off the slow clock.
-*/
-/**************************************************************************/
+/* Turn off the slow clock */
 void slow_clock_stop()
 {
-    ctimer_stop(&slow_clk);
+	ctimer_stop(&slow_clk);
 }
 
-/**************************************************************************/
-/*!
-    This function gets called every second and will handle the timeouts for
-    all functions that require a slow clock.
-*/
-/**************************************************************************/
-//lint -e{715} Symbol 'ptr' not referenced
-//lint -e{818} Pointer parameter 'ptr' could be declared as pointing to const
-// Note: (void *ptr) format required for callback timer
+/*
+ * This function gets called every second and will handle the timeouts for
+ * all functions that require a slow clock.
+ */
 void slow_clock_periodic(void *ptr)
 {
-    U8 i;
+	U8 i;
 
-    for (i=0; timeouts[i] != NULL; i++)
-    {
-        timeouts[i]();
-    }
-    ctimer_set(&slow_clk, CLOCK_SECOND, slow_clock_periodic, NULL);
+	for (i=0; timeouts[i] != NULL; i++)
+		timeouts[i]();
+
+	ctimer_set(&slow_clk, CLOCK_SECOND, slow_clock_periodic, NULL);
 }
-
-
-

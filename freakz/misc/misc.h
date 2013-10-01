@@ -45,8 +45,6 @@
 #define MISC_H
 
 void busy_wait(U16 msec);
-//U16 array2int(U8 *array);
-//U64 array2ull(U8 *array);
 
 #if (TEST_SIM == 1)
 void format_cmd_str(U8 *msg);

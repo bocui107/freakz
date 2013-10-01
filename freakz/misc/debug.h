@@ -56,45 +56,46 @@ extern FILE *fp;
 #endif
 
 #if (FREAKZ_DEBUG)
-    #if (TEST_SIM)
-        #define DBG_PRINT(...)                                  \
-            do                                                  \
-            {                                                   \
-                mac_pib_t *pib = mac_pib_get();                 \
-                printf("<Addr: %04X>", pib->short_addr);        \
-                printf(__VA_ARGS__);                            \
-                fflush(stdout);                                 \
-                fprintf(fp, "<Addr: %04X> ", pib->short_addr);  \
-                fprintf(fp, __VA_ARGS__);                       \
-                fflush(fp);                                     \
-            } while(0);
 
-        #define DBG_PRINT_RAW(...)                      \
-            do                                          \
-            {                                           \
-                printf(__VA_ARGS__);                    \
-                fflush(stdout);                         \
-                fprintf(fp, __VA_ARGS__);               \
-                fflush(fp);                             \
-            } while(0);
+#if (TEST_SIM)
 
-        #define DBG_PRINT_SIMONLY(...)                  \
-            do                                          \
-            {                                           \
-                printf(__VA_ARGS__);                    \
-                fflush(stdout);                         \
-                fprintf(fp, __VA_ARGS__);               \
-                fflush(fp);                             \
-            } while (0);
-    #else
-        #define DBG_PRINT(...) printf(__VA_ARGS__);
-        #define DBG_PRINT_RAW(...) printf(__VA_ARGS__);
-        #define DBG_PRINT_SIMONLY(...)
-    #endif //TEST_SIM
+#define DBG_PRINT(...)						\
+	do {							\
+		mac_pib_t *pib = mac_pib_get();			\
+		printf("<Addr: %04X>", pib->short_addr);	\
+		printf(__VA_ARGS__);				\
+		fflush(stdout);					\
+		fprintf(fp, "<Addr: %04X> ", pib->short_addr);	\
+		fprintf(fp, __VA_ARGS__);			\
+		fflush(fp);					\
+	} while(0);
+
+#define DBG_PRINT_RAW(...)				\
+	do {						\
+		printf(__VA_ARGS__);			\
+		fflush(stdout);				\
+		fprintf(fp, __VA_ARGS__);		\
+		fflush(fp);				\
+	} while(0);
+
+#define DBG_PRINT_SIMONLY(...)				\
+	do {						\
+		printf(__VA_ARGS__);			\
+		fflush(stdout);				\
+		fprintf(fp, __VA_ARGS__);		\
+		fflush(fp);				\
+	} while (0);
+
 #else
-    #define DBG_PRINT(...)
-    #define DBG_PRINT_RAW(...)
-    #define DBG_PRINT_SIMONLY(...)
+#define DBG_PRINT(...)		printf(__VA_ARGS__);
+#define DBG_PRINT_RAW(...)	printf(__VA_ARGS__);
+#define DBG_PRINT_SIMONLY(...)
+#endif //TEST_SIM
+
+#else
+#define DBG_PRINT(...)
+#define DBG_PRINT_RAW(...)
+#define DBG_PRINT_SIMONLY(...)
 #endif //FREAKZ_DEBUG
 
 void debug_dump_buf(const U8 *buf, U8 len);

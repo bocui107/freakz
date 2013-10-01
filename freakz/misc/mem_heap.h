@@ -46,18 +46,16 @@
 
 #define MAX_MEM_PTR_POOL 30             ///< Define the number of mem pointers here
 
-/**************************************************************************/
-/*!
-        Memory pointer structure - This is the structure that will go into all
-        the tables and lists, and is a generic handle to the underlying memory.
-        You will need to access this structure via the pre-defined handle names.
-*/
-/**************************************************************************/
+/*
+ * Memory pointer structure - This is the structure that will go into all
+ * the tables and lists, and is a generic handle to the underlying memory.
+ * You will need to access this structure via the pre-defined handle names.
+ */
 typedef struct _mem_ptr_t
 {
-    struct _mem_ptr_t *next;    ///< Next pointer in memory
-    bool    alloc;              ///< Allocated
-    struct  mmem mmem_ptr;      ///< The actual pointer to the pointer to the mem block
+	struct _mem_ptr_t *next;
+	bool alloc;
+	struct mmem mmem_ptr;
 } mem_ptr_t;
 
 void mem_heap_init();
