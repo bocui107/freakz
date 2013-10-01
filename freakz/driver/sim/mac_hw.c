@@ -189,8 +189,8 @@ static void mac_eventhandler(process_event_t event)
 	{
 		DBG_PRINT("MAC_EVENTHANDLER: Rx event occurred.\n");
 
-		if ((buf = mac_queue_buf_pop()) != NULL)
-		{
+		buf = mac_queue_buf_pop();
+		if (buf) {
 			DBG_PRINT_RAW("\n<INCOMING>");
 			debug_dump_buf(buf->dptr, buf->len);
 

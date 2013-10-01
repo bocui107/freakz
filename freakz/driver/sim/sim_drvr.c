@@ -219,20 +219,15 @@ static bool drvr_check_addr(buffer_t *buf)
 
 
 	if ((hdr.mac_frm_ctrl.frame_type == MAC_BEACON) ||
-		(hdr.mac_frm_ctrl.frame_type == MAC_ACK))
-	{
+	    (hdr.mac_frm_ctrl.frame_type == MAC_ACK)) {
 		return true;
 	} else if (hdr.dest_addr.mode == SHORT_ADDR) {
 		if ((hdr.dest_addr.short_addr == pib->short_addr) ||
-			(hdr.dest_addr.short_addr == MAC_BROADCAST_ADDR))
+		    (hdr.dest_addr.short_addr == MAC_BROADCAST_ADDR))
 			return true;
-		else
-			return false;
 	} else if (hdr.dest_addr.mode == LONG_ADDR) {
 		if ((hdr.dest_addr.long_addr == pib->ext_addr))
 			return true;
-		else
-			return false;
 	}
 
 	return false;
@@ -257,11 +252,12 @@ void drvr_rx_isr()
 
 	/*
 	 * copy data into the buffer starting from the back. it will be easier
-	 * to forward in case we're not the final destination
+	 * to forward in case we're not the final destination.
 	 */
 	buf->dptr = &buf->buf[aMaxPHYPacketSize - rx_len];
 	buf->len = rx_len;
 
+	/* void *memcpy(void *dest, const void *src, size_t n) */
 	memcpy(buf->dptr, rx_buf, rx_len);
 
 	if (drvr_check_addr(buf)) {
