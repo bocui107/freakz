@@ -61,6 +61,17 @@ int contiki_main(void)
 		n = process_run();
 		tv.tv_sec = 0;
 		tv.tv_usec = 1;
+		/*
+		 * int select(int n,
+		 *	      fd_set *readfds,
+		 *	      fd_set *writefds,
+		 *	      fd_set *exceptfds,
+		 *	      struct timeval *timeout);
+		 *
+		 * select() wait the change of the file.
+		 * n: the max file describe + 1
+		 * readfds, writefds and exceptfds is the set of the file,
+		 */
 		select(0, NULL, NULL, NULL, &tv);
 		etimer_request_poll();
 	}

@@ -43,13 +43,9 @@
  *         Adam Dunkels <adam@sics.se>
  */
 
-// suppress all lint messages for this file
-//lint --e{*}
-
 #include "ctimer.h"
 #include "contiki.h"
 #include "lib/list.h"
-//#include "net/rime.h"
 
 LIST(ctimer_list);
 
@@ -63,7 +59,6 @@ static char initialized;
 #define PRINTF(...)
 #endif
 
-/*---------------------------------------------------------------------------*/
 PROCESS(ctimer_process, "ctimer process");
 PROCESS_THREAD(ctimer_process, ev, data)
 {
@@ -92,17 +87,15 @@ PROCESS_THREAD(ctimer_process, ev, data)
 	}
 	PROCESS_END();
 }
-/*---------------------------------------------------------------------------*/
-void
-ctimer_init(void)
+
+void ctimer_init(void)
 {
 	initialized = 0;
 	list_init(ctimer_list);
 	process_start(&ctimer_process, NULL);
 }
-/*---------------------------------------------------------------------------*/
-void
-ctimer_set(struct ctimer *c, clock_time_t t,
+
+void ctimer_set(struct ctimer *c, clock_time_t t,
 	   void (*f)(void *), void *ptr)
 {
 	PRINTF("ctimer_set %p %d\n", c, t);
@@ -120,9 +113,8 @@ ctimer_set(struct ctimer *c, clock_time_t t,
 	list_remove(ctimer_list, c);
 	list_add(ctimer_list, c);
 }
-/*---------------------------------------------------------------------------*/
-void
-ctimer_reset(struct ctimer *c)
+
+void ctimer_reset(struct ctimer *c)
 {
 	if(initialized) {
 		PROCESS_CONTEXT_BEGIN(&ctimer_process);
@@ -133,9 +125,8 @@ ctimer_reset(struct ctimer *c)
 	list_remove(ctimer_list, c);
 	list_add(ctimer_list, c);
 }
-/*---------------------------------------------------------------------------*/
-void
-ctimer_stop(struct ctimer *c)
+
+void ctimer_stop(struct ctimer *c)
 {
 	if(initialized) {
 		etimer_stop(&c->etimer);
@@ -145,5 +136,3 @@ ctimer_stop(struct ctimer *c)
 	}
 	list_remove(ctimer_list, c);
 }
-/*---------------------------------------------------------------------------*/
-/** @} */
