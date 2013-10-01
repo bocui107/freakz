@@ -43,90 +43,72 @@
     After that, an event will be posted to the mac process and the mac's eventhandler
     will pull the frame from the rx queue.
 */
-/**************************************************************************/
+
 #include "freakz.h"
 
-/**************************************************************************/
-/*!
-        List head for the MAC rx queue. When an inbound frame arrives, it will
-        get put in this queue. An indication to the MAC process is then sent
-        and the MAC will pull out the frame from the queue and begin processing it.
-*/
-/**************************************************************************/
+/*
+ * List head for the MAC rx queue. When an inbound frame arrives, it will
+ * get put in this queue. An indication to the MAC process is then sent
+ * and the MAC will pull out the frame from the queue and begin processing it.
+ */
+
 LIST(mac_rx_queue);
 
-/**************************************************************************/
-/*!
-    Initialize the list (queue).
-*/
-/**************************************************************************/
+/*
+ * Initialize the list (queue).
+ */
 void mac_queue_init()
 {
-    list_init(mac_rx_queue);
+	list_init(mac_rx_queue);
 }
 
-/**************************************************************************/
-/*!
-    Insert a received frame buffer into the queue.
-*/
-/**************************************************************************/
+/*
+ *    Insert a received frame buffer into the queue.
+ */
 void mac_queue_buf_insert(buffer_t *buf)
 {
-    if (buf)
-    {
-        list_add(mac_rx_queue, buf);
-        debug_dump_buf(buf->dptr, buf->len);
-    }
+	if (buf) {
+		list_add(mac_rx_queue, buf);
+		debug_dump_buf(buf->dptr, buf->len);
+	}
 }
 
-/**************************************************************************/
-/*!
-    Remove a received frame buffer from the queue.
-*/
-/**************************************************************************/
+/*
+ * Remove a received frame buffer from the queue.
+ */
 buffer_t *mac_queue_buf_pop()
 {
-    buffer_t *tmp;
+	buffer_t *tmp;
 
-    if ((tmp = list_head(mac_rx_queue)) != NULL)
-    {
-        list_remove(mac_rx_queue, tmp);
-    }
-    return tmp;
+	tmp = list_head(mac_rx_queue);
+	if (tmp) {
+		list_remove(mac_rx_queue, tmp);
+	}
+	return tmp;
 }
 
-/**************************************************************************/
-/*!
-    Return a pointer to the queue head.
-*/
-/**************************************************************************/
+/* Return a pointer to the queue head */
 buffer_t *mac_queue_get_head()
 {
-    return list_head(mac_rx_queue);
+	return list_head(mac_rx_queue);
 }
-/**************************************************************************/
-/*!
-    Check if there are any frames in the queue. If there are, the function
-    returns false. Otherwise, return true for an empty queue.
-*/
-/**************************************************************************/
+
+/*
+ * Check if there are any frames in the queue. If there are, the function
+ * returns false. Otherwise, return true for an empty queue.
+ */
 bool mac_queue_is_empty()
 {
-    return (list_head(mac_rx_queue) == NULL);
+	return (list_head(mac_rx_queue) == NULL);
 }
 
-/**************************************************************************/
-/*!
-    Remove all entries from the queue.
-*/
-/**************************************************************************/
+/* Remove all entries from the queue. */
 void mac_queue_clear()
 {
-    buffer_t *buf;
+	buffer_t *buf = list_chop(mac_rx_queue);
 
-    for (buf = list_chop(mac_rx_queue); buf != NULL; buf = list_chop(mac_rx_queue))
-    {
-        buf_free(buf);
-    }
+	while(buf) {
+		buf_free(buf);
+		buf = list_chop(mac_rx_queue);
+	}
 }
-

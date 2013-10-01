@@ -41,34 +41,28 @@
     The MAC start service is used to start up the MAC layer. Currently,
     it doesn't do much other than set some default values.
 */
-/**************************************************************************/
 #include "freakz.h"
 
-/**************************************************************************/
-/*!
-    This function preps the mac layer to be started. Normally, the MAC start
-    service has more to it than setting default values, however most of the
-    start service functions are used for 802.15.4 beacon mode. Since we're not
-    using beacon mode, the start service is dramatically simplified.
-*/
-/**************************************************************************/
+/*
+ * This function preps the mac layer to be started. Normally, the MAC start
+ * service has more to it than setting default values, however most of the
+ * start service functions are used for 802.15.4 beacon mode. Since we're not
+ * using beacon mode, the start service is dramatically simplified.
+ */
 void mac_start_req(const mac_start_req_t *args)
 {
-    mac_pib_t *pib = mac_pib_get();
+	mac_pib_t *pib = mac_pib_get();
 
-    // set the pan id, channel, short addr, and ext pan id in the pib
-    pib->pan_id                 = args->pan_id;
-    pib->coord                  = true;
-    pib->short_addr             = 0x0000;
-    pib->coord_addr.mode        = SHORT_ADDR;
-    pib->coord_addr.short_addr  = 0x0000;
+	/* set the pan id, channel, short addr, and ext pan id in the pib */
+	pib->pan_id                 = args->pan_id;
+	pib->coord                  = true;
+	pib->short_addr             = 0x0000;
+	pib->coord_addr.mode        = SHORT_ADDR;
+	pib->coord_addr.short_addr  = 0x0000;
 
-    // set up the hardware with the device parameters
-    mac_set_channel(args->channel);
-    drvr_set_pan_id(pib->pan_id);
-    drvr_set_short_addr(pib->short_addr);
-    drvr_set_coord(pib->coord);
+	/* set up the hardware with the device parameters */
+	mac_set_channel(args->channel);
+	drvr_set_pan_id(pib->pan_id);
+	drvr_set_short_addr(pib->short_addr);
+	drvr_set_coord(pib->coord);
 }
-
-
-
