@@ -71,52 +71,47 @@ static void test_app_dump_free_bufs(U8 argc, char **argv);
 // Main command table for this node
 static test_app_cmd_t test_app_cmd_tbl[] =
 {
-    {"hello",   test_app_hello},
-    {"zs",      test_app_zdo_start},
-    {"nib",     test_app_dump_nib},
-    {"pib",     test_app_dump_pib},
-    {"buf",     test_app_dump_free_bufs},
-    {"dnt",     test_app_dump_nbor_tbl},
-    {"drt",     test_app_dump_rte_tbl},
-    {"dbt",     test_app_dump_bnd_tbl},
-    {"dgt",     test_app_dump_grp_tbl},
-    {"abe",     test_app_add_bnd},
-    {"rbe",     test_app_rem_bnd},
-    {"ag",      test_app_add_grp},
-    {"rg",      test_app_rem_grp},
-    {"ra",      test_zcl_read_attrib},
-    {"wa",      test_zcl_write_attrib},
-    {"da",      test_zcl_disc_attrib},
-    {"cr",      test_zcl_config_rpt},
-    {"id",      test_zcl_id_req},
-    {"onoff",   test_zcl_on_off_req},
-    {"movt",    test_zcl_level_move_to_req},
-    {"move",    test_zcl_level_move_req},
-    {"step",    test_zcl_level_step_req},
-    {"stop",    test_zcl_level_stop_req},
-    {"nar",     test_zdo_nwk_addr_req},
-    {"iar",     test_zdo_ieee_addr_req},
-    {"edb",     test_zdo_end_dev_bind},
-    {"znl",     test_zdo_nwk_lqi_req},
-    {"lv",      test_zdo_nwk_leave_req},
-    {"ndr",     test_zdo_nwk_disc_req},
-    {"nlr",     test_zdo_server_nwk_leave_req},
-    {"npj",     test_zdo_permit_join_req},
-    {"zbr",     test_zdo_bind_req},
-    {"zur",     test_zdo_unbind_req},
-    {"nur",     test_zdo_nwk_update_req},
-    {"udr",     test_data_unicast_data_req},
-    {"rudr",    test_data_unicast_rel_data_req},
-    {"idr",     test_data_ind_data_req},
-    {"gdr",     test_data_grp_data_req},
-    {NULL,      NULL}
+	{"hello",   test_app_hello},
+	{"zs",      test_app_zdo_start},
+	{"nib",     test_app_dump_nib},
+	{"pib",     test_app_dump_pib},
+	{"buf",     test_app_dump_free_bufs},
+	{"dnt",     test_app_dump_nbor_tbl},
+	{"drt",     test_app_dump_rte_tbl},
+	{"dbt",     test_app_dump_bnd_tbl},
+	{"dgt",     test_app_dump_grp_tbl},
+	{"abe",     test_app_add_bnd},
+	{"rbe",     test_app_rem_bnd},
+	{"ag",      test_app_add_grp},
+	{"rg",      test_app_rem_grp},
+	{"ra",      test_zcl_read_attrib},
+	{"wa",      test_zcl_write_attrib},
+	{"da",      test_zcl_disc_attrib},
+	{"cr",      test_zcl_config_rpt},
+	{"id",      test_zcl_id_req},
+	{"onoff",   test_zcl_on_off_req},
+	{"movt",    test_zcl_level_move_to_req},
+	{"move",    test_zcl_level_move_req},
+	{"step",    test_zcl_level_step_req},
+	{"stop",    test_zcl_level_stop_req},
+	{"nar",     test_zdo_nwk_addr_req},
+	{"iar",     test_zdo_ieee_addr_req},
+	{"edb",     test_zdo_end_dev_bind},
+	{"znl",     test_zdo_nwk_lqi_req},
+	{"lv",      test_zdo_nwk_leave_req},
+	{"ndr",     test_zdo_nwk_disc_req},
+	{"nlr",     test_zdo_server_nwk_leave_req},
+	{"npj",     test_zdo_permit_join_req},
+	{"zbr",     test_zdo_bind_req},
+	{"zur",     test_zdo_unbind_req},
+	{"nur",     test_zdo_nwk_update_req},
+	{"udr",     test_data_unicast_data_req},
+	{"rudr",    test_data_unicast_rel_data_req},
+	{"idr",     test_data_ind_data_req},
+	{"gdr",     test_data_grp_data_req},
+	{NULL,      NULL}
 };
 
-/**************************************************************************/
-/*!
-
-*/
-/**************************************************************************/
 void test_app_init()
 {
     test_zdo_init();
@@ -124,11 +119,6 @@ void test_app_init()
     test_data_init();
 }
 
-/**************************************************************************
-Function Name: test_app_parse
-
-Description:
-**************************************************************************/
 void test_app_parse(char *data)
 {
     U8 argc, i = 0;
@@ -157,21 +147,11 @@ void test_app_parse(char *data)
     DBG_PRINT("ZDO_CMD: Command not recognized.\n");
 }
 
-/**************************************************************************/
-/*!
-
-*/
-/**************************************************************************/
 static void test_app_hello(U8 argc, char **argv)
 {
     DBG_PRINT("Hello World!\n");
 }
 
-/**************************************************************************
-Function Name: test_app_zdo_start
-
-Description:
-**************************************************************************/
 static void test_app_zdo_start(U8 argc, char **argv)
 {
     aps_aib_t *aib = aps_aib_get();
@@ -199,81 +179,41 @@ static void test_app_zdo_start(U8 argc, char **argv)
     zdo_nwk_start();
 }
 
-/**************************************************************************
-Function Name: test_app_dump_nib
-
-Description:
-**************************************************************************/
 static void test_app_dump_nib(U8 argc, char **argv)
 {
     debug_dump_nib();
 }
 
-/**************************************************************************
-Function Name: test_app_dump_pib
-
-Description:
-**************************************************************************/
 static void test_app_dump_pib(U8 argc, char **argv)
 {
     debug_dump_pib();
 }
 
-/**************************************************************************/
-/*!
-
-*/
-/**************************************************************************/
 static void test_app_dump_free_bufs(U8 argc, char **argv)
 {
     DBG_PRINT("Used buffers: %d.\n", buf_get_cnt());
 }
 
-/**************************************************************************/
-/*!
-
-*/
-/**************************************************************************/
 static void test_app_dump_nbor_tbl(U8 argc, char **argv)
 {
     debug_dump_nbor_tbl();
 }
 
-/**************************************************************************/
-/*!
-
-*/
-/**************************************************************************/
 static void test_app_dump_rte_tbl(U8 argc, char **argv)
 {
     debug_dump_rte_tbl();
 }
 
-/**************************************************************************/
-/*!
-
-*/
-/**************************************************************************/
 static void test_app_dump_bnd_tbl(U8 argc, char **argv)
 {
     debug_dump_bnd_tbl();
 }
 
-/**************************************************************************/
-/*!
-
-*/
-/**************************************************************************/
 static void test_app_dump_grp_tbl(U8 argc, char **argv)
 {
     debug_dump_grp_tbl();
 }
 
-/**************************************************************************/
-/*!
-
-*/
-/**************************************************************************/
 static void test_app_add_bnd(U8 argc, char **argv)
 {
     U8 src_ep, dest_ep;
@@ -296,11 +236,6 @@ static void test_app_add_bnd(U8 argc, char **argv)
     aps_bind_req(src_ep, &addr, dest_ep, clust_id);
 }
 
-/**************************************************************************/
-/*!
-
-*/
-/**************************************************************************/
 static void test_app_rem_bnd(U8 argc, char **argv)
 {
     U8 src_ep, dest_ep;
@@ -323,11 +258,6 @@ static void test_app_rem_bnd(U8 argc, char **argv)
     aps_unbind_req(src_ep, &addr, dest_ep, clust_id);
 }
 
-/**************************************************************************/
-/*!
-
-*/
-/**************************************************************************/
 static void test_app_add_grp(U8 argc, char **argv)
 {
     U8 ep;
@@ -343,11 +273,6 @@ static void test_app_add_grp(U8 argc, char **argv)
     aps_grp_add(id, ep);
 }
 
-/**************************************************************************/
-/*!
-
-*/
-/**************************************************************************/
 static void test_app_rem_grp(U8 argc, char **argv)
 {
     U8 ep;

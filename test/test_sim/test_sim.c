@@ -67,14 +67,11 @@ FILE *fout;
 
 /* Threads to handle the pipe communications */
 
-/**************************************************************************
-Function Name: sim_data_in_thread
-
-Description:
-This thread is used to monitor the data_in pipe for incoming frames.
-
-CAUTION: Threads should only call reentrant functions or else bad things can happen.
-**************************************************************************/
+/*
+ * This thread is used to monitor the data_in pipe for
+ * incoming frames. Threads should only call reentrant
+ * functions or else bad things can happen.
+ */
 static void *sim_data_in_thread(void *dummy)
 {
 	static char msg[BUFSIZE];
@@ -94,16 +91,12 @@ static void *sim_data_in_thread(void *dummy)
 	return NULL;
 }
 
-/**************************************************************************
-Function Name: sim_cmd_in_thread
-
-Description:
-This thread is used to monitor the cmd_in pipe for incoming commands issued
-from the simulator shell. When the commands appear, it will save them in a static
-variable and post an event to the zdo cmd process with a pointer to the cmd string.
-
-CAUTION: Threads should only call reentrant functions or else bad things can happen.
-**************************************************************************/
+/*
+ * This thread is used to monitor the cmd_in pipe for incoming
+ * commands issued from the simulator shell. When the commands
+ * appear, it will save them in a static variable and post an
+ * event to the zdo cmd process with a pointer to the cmd string.
+ */
 static void *sim_cmd_in_thread(void *dummy)
 {
 	while (1)

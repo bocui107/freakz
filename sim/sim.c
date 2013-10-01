@@ -83,7 +83,7 @@ void *sim_data_out_thread(void *node)
 		 * the contents of the data to the sim console.
 		 */
 		printf("SIM: Data out from node %d.\n", nd.index);
-		for (i=0; i<nd.buf[0]; i++)
+		for (i = 0; i < nd.buf[0]; i++)
 			printf("%02x ", nd.buf[i]);
 		printf("\n");
 
@@ -94,8 +94,8 @@ void *sim_data_out_thread(void *node)
 			 * if the indices are less than maxnodes, then process them
 			 * according to the connection map otherwise, just skip over them.
 			 */
-			if ((nd.index-1 <= MAXNODES) && (sibling->index-1 <= MAXNODES))
-				if (conn_map[nd.index-1][sibling->index-1])
+			if ((nd.index - 1 <= MAXNODES) && (sibling->index - 1 <= MAXNODES))
+				if (conn_map[nd.index - 1][sibling->index - 1])
 					if ((write(sibling->data_in.pipe, nd.buf, nd.buf[0])) == -1)
 						perror("write");
 		}
