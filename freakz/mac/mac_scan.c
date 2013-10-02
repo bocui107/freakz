@@ -127,10 +127,9 @@ mem_ptr_t *mac_scan_descr_find_addr(address_t *addr)
 		if ((SCAN_ENTRY(mem_ptr)->coord_addr.mode == SHORT_ADDR) &&
 			(SCAN_ENTRY(mem_ptr)->coord_addr.short_addr == addr->short_addr))
 			break;
-		} else if ((SCAN_ENTRY(mem_ptr)->coord_addr.mode == LONG_ADDR) &&
+		else if ((SCAN_ENTRY(mem_ptr)->coord_addr.mode == LONG_ADDR) &&
 			(SCAN_ENTRY(mem_ptr)->coord_addr.long_addr == addr->long_addr))
 			break;
-		}
 	}
 	return mem_ptr;
 }

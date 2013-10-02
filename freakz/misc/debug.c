@@ -59,7 +59,7 @@ void debug_dump_buf(const U8 *buf, U8 len)
 		DBG_PRINT_RAW("%02x ", buf[i]);
 
 	DBG_PRINT_RAW("\n");
-#endif // DEBUG_BUF
+#endif
 }
 
 /* Decode the MAC header and print out the fields */
@@ -76,8 +76,7 @@ void debug_dump_mac_hdr(const mac_hdr_t *hdr)
 		  (hdr->mac_frm_ctrl.frame_pending) ?  "TRUE"    : "FALSE");
 	DBG_PRINT("DUMP_MAC_HDR: DSN            = %02X.\n", hdr->dsn);
 
-	if (hdr->mac_frm_ctrl.frame_type != MAC_ACK)
-	{
+	if (hdr->mac_frm_ctrl.frame_type != MAC_ACK) {
 		DBG_PRINT("DUMP_MAC_HDR: ACK REQ        = %s.\n",
 			  (hdr->mac_frm_ctrl.ack_req) ? "TRUE" : "FALSE");
 		DBG_PRINT("DUMP_MAC_HDR: PAN ID COMPR   = %s.\n",
@@ -93,8 +92,7 @@ void debug_dump_mac_hdr(const mac_hdr_t *hdr)
 			  (hdr->src_addr.mode == 3) ? "LONG"  :
 						      "UNDEF");
 
-		switch (hdr->dest_addr.mode)
-		{
+		switch (hdr->dest_addr.mode) {
 		case NO_PAN_ID_ADDR:
 			DBG_PRINT("DUMP_MAC_HDR: DEST PAN ID    = %s.\n", "NONE");
 			DBG_PRINT("DUMP_MAC_HDR: DEST ADDR      = %s.\n", "NONE");
@@ -111,13 +109,13 @@ void debug_dump_mac_hdr(const mac_hdr_t *hdr)
 			break;
 		}
 
-		if (!hdr->mac_frm_ctrl.pan_id_compr)
+		if (!hdr->mac_frm_ctrl.pan_id_compr) {
 			DBG_PRINT("DUMP_MAC_HDR: SRC PAN ID     = %04X.\n", hdr->src_pan_id);
-		else
+		} else {
 			DBG_PRINT("DUMP_MAC_HDR: SRC PAN ID     = %s.\n", "NONE");
+		}
 
-		switch (hdr->src_addr.mode)
-		{
+		switch (hdr->src_addr.mode) {
 		case NO_PAN_ID_ADDR:
 			DBG_PRINT("DUMP_MAC_HDR: SRC ADDR       = %s.\n", "NONE");
 			break;
@@ -131,7 +129,7 @@ void debug_dump_mac_hdr(const mac_hdr_t *hdr)
 			break;
 		}
 	}
-#endif // DEBUG_FRMS
+#endif
 }
 
 /* Decode the NWK header and print out the fields */
@@ -535,12 +533,13 @@ void debug_dump_bnd_tbl()
 		DBG_PRINT("BIND ENTRY %02X: DEST ADDR MDE = %s.\n",
 			  i, (BIND_ENTRY(mem_ptr)->dest_addr.mode == SHORT_ADDR) ?
 			  "SHORT ADDR" : "LONG ADDR");
-		if (BIND_ENTRY(mem_ptr)->dest_addr.mode == SHORT_ADDR)
+		if (BIND_ENTRY(mem_ptr)->dest_addr.mode == SHORT_ADDR) {
 			DBG_PRINT("BIND ENTRY %02X: DEST ADDR     = %04X.\n",
 				  i, BIND_ENTRY(mem_ptr)->dest_addr.short_addr);
-		else
+		} else {
 			DBG_PRINT("BIND_ENTRY %02X: DEST_ADDR     = %016llX.\n",
 				  i, BIND_ENTRY(mem_ptr)->dest_addr.long_addr);
+		}
 
 		DBG_PRINT("BIND ENTRY %02X: DEST EP       = %02X.\n",
 			  i, BIND_ENTRY(mem_ptr)->dest_ep);
@@ -584,10 +583,11 @@ void debug_dump_pib()
 	DBG_PRINT("DUMP_MAC_PIB: COORDINATOR    = %s.\n",      pib->coord ? "TRUE" : "FALSE");
 	DBG_PRINT("DUMP_MAC_PIB: CURR CHANNEL   = %02X.\n",    pib->curr_channel);
 
-	if (pib->coord_addr.mode == SHORT_ADDR)
+	if (pib->coord_addr.mode == SHORT_ADDR) {
 		DBG_PRINT("DUMP_MAC_PIB: COORD ADDR     = %04X.\n", pib->coord_addr.short_addr);
-	else
+	} else {
 		DBG_PRINT("DUMP_MAC_PIB: COORD ADDR     = %16llX.\n", pib->coord_addr.long_addr);
+	}
 #endif // DEBUG_FRMS
 }
 
@@ -597,10 +597,11 @@ void debug_dump_pan_descr(pan_descr_t *desc)
 #if (DEBUG_MAC == 1)
 	DBG_PRINT("DUMP_PAN_DESCR: COORD ADDR MODE = %s.\n",
 		  (desc->coord_addr.mode == SHORT_ADDR) ? "SHORT" : "LONG");
-	if (desc->coord_addr.mode == SHORT_ADDR)
+	if (desc->coord_addr.mode == SHORT_ADDR) {
 		DBG_PRINT("DUMP_PAN_DESCR: COORD ADDR      = %04X.\n", desc->coord_addr.short_addr);
-	else
+	} else {
 		DBG_PRINT("DUMP_PAN_DESCR: COORD ADDR      = %016llX.\n", desc->coord_addr.long_addr);
+	}
 	DBG_PRINT("DUMP_PAN_DESCR: COORD PAN ID    = %04X.\n", desc->coord_pan_id);
 	DBG_PRINT("DUMP_PAN_DESCR: CHANNEL         = %02d.\n", desc->channel);
 	DBG_PRINT("DUMP_PAN_DESCR: SUPERFRAME SPEC = %04X.\n", desc->superfrm_spec);
@@ -688,8 +689,7 @@ void debug_dump_zdo_request(zdo_req_t *req)
 	DBG_PRINT("DUMP_ZDO_REQ: SEQ            = %02X.\n", req->seq);
 	DBG_PRINT("DUMP_ZDO_REQ: CLUST          = %04X.\n", req->clust);
 
-	switch (req->clust)
-	{
+	switch (req->clust) {
 	case NWK_ADDR_REQ_CLUST:
 		DBG_PRINT("DUMP_ZDO_REQ: REQ            = NWK ADDR REQ.\n");
 		DBG_PRINT("DUMP_ZDO_REQ: EXT ADDR       = %016llX.\n",
@@ -803,8 +803,7 @@ void debug_dump_zdo_request(zdo_req_t *req)
 		DBG_PRINT("DUMP_ZDO_REQ: SCAN CHANNELS  = %08X.\n", req->type.nwk_update.scan_channels);
 		DBG_PRINT("DUMP_ZDO_REQ: SCAN DURATION  = %02X.\n", req->type.nwk_update.scan_duration);
 
-		if (req->type.nwk_update.scan_duration <= 0x5)
-		{
+		if (req->type.nwk_update.scan_duration <= 0x5) {
 			DBG_PRINT("DUMP_ZDO_REQ: SCAN COUNT     = %02X.\n",
 				  req->type.nwk_update.scan_cnt);
 		} else if (req->type.nwk_update.scan_duration == 0xFE) {
@@ -816,8 +815,10 @@ void debug_dump_zdo_request(zdo_req_t *req)
 			DBG_PRINT("DUMP_ZDO_REQ: NWK MGR ADDR   = %04X.\n",
 				  req->type.nwk_update.nwk_mngr_addr);
 		}
+	}
 }
 #endif
+
 /* Dump all the neighbor entries from the ZDO LQI response */
 #if (DEBUG_ZDO == 1)
 static void debug_dump_nbor_entry(zdo_resp_t *resp, U8 *data)
@@ -1410,7 +1411,7 @@ void debug_dump_zcl_frm(U8 *data, zcl_hdr_t *hdr, U16 clust)
 				DBG_PRINT("DUMP_ZCL_FRM: CMD            = %s.\n", "STOP");
 				break;
 			}
-		break;
+			break;
 		}
 	}
 #endif
