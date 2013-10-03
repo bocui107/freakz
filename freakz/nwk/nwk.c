@@ -71,173 +71,171 @@
     the broadcast timers will be started, and we will forward the frame again as a
     broadcast.
 */
-/**************************************************************************/
 #include "freakz.h"
 
-static nwk_pcb_t pcb;   ///< NWK layer protocol control block instantiation
-static nwk_nib_t nib;   ///< NWK information base instantiation
+/* NWK layer protocol control block instantiation */
+static nwk_pcb_t pcb;
 
-/**************************************************************************/
-/*!
-    Init the NWK protocol control block, the NWK capability info, set the
-    NWK info base to default values, and init the rest of the components
-    of the NWK layer.
-*/
-/**************************************************************************/
+/* NWK information base instantiation */
+static nwk_nib_t nib;
+
+/*
+ * Init the NWK protocol control block, the NWK capability info, set the
+ * NWK info base to default values, and init the rest of the components
+ * of the NWK layer.
+ */
 void nwk_init()
 {
-    nwk_capab_info_t info;
+	nwk_capab_info_t info;
 
-    // init the pcb
-    memset(&pcb, 0, sizeof(nwk_pcb_t));
-    pcb.brc_accept_new = true;
+	/* init the pcb */
+	memset(&pcb, 0, sizeof(nwk_pcb_t));
+	pcb.brc_accept_new = true;
 
-    // generate the initial capability info for this device. this can be modified
-    // later if needed when we join a network.
-    info.dev_type               = ZIGBEE_DEVICE_TYPE;
-    info.alloc_addr             = true;                 // always true for this version
-    info.security               = false;                // no high security support
-    info.pwr_src                = ZIGBEE_MAINS_POWERED;
-    info.rx_on_idle             = ZIGBEE_RX_ON_WHEN_IDLE;
+	/*
+	 * generate the initial capability info for this
+	 * device. this can be modified later if needed
+	 * when we join a network.
+	 */
+	info.dev_type               = ZIGBEE_DEVICE_TYPE;
+	/* always true for this version */
+	info.alloc_addr             = true;
+        /* no high security support */
+	info.security               = false;
+	info.pwr_src                = ZIGBEE_MAINS_POWERED;
+	info.rx_on_idle             = ZIGBEE_RX_ON_WHEN_IDLE;
 
-    // init the NIB
-    memset(&nib, 0, sizeof(nwk_nib_t));
-    nib.capability_info         = nwk_gen_capab_info(&info);
-    nib.seq_num                 = (U8)drvr_get_rand();
-    nib.rreq_id                 = (U8)drvr_get_rand();
-    nib.report_const_cost       = true;
-    nib.traxn_persist_time      = 10;
-    nib.short_addr              = 0xFFFF;
-    nib.stack_profile           = ZIGBEE_STACK_PROFILE;
-    nib.max_routers             = ZIGBEE_MAX_ROUTERS;
-    nib.max_children            = ZIGBEE_MAX_CHILDREN;
-    nib.max_depth               = ZIGBEE_MAX_DEPTH;
-    nib.rtr_cap                 = nib.max_routers;
-    nib.ed_cap                  = nib.max_children - nib.max_routers;
-    nib.dev_type                = ZIGBEE_DEVICE_TYPE;
-    nib.joined                  = false;
+	/* init the NIB */
+	memset(&nib, 0, sizeof(nwk_nib_t));
+	nib.capability_info         = nwk_gen_capab_info(&info);
+	nib.seq_num                 = (U8)drvr_get_rand();
+	nib.rreq_id                 = (U8)drvr_get_rand();
+	nib.report_const_cost       = true;
+	nib.traxn_persist_time      = 10;
+	nib.short_addr              = 0xFFFF;
+	nib.stack_profile           = ZIGBEE_STACK_PROFILE;
+	nib.max_routers             = ZIGBEE_MAX_ROUTERS;
+	nib.max_children            = ZIGBEE_MAX_CHILDREN;
+	nib.max_depth               = ZIGBEE_MAX_DEPTH;
+	nib.rtr_cap                 = nib.max_routers;
+	nib.ed_cap                  = nib.max_children - nib.max_routers;
+	nib.dev_type                = ZIGBEE_DEVICE_TYPE;
+	nib.joined                  = false;
 
-    nwk_rte_mesh_init();
-    nwk_rte_tree_init();
-    nwk_neighbor_tbl_init();
-    nwk_rte_disc_tbl_init();
-    nwk_rte_tbl_init();
-    nwk_pend_init();
-    nwk_brc_init();
-    nwk_addr_map_init();
+	nwk_rte_mesh_init();
+	nwk_rte_tree_init();
+	nwk_neighbor_tbl_init();
+	nwk_rte_disc_tbl_init();
+	nwk_rte_tbl_init();
+	nwk_pend_init();
+	nwk_brc_init();
+	nwk_addr_map_init();
 }
 
-/**************************************************************************/
-/*!
-    Return a pointer to the NWK protocol control block structure.
-*/
-/**************************************************************************/
+/* Return a pointer to the NWK protocol control block structure */
 nwk_pcb_t *nwk_pcb_get()
 {
-    return &pcb;
+	return &pcb;
 }
 
-/**************************************************************************/
-/*!
-    Return a pointer to the NWK information base structure.
-*/
-/**************************************************************************/
+/* Return a pointer to the NWK information base structure */
 nwk_nib_t *nwk_nib_get()
 {
-    return &nib;
+	return &nib;
 }
 
-/**************************************************************************/
-/*!
-    This is the nwk data request service that receives an APS frame
-    and slaps on a NWK header. If the frame is meant to be broadcasted,
-    it will also startoff the broadcast procedure. Currently, it will send
-    the frame to the NWK forward function in case that it needs routing.
-*/
-/**************************************************************************/
+/*
+ * This is the nwk data request service that receives an APS frame
+ * and slaps on a NWK header. If the frame is meant to be broadcasted,
+ * it will also startoff the broadcast procedure. Currently, it will send
+ * the frame to the NWK forward function in case that it needs routing.
+ */
 void nwk_data_req(const nwk_data_req_t *req)
 {
-    nwk_hdr_t nwk_hdr;
+	nwk_hdr_t nwk_hdr;
 
-    // Fill out and generate the nwk header
-    memset(&nwk_hdr, 0, sizeof(nwk_hdr_t));
-    nwk_hdr.nwk_frm_ctrl.frame_type     = NWK_DATA_FRM;
-    nwk_hdr.nwk_frm_ctrl.disc_route     = req->disc_rte;
-    nwk_hdr.nwk_frm_ctrl.protocol_ver   = ZIGBEE_PROTOCOL_VERSION;
-    nwk_hdr.seq_num                     = nib.seq_num++;
-    nwk_hdr.dest_addr                   = req->dest_addr;
-    nwk_hdr.src_addr                    = nib.short_addr;
-    nwk_hdr.radius                      = req->radius;
-    nwk_hdr.handle                      = req->nsdu_handle;
+	/* Fill out and generate the nwk header */
+	memset(&nwk_hdr, 0, sizeof(nwk_hdr_t));
+	nwk_hdr.nwk_frm_ctrl.frame_type     = NWK_DATA_FRM;
+	nwk_hdr.nwk_frm_ctrl.disc_route     = req->disc_rte;
+	nwk_hdr.nwk_frm_ctrl.protocol_ver   = ZIGBEE_PROTOCOL_VERSION;
+	nwk_hdr.seq_num                     = nib.seq_num++;
+	nwk_hdr.dest_addr                   = req->dest_addr;
+	nwk_hdr.src_addr                    = nib.short_addr;
+	nwk_hdr.radius                      = req->radius;
+	nwk_hdr.handle                      = req->nsdu_handle;
 
-    // if this is a brc frame that we're originating, we need to add it to the brc table.
-    if ((nwk_hdr.dest_addr & NWK_BROADCAST_MASK) == 0xFFF0)
-    {
-        // set up the brc parameter, then start the brc transmission procedure
-        nwk_hdr.nwk_frm_ctrl.disc_route = false;
-        if (nwk_brc_start(req->buf, &nwk_hdr) != NWK_SUCCESS)
-        {
-            return;
-        }
-    }
+	/*
+	 * if this is a brc frame that we're originating,
+	 * we need to add it to the brc table.
+	 */
+	if ((nwk_hdr.dest_addr & NWK_BROADCAST_MASK) == 0xFFF0)
+	{
+		/*
+		 * set up the brc parameter, then start the
+		 * brc transmission procedure
+		 */
+		nwk_hdr.nwk_frm_ctrl.disc_route = false;
+		if (nwk_brc_start(req->buf, &nwk_hdr) != NWK_SUCCESS)
+			return;
+	}
 
-    // send it to the fwd function for processing and possible routing
-    nwk_fwd(req->buf, &nwk_hdr);
+	/* send it to the fwd function for processing and possible routing */
+	nwk_fwd(req->buf, &nwk_hdr);
 }
 
-/**************************************************************************/
-/*!
-    Send out the NWK frame to the MAC layer for transmission. This function
-    does final assembly of the NWK header and generates the MAC request
-    based on the given information.
-*/
-/**************************************************************************/
+/*
+ * Send out the NWK frame to the MAC layer for transmission. This function
+ * does final assembly of the NWK header and generates the MAC request
+ * based on the given information.
+ */
 static void nwk_tx(buffer_t *buf, nwk_hdr_t *hdr, bool indirect)
 {
-    mac_pib_t *pib = mac_pib_get();
-    mac_data_req_t req;
+	mac_pib_t *pib = mac_pib_get();
+	mac_data_req_t req;
 
-    // finish filling out the nwk hdr and generate it
-    hdr->nwk_frm_ctrl.protocol_ver          = ZIGBEE_PROTOCOL_VERSION;
-    hdr->nwk_frm_ctrl.mcast_flag            = false;        // multicast not supported
-    hdr->nwk_frm_ctrl.security              = false;
-    hdr->nwk_frm_ctrl.src_rte               = false;
-    hdr->nwk_frm_ctrl.dest_ieee_addr_flag   = false;
-    hdr->nwk_frm_ctrl.src_ieee_addr_flag    = false;
+	/* finish filling out the nwk hdr and generate it */
+	hdr->nwk_frm_ctrl.protocol_ver          = ZIGBEE_PROTOCOL_VERSION;
+	hdr->nwk_frm_ctrl.mcast_flag            = false;        // multicast not supported
+	hdr->nwk_frm_ctrl.security              = false;
+	hdr->nwk_frm_ctrl.src_rte               = false;
+	hdr->nwk_frm_ctrl.dest_ieee_addr_flag   = false;
+	hdr->nwk_frm_ctrl.src_ieee_addr_flag    = false;
 
-    nwk_gen_header(buf, hdr);
-    debug_dump_nwk_hdr(hdr);
+	nwk_gen_header(buf, hdr);
+	debug_dump_nwk_hdr(hdr);
 
-    req.src_addr.mode                       = SHORT_ADDR;
-    req.dest_addr.mode                      = SHORT_ADDR;
-    req.src_addr.short_addr                 = hdr->mac_hdr->src_addr.short_addr;
-    req.dest_addr.short_addr                = hdr->mac_hdr->dest_addr.short_addr;
-    req.src_pan_id                          = pib->pan_id;
-    req.dest_pan_id                         = pib->pan_id;
-    req.msdu_handle                         = hdr->handle;
-    req.buf                                 = buf;
+	req.src_addr.mode                       = SHORT_ADDR;
+	req.dest_addr.mode                      = SHORT_ADDR;
+	req.src_addr.short_addr                 = hdr->mac_hdr->src_addr.short_addr;
+	req.dest_addr.short_addr                = hdr->mac_hdr->dest_addr.short_addr;
+	req.src_pan_id                          = pib->pan_id;
+	req.dest_pan_id                         = pib->pan_id;
+	req.msdu_handle                         = hdr->handle;
+	req.buf                                 = buf;
 
-    // it its a broadcast, then no ack request. otherwise, ack requests on all other transfers.
-    req.tx_options = (req.dest_addr.short_addr != 0xFFFF) ? MAC_ACK_REQUEST : 0x0;
-    req.tx_options |= indirect ? MAC_INDIRECT_TRANS : 0x0;
+	/*
+	 * it its a broadcast, then no ack request.
+	 * otherwise, ack requests on all other transfers.
+	 */
+	req.tx_options = (req.dest_addr.short_addr != 0xFFFF) ? MAC_ACK_REQUEST : 0x0;
+	req.tx_options |= indirect ? MAC_INDIRECT_TRANS : 0x0;
 
-    // kick it to the curb!
-    mac_data_req(&req);
+	/* kick it to the curb! */
+	mac_data_req(&req);
 }
 
-/**************************************************************************/
-/*!
-    This function is the work horse of the NWK layer. It takes a frame from
-    either the data request or the data indication functions (if the dest address
-    is not for this node). It will look at the dest address and determine
-    how this frame should be transmitted. The forwarding choices are:
-    1) broadcast
-    2) neighbor table   (the dest is a neighbor of ours)
-    3) routing table    (the route path exists)
-    4) route discovery  (the route path does not exist but mesh routing is okay)
-    5) tree             (none of the above and the route discovery flag is disabled)
-*/
-/**************************************************************************/
+/*
+ * This function is the work horse of the NWK layer. It takes a frame from
+ * either the data request or the data indication functions (if the dest address
+ * is not for this node). It will look at the dest address and determine
+ * how this frame should be transmitted. The forwarding choices are:
+ * 1) broadcast
+ * 2) neighbor table   (the dest is a neighbor of ours)
+ * 3) routing table    (the route path exists)
+ * 4) route discovery  (the route path does not exist but mesh routing is okay)
+ * 5) tree             (none of the above and the route discovery flag is disabled)
+ */
 void nwk_fwd(buffer_t *buf, nwk_hdr_t *hdr_in)
 {
     U16 next_hop;

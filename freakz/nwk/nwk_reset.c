@@ -44,32 +44,27 @@
 /**************************************************************************/
 #include "freakz.h"
 
-/**************************************************************************/
-/*!
-    Resets the nib, pcb, and clears all table entries. If warm start is set, it will only
-    clear the table entries.
-*/
-/**************************************************************************/
+/*
+ * Resets the nib, pcb, and clears all table entries. If warm
+ * start is set, it will only clear the table entries.
+ */
 void nwk_reset_req(bool cold_start)
 {
-    if (cold_start)
-    {
-        slow_clock_stop();
-        nwk_sync_stop_tmr();
-        nwk_rte_mesh_stop_tmr();
-        nwk_init();
-        slow_clock_init();
-    }
+	if (cold_start) {
+		slow_clock_stop();
+		nwk_sync_stop_tmr();
+		nwk_rte_mesh_stop_tmr();
+		nwk_init();
+		slow_clock_init();
+	}
 
-    // clear all the tables
-    nwk_rte_disc_clear();
-    nwk_rte_tbl_clear();
-    nwk_neighbor_tbl_clear();
-    nwk_pend_clear();
-    nwk_brc_clear();
+	/* clear all the tables */
+	nwk_rte_disc_clear();
+	nwk_rte_tbl_clear();
+	nwk_neighbor_tbl_clear();
+	nwk_pend_clear();
+	nwk_brc_clear();
 
-    // reset the mac
-    mac_reset_req(cold_start);
+	/* reset the mac */
+	mac_reset_req(cold_start);
 }
-
-

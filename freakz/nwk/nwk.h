@@ -52,13 +52,13 @@
 
 // this define is just used to make the code more comprehensible. otherwise,
 // you'd have to stare at these monsters all over the place.
-#define ADDR_MAP_ENTRY(m)   ((nwk_addr_map_t *)MMEM_PTR(&m->mmem_ptr))   ///< De-reference the mem ptr and cast it as an addr map entry
-#define BRC_ENTRY(m)        ((nwk_brc_t *)MMEM_PTR(&m->mmem_ptr))        ///< De-reference the mem ptr and cast it as a broadcast table entry
-#define NBOR_ENTRY(m)       ((nbor_tbl_entry_t *)MMEM_PTR(&m->mmem_ptr)) ///< De-reference the mem ptr and cast it as a neighbor table entry
-#define PEND_ENTRY(m)       ((nwk_pend_t *)MMEM_PTR(&m->mmem_ptr))       ///< De-reference the mem ptr and cast it as a pending list entry
-#define DISC_ENTRY(m)       ((disc_entry_t *)MMEM_PTR(&m->mmem_ptr))     ///< De-reference the mem ptr and cast it as a discovery table entry
-#define RTE_ENTRY(m)        ((rte_entry_t *)MMEM_PTR(&m->mmem_ptr))      ///< De-reference the mem ptr and cast it as a route table entry
-#define RREQ_ENTRY(m)       ((rreq_t *)MMEM_PTR(&m->mmem_ptr))          ///< De-reference the mem ptr and cast it as a rte request entry
+#define ADDR_MAP_ENTRY(m)	((nwk_addr_map_t *)MMEM_PTR(&m->mmem_ptr))
+#define BRC_ENTRY(m)		((nwk_brc_t *)MMEM_PTR(&m->mmem_ptr))
+#define NBOR_ENTRY(m)		((nbor_tbl_entry_t *)MMEM_PTR(&m->mmem_ptr))
+#define PEND_ENTRY(m)		((nwk_pend_t *)MMEM_PTR(&m->mmem_ptr))
+#define DISC_ENTRY(m)		((disc_entry_t *)MMEM_PTR(&m->mmem_ptr))
+#define RTE_ENTRY(m)		((rte_entry_t *)MMEM_PTR(&m->mmem_ptr))
+#define RREQ_ENTRY(m)		((rreq_t *)MMEM_PTR(&m->mmem_ptr))
 
 /****************************************************************/
 /*!
@@ -230,37 +230,35 @@ enum NWK_STATUS_ENUMS
     NWK_FRAME_NOT_BUFFERED          = 0xD3  ///< Data transmit request failed due to lack of pending entries
 };
 
-/****************************************************************/
-/*!
-    Miscellaneous enumerated definitions used in the network layer
-*/
-/****************************************************************/
+/* Miscellaneous enumerated definitions used in the network layer */
 enum NWK_MISC_ENUMS
 {
-    // nwk tx dest addr mode
-    NWK_TX_MCAST_ADDR               = 0x1,      ///< Network data request transmit multicast
-    NWK_TX_UNICAST_BROADCAST        = 0x2,      ///< Network data request transmit unicast/broadcast
+	/* nwk tx dest addr mode */
+	NWK_TX_MCAST_ADDR               = 0x1,   ///< Network data request transmit multicast
+	NWK_TX_UNICAST_BROADCAST        = 0x2,   ///< Network data request transmit unicast/broadcast
 
-    // address allocation
-    NWK_ADDR_ALLOC_TREE             = 0x0,      ///< Use tree addressing for addr allocation
-    NWK_ADDR_ALLOC_STOCHASTIC       = 0x2,      ///< Use stochastic addressing for addr allocation
+	/* address allocation */
+	NWK_ADDR_ALLOC_TREE             = 0x0,   ///< Use tree addressing for addr allocation
+	NWK_ADDR_ALLOC_STOCHASTIC       = 0x2,   ///< Use stochastic addressing for addr allocation
 
-    // default non member radius value
-    NWK_NON_MEMB_RADIUS_INFIN       = 0x7,      ///< Constant for infinite nonmember radius
+	/* default non member radius value */
+	NWK_NON_MEMB_RADIUS_INFIN       = 0x7,   ///< Constant for infinite nonmember radius
 
-    // default static path cost
-    NWK_STATIC_PATH_COST            = 0x7,      ///< Constant for path cost. \todo This needs to be changed.
+	/* default static path cost */
+	NWK_STATIC_PATH_COST            = 0x7,   ///< Constant for path cost. \todo This needs to be changed.
 
-    // network broadcast values
-    NWK_BROADCAST_ALL               = 0xFFFF,   ///< Broadcast address for all devices
-    NWK_BROADCAST_RXONIDLE          = 0xFFFD,   ///< Broadcast address for devices whose receiver is always on
-    NWK_BROADCAST_ROUTERS_COORD     = 0xFFFC,   ///< Broadcast address for only routers and coordinators
-    NWK_BROADCAST_MASK              = 0xFFF0,   ///< Broadcast address mask - used to identify any type of brc address
+	/* network broadcast values */
+	NWK_BROADCAST_ALL               = 0xFFFF, /* For all devices */
+	NWK_BROADCAST_RXONIDLE          = 0xFFFD, /* For devices whose receiver is always on */
+	NWK_BROADCAST_ROUTERS_COORD     = 0xFFFC, /* For only routers and coordinators */
+	/* Broadcast address mask - used to identify any type of brc address */
+	NWK_BROADCAST_MASK              = 0xFFF0,
 
-    // nlme states
-    NLME_IDLE                       = 0x0,      ///< Network management state machine - idle state
-    NLME_NWK_DISC                   = 0x1,      ///< Network management state machine - network discovery state
-    NLME_NWK_FORMATION              = 0x2       ///< Network management state machine - network formation state
+	/* nlme states */
+	/* Network management state machine */
+	NLME_IDLE			= 0x0,	/* idle state */
+	NLME_NWK_DISC			= 0x1,	/* network discovery state */
+	NLME_NWK_FORMATION		= 0x2	/* network formation state */
 };
 
 /*******************************************************************/
