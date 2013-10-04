@@ -86,8 +86,7 @@ void mac_scan_descr_add(address_t *src_addr, U16 src_pan_id, U8 channel, U16 sup
 	mem_ptr_t *mem_ptr;
 
 	mem_ptr = mac_scan_alloc();
-	if (mem_ptr)
-	{
+	if (mem_ptr) {
 		memcpy(&SCAN_ENTRY(mem_ptr)->coord_addr, src_addr, sizeof(address_t));
 		SCAN_ENTRY(mem_ptr)->superfrm_spec  = superframe_spec;
 		SCAN_ENTRY(mem_ptr)->coord_pan_id   = src_pan_id;
@@ -201,7 +200,7 @@ void mac_scan_energy()
 	 * channel, and then poll the RSSI until the timer expires. Keep
 	 * the max value that we get.
 	 */
-	for (i=0; i<MAC_MAX_CHANNELS; i++)
+	for (i = 0; i < MAC_MAX_CHANNELS; i++)
 	{
 		/*
 		 * check to see if we found a set bit in the channel mask, and
@@ -248,11 +247,12 @@ void mac_scan_energy()
 		}
 	}
 
-	// send scan confirm for energy detect
-	scan_conf.scan_type         = MAC_ENERGY_SCAN;
-	scan_conf.energy_list       = pcb->energy_list;
-	scan_conf.status            = MAC_SUCCESS;
-	mac_rx_enb(true, true);     // set the trx in auto ack mode
+	/* send scan confirm for energy detect */
+	scan_conf.scan_type	= MAC_ENERGY_SCAN;
+	scan_conf.energy_list	= pcb->energy_list;
+	scan_conf.status	= MAC_SUCCESS;
+	/* set the trx in auto ack mode */
+	mac_rx_enb(true, true);
 	mac_scan_conf(&scan_conf);
 }
 
@@ -318,8 +318,8 @@ void mac_scan(void *ptr)
 	 * find an allowable channel or we exceed the max channels that
 	 * are supported.
 	 */
-	for (;pcb->curr_scan_channel < (MAC_PHY_CHANNEL_OFFSET + MAC_MAX_CHANNELS);
-								pcb->curr_scan_channel++)
+	for (; pcb->curr_scan_channel < (MAC_PHY_CHANNEL_OFFSET + MAC_MAX_CHANNELS);
+	       pcb->curr_scan_channel++)
 	{
 		/* shift the bitmask and compare to the channel mask */
 		if (pcb->channel_mask & (1UL << pcb->curr_scan_channel))
@@ -342,16 +342,16 @@ void mac_scan(void *ptr)
 		 */
 		BUF_ALLOC(buf, TX);
 
-		dest_addr.mode          = SHORT_ADDR;
-		dest_addr.short_addr    = MAC_BROADCAST_ADDR;
+		dest_addr.mode		= SHORT_ADDR;
+		dest_addr.short_addr	= MAC_BROADCAST_ADDR;
 
 		if (pcb->scan_type == MAC_ACTIVE_SCAN) {
-			cmd.cmd_id          = MAC_BEACON_REQ;
-			src_addr.mode       = NO_PAN_ID_ADDR;
+			cmd.cmd_id	= MAC_BEACON_REQ;
+			src_addr.mode	= NO_PAN_ID_ADDR;
 		} else if (pcb->scan_type == MAC_ORPHAN_SCAN) {
-			cmd.cmd_id          = MAC_ORPHAN_NOT;
-			src_addr.mode       = LONG_ADDR;
-			src_addr.long_addr  = pib->ext_addr;
+			cmd.cmd_id	= MAC_ORPHAN_NOT;
+			src_addr.mode	= LONG_ADDR;
+			src_addr.long_addr = pib->ext_addr;
 		}
 
 		mac_gen_cmd(buf, &cmd);

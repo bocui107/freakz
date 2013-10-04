@@ -40,7 +40,6 @@
 
     Header file for the MAC layer of the FreakZ stack.
 */
-/****************************************************************/
 #ifndef MAC_H
 #define MAC_H
 #include "contiki.h"
@@ -49,102 +48,129 @@
 #include "buf.h"
 #include "mem_heap.h"
 
-/// Calculate amount of time to perform a scan
+/* Calculate amount of time to perform a scan */
 #define MAC_SCAN_TIME(duration) (((aBaseSuperframeDuration << duration) + aBaseSuperframeDuration) >> 6)
 
-// this define is just used to make the code more comprehensible. otherwise,
-// you'd have to stare at these monsters all over the place.
-#define INDIR_ENTRY(m) ((mac_indir_t *)MMEM_PTR(&m->mmem_ptr))  ///< De-reference the mem ptr and cast it as an indirect entry
-#define RETRY_ENTRY(m) ((mac_retry_t *)MMEM_PTR(&m->mmem_ptr))  ///< De-reference the mem ptr and cast it as an retry entry
-#define SCAN_ENTRY(m)  ((pan_descr_t *)MMEM_PTR(&m->mmem_ptr))  ///< De-reference the mem ptr and cast it as a scan entry
-                                                                ///
-/****************************************************************/
-/*!
-    Enumerated definitions for the MAC Frame Control Field in the MAC Header.
-*/
-/****************************************************************/
+/*
+ * this define is just used to make the code more comprehensible.
+ * otherwise, you'd have to stare at these monsters all over the
+ * place.
+ */
+
+#define INDIR_ENTRY(m) ((mac_indir_t *)MMEM_PTR(&m->mmem_ptr))
+#define RETRY_ENTRY(m) ((mac_retry_t *)MMEM_PTR(&m->mmem_ptr))
+#define SCAN_ENTRY(m)  ((pan_descr_t *)MMEM_PTR(&m->mmem_ptr))
+
+/* Enumerated definitions for the MAC Frame Control Field in the MAC Header */
 typedef enum
 {
-    MAC_FRM_PEND_OFF                    = 4,        ///< Data pending flag offset in FCF
-    MAC_ACK_REQ_OFF                     = 5,        ///< Ack request flag offset in FCF
-    MAC_PAN_ID_COMPR_OFF                = 6,        ///< Pan ID compression offset in FCF
-    MAC_DEST_ADDR_MODE_OFF              = 10,       ///< Destination address mode offset in FCF
-    MAC_SRC_ADDR_MODE_OFF               = 14,       ///< Source address offset in FCF
+	/* Data pending flag offset in FCF */
+	MAC_FRM_PEND_OFF	= 4,
+	/* Ack request flag offset in FCF */
+	MAC_ACK_REQ_OFF		= 5,
+	/* Pan ID compression offset in FCF */
+	MAC_PAN_ID_COMPR_OFF	= 6,
+	/* Destination address mode offset in FCF */
+	MAC_DEST_ADDR_MODE_OFF	= 10,
+	/* Source address offset in FCF */
+	MAC_SRC_ADDR_MODE_OFF	= 14,
 
-    // MAC frame control field bit masks
-    MAC_FRAME_TYPE_MASK                 = 0x0003,   ///< Data, command, ACK, or beacon frame indicator
-    MAC_PENDING_FRAME_MASK              = 0x0010,   ///< Indirect data awaiting retrieval for dest address
-    MAC_ACK_REQ_MASK                    = 0x0020,   ///< Ack required for this frame
-    MAC_PAN_ID_COMPR_MASK               = 0x0040,   ///< If src and dest PAN ID are same, then include once and set this flag
-    MAC_DEST_ADDR_MODE_MASK             = 0x0C00,   ///< Address mode in address field for dest - network or extended addr
-    MAC_SRC_ADDR_MODE_MASK              = 0xC000,   ///< Address mode in address field for src - network or extended addr
+	/* MAC frame control field bit masks */
+	/* Data, command, ACK, or beacon frame indicator */
+	MAC_FRAME_TYPE_MASK	= 0x0003,
+	/* Indirect data awaiting retrieval for dest address */
+	MAC_PENDING_FRAME_MASK	= 0x0010,
+	/* Ack required for this frame */
+	MAC_ACK_REQ_MASK	= 0x0020,
+	/*
+	 * If src and dest PAN ID are same, then include
+	 * once and set this flag
+	 */
+	MAC_PAN_ID_COMPR_MASK	= 0x0040,
+	/*
+	 * Address mode in address field for
+	 * dest - network or extended addr
+	 */
+	MAC_DEST_ADDR_MODE_MASK	= 0x0C00,
+	/*
+	 * Address mode in address field for
+	 * src - network or extended addr
+	 */
+	MAC_SRC_ADDR_MODE_MASK	= 0xC000,
 
-    // frame type for FCF enums
-    MAC_BEACON                          = 0x0,      ///< Beacon frame indicator
-    MAC_DATA                            = 0x1,      ///< Data frame indicator
-    MAC_ACK                             = 0x2,      ///< ACK frame indicator
-    MAC_COMMAND                         = 0x3,      ///< Command frame indicator
+	/* frame type for FCF enums */
+	/* Beacon frame indicator */
+	MAC_BEACON		= 0x0,
+	/* Data frame indicator */
+	MAC_DATA		= 0x1,
+	/* ACK frame indicator */
+	MAC_ACK			= 0x2,
+	/* Command frame indicator */
+	MAC_COMMAND		= 0x3,
 
-    // address mode enums
-    NO_PAN_ID_ADDR                      = 0x0,      ///< No address and no PAN ID in address field
-    SHORT_ADDR                          = 0x2,      ///< Address field contains network (short) address
-    LONG_ADDR                           = 0x3       ///< Address field contains IEEE (long) address
+	/* address mode enums */
+	/* No address and no PAN ID in address field */
+	NO_PAN_ID_ADDR		= 0x0,
+	/* Address field contains network (short) address */
+	SHORT_ADDR		= 0x2,
+	/* Address field contains IEEE (long) address */
+	LONG_ADDR		= 0x3
 } mac_frm_ctrl_enums_t;
 
-/****************************************************************/
-/*!
-    Enumerated definitions for the MAC Beacon frames.
-*/
-/****************************************************************/
+/* Enumerated definitions for the MAC Beacon frames */
 typedef enum
 {
-    // mac beacon fields
-    MAC_GTS_MASK                        = 0x7,      ///< Guaranteed timeslot mask for beacon frame
-    MAC_GTS_DESC_SIZE                   = 0x3,      ///< Guaranteed timeslot descriptor size for beacon frame
-    MAC_GTS_DIR_SIZE                    = 0x1,      ///< Guaranteed timeslot direction size for beacon frame
-    MAC_PENDING_SHORT_ADDR_MASK         = 0x7,      ///< Pending short address mask for beacon frame
-    MAC_PENDING_LONG_ADDR_OFF           = 0x4,      ///< Pending long address offset for beacon frame
-    MAC_PENDING_LONG_ADDR_MASK          = 0x70,     ///< Pending long address mask for beacon frame
-    MAC_BEACON_PAYLOAD_SIZE             = 0x4,      ///< Beacon frame payload size
+	/* mac beacon fields */
+	/* Guaranteed timeslot mask for beacon frame */
+	MAC_GTS_MASK			= 0x7,
+	/* Guaranteed timeslot descriptor size for beacon frame */
+	MAC_GTS_DESC_SIZE		= 0x3,
+	/* Guaranteed timeslot direction size for beacon frame */
+	MAC_GTS_DIR_SIZE		= 0x1,
+	/* Pending short address mask for beacon frame */
+	MAC_PENDING_SHORT_ADDR_MASK	= 0x7,
+	/* Pending long address offset for beacon frame */
+	MAC_PENDING_LONG_ADDR_OFF	= 0x4,
+	/* Pending long address mask for beacon frame */
+	MAC_PENDING_LONG_ADDR_MASK	= 0x70,
+	/* Beacon frame payload size */
+	MAC_BEACON_PAYLOAD_SIZE		= 0x4,
 
-    // mac superframe spec fields
-    MAC_ASSOC_PERMIT_OFF                = 15,
-    MAC_COORDINATOR_OFF                 = 14,
-    MAC_FINAL_CAP_SLOT_OFF              = 8,
-    MAC_SUPERFRAME_ORDER_OFF            = 4,
-    MAC_BEACON_ORDER_OFF                = 0,
-    MAC_ASSOC_PERMIT_MASK               = (0x1 << MAC_ASSOC_PERMIT_OFF),    ///< Indicate if association is permitted (superfrm spec)
-    MAC_COORDINATOR_MASK                = (0x1 << MAC_COORDINATOR_OFF),     ///< Indicate if coordinator (superfrm spec)
-    MAC_BEACON_ORDER                    = (0xF << MAC_BEACON_ORDER_OFF),    ///< Indicate beacon order (superfrm spec)
-    MAC_SUPERFRAME_ORDER                = (0xF << MAC_SUPERFRAME_ORDER_OFF), ///< Indicate superfrm order (superfrm spec)
-    MAC_FINAL_CAP_SLOT                  = (0xF << MAC_FINAL_CAP_SLOT_OFF)   ///< Indicate final contention access period slot (superfrm spec)
+	/* mac superframe spec fields */
+	MAC_ASSOC_PERMIT_OFF		= 15,
+	MAC_COORDINATOR_OFF		= 14,
+	MAC_FINAL_CAP_SLOT_OFF		= 8,
+	MAC_SUPERFRAME_ORDER_OFF	= 4,
+	MAC_BEACON_ORDER_OFF		= 0,
+	/* Indicate if association is permitted (superfrm spec) */
+	MAC_ASSOC_PERMIT_MASK		= (0x1 << MAC_ASSOC_PERMIT_OFF),
+	/* Indicate if coordinator (superfrm spec) */
+	MAC_COORDINATOR_MASK		= (0x1 << MAC_COORDINATOR_OFF),
+	/* Indicate beacon order (superfrm spec) */
+	MAC_BEACON_ORDER		= (0xF << MAC_BEACON_ORDER_OFF),
+	/* Indicate superfrm order (superfrm spec) */
+	MAC_SUPERFRAME_ORDER		= (0xF << MAC_SUPERFRAME_ORDER_OFF),
+	/* Indicate final contention access period slot (superfrm spec) */
+	MAC_FINAL_CAP_SLOT		= (0xF << MAC_FINAL_CAP_SLOT_OFF)
 } mac_beacon_enums_t;
 
-/****************************************************************/
-/*!
-    Enumerated definitions for the MAC command frames.
-*/
-/****************************************************************/
+/* Enumerated definitions for the MAC command frames. */
 typedef enum
 {
-    // mac command frames
-    MAC_ASSOC_REQ                       = 0x1,  ///< Association request command ID
-    MAC_ASSOC_RESP                      = 0x2,  ///< Association response command ID
-    MAC_DATA_REQ                        = 0x4,  ///< Data request command ID
-    MAC_ORPHAN_NOT                      = 0x6,  ///< Orphan notification command ID
-    MAC_BEACON_REQ                      = 0x7,  ///< Beacon request command ID
-    MAC_COORD_REALIGN                   = 0x8,  ///< Coordinator realignment command ID
+	/* mac command frames */
+	MAC_ASSOC_REQ		= 0x1,  /* Association request command ID */
+	MAC_ASSOC_RESP		= 0x2,  /* Association response command ID */
+	MAC_DATA_REQ		= 0x4,  /* Data request command ID */
+	MAC_ORPHAN_NOT		= 0x6,  /* Orphan notification command ID */
+	MAC_BEACON_REQ		= 0x7,  /* Beacon request command ID */
+	MAC_COORD_REALIGN	= 0x8,  /* Coordinator realignment command ID */
 
-    MAC_ASSOC_REQ_LEN                   = 0x2,
-    MAC_ASSOC_RESP_LEN                  = 0x4,
-    MAC_COORD_REALIGN_LEN               = 0x8
+	MAC_ASSOC_REQ_LEN	= 0x2,
+	MAC_ASSOC_RESP_LEN	= 0x4,
+	MAC_COORD_REALIGN_LEN	= 0x8
 } mac_cmd_frm_enums_t;
 
-/****************************************************************/
-/*!
-    Enumerated definitions for the MAC status values.
-*/
-/****************************************************************/
+/* Enumerated definitions for the MAC status values */
 typedef enum
 {
     // mac status
@@ -348,143 +374,181 @@ typedef struct _pan_descr_t
     bool        pot_parent;     ///< Potential Parent for this device
 } pan_descr_t;
 
-/*******************************************************************/
-/*!
-    The MAC data request structure is used to hold the arguments
-    for the MAC data request service. The arguments will be used
-    to generate the header which will then be stored in the buffer.
-*/
-/*******************************************************************/
+/*
+ * The MAC data request structure is used to hold the arguments
+ * for the MAC data request service. The arguments will be used
+ * to generate the header which will then be stored in the buffer.
+ *
+ * src_addr: Src address (usually this device's address)
+ * dest_addr: Dest address
+ * src_pan_id: Src PAN ID
+ * dest_pan_id: Dest PAN ID
+ * buf: Data buffer to be transmitted
+ * msdu_handle: Data handle identifier for this frame
+ * tx_options: Transmission options (ack request, indirect)
+ */
 typedef struct
 {
-  address_t         src_addr;       ///< Src address (usually this device's address)
-  address_t         dest_addr;      ///< Dest address
-  U16               src_pan_id;     ///< Src PAN ID
-  U16               dest_pan_id;    ///< Dest PAN ID
-  buffer_t          *buf;           ///< Data buffer to be transmitted
-  U8                msdu_handle;    ///< Data handle identifier for this frame
-  U8                tx_options;     ///< Transmission options (ack request, indirect)
+	address_t	src_addr;
+	address_t	dest_addr;
+	U16		src_pan_id;
+	U16		dest_pan_id;
+	buffer_t	*buf;
+	U8		msdu_handle;
+	U8		tx_options;
 } mac_data_req_t;
 
-/*******************************************************************/
-/*!
-    These are the arguments for the MAC association request function.
-*/
-/*******************************************************************/
+/*
+ * These are the arguments for the MAC association request function.
+ *
+ * channel: Channel of network to join
+ * coord_addr: Address of parent to join
+ * coord_pan_id: PAN ID of network to join
+ * capability: Capability info of this device
+ */
 typedef struct
 {
-  U8            channel;        ///< Channel of network to join
-  address_t     coord_addr;     ///< Address of parent to join
-  U16           coord_pan_id;   ///< PAN ID of network to join
-  U8            capability;     ///< Capability info of this device
+	U8		channel;
+	address_t	coord_addr;
+	U16		coord_pan_id;
+	U8		capability;
 } mac_assoc_req_t ;
 
-/*******************************************************************/
-/*!
-    These are the arguments for the MAC association indication function.
-*/
-/*******************************************************************/
+/*
+ * These are the arguments for the MAC association indication function.
+ *
+ * Address of device requesting association
+ * Capability info of device requesting association
+ */
 typedef struct
 {
-  address_t     dev_addr;       ///< Address of device requesting association
-  U8            capability;     ///< Capability info of device requesting association
+	address_t	dev_addr;
+	U8		capability;
 } mac_assoc_ind_t;
 
-/*******************************************************************/
-/*!
-    These are the arguments for the MAC association response function.
-*/
-/*******************************************************************/
+/*
+ * These are the arguments for the MAC association response function.
+ *
+ * dev_add: IEEE address of child
+ * assoc_short_addr: Network address given to child
+ * status: Status of association request
+ */
 typedef struct
 {
-  address_t     dev_addr;           ///< IEEE address of child
-  U16           assoc_short_addr;   ///< Network address given to child
-  U8            status;             ///< Status of association request
+	address_t	dev_addr;
+	U16		assoc_short_addr;
+	U8		status;
 } mac_assoc_resp_t;
 
-/*******************************************************************/
-/*!
-    These are the arguments for the MAC association confirm function.
-*/
-/*******************************************************************/
+/*
+ * These are the arguments for the MAC association confirm function.
+ *
+ * status: Status of scan request
+ * scan_type: Scan type requested
+ * energy_list: Pointer to the energy scan list
+ */
 typedef struct
 {
-    U8  status;         ///< Status of scan request
-    U8  scan_type;      ///< Scan type requested
-    U8  *energy_list;   ///< Pointer to the energy scan list
+	U8  status;
+	U8  scan_type;
+	U8  *energy_list;
 } mac_scan_conf_t;
 
-/*******************************************************************/
-/*!
-    These are the arguments for the MAC start request function.
-*/
-/*******************************************************************/
+/*
+ * These are the arguments for the MAC start request function
+ *
+ * pan_id: Start the MAC layer of this device with this PAN ID
+ * channel: Start the MAC layer of this device on this channel
+ */
 typedef struct
 {
-    U16     pan_id;     ///< Start the MAC layer of this device with this PAN ID
-    U8      channel;    ///< Start the MAC layer of this device on this channel
+	U16     pan_id;
+	U8      channel;
 } mac_start_req_t;
 
-/*******************************************************************/
-/*!
-    This structure is used for the MAC retry queue. When an ACK fails
-    to arrive for a transmitted frame, the data from this struct is
-    used to re-send the data.
-*/
-/*******************************************************************/
+/*
+ * This structure is used for the MAC retry queue. When an ACK fails
+ * to arrive for a transmitted frame, the data from this struct is
+ * used to re-send the data.
+ *
+ * buf: Data buffer to be retransmitted
+ * dsn: Data sequence number of data
+ * retries: Number of retries remaining
+ * handle: Data handle identifier for confirmation
+ * expiry: Time to expiration of this entry
+ */
 typedef struct _mac_retry_t
 {
-    buffer_t            *buf;       ///< Data buffer to be retransmitted
-    U8                  dsn;        ///< Data sequence number of data
-    U8                  retries;    ///< Number of retries remaining
-    U8                  handle;     ///< Data handle identifier for confirmation
-    U8                  expiry;     ///< Time to expiration of this entry
+	buffer_t	*buf;
+	U8		dsn;
+	U8		retries;
+	U8		handle;
+	U8		expiry;
 } mac_retry_t;
 
-/*******************************************************************/
-/*!
-    This struct is used for the MAC indirect queue. Frames are buffered
-    in this struct until a sleeping node wakes up and polls this device
-    for its data.
-*/
-/*******************************************************************/
+/*
+ * This struct is used for the MAC indirect queue. Frames are buffered
+ * in this struct until a sleeping node wakes up and polls this device
+ * for its data.
+ *
+ * buf: Data buffer to be transmitted
+ * dsn: Data sequence number
+ * ack_req: ACK required for this transmission
+ * addr: Destination address of this frame
+ * handle: Data handle identifier for confirmation
+ * expiry: Time to expiration of this entry
+ */
 typedef struct _mac_indir_t
 {
-    buffer_t            *buf;       ///< Data buffer to be transmitted
-    U8                  dsn;        ///< Data sequence number
-    bool                ack_req;    ///< ACK required for this transmission
-    address_t           addr;       ///< Destination address of this frame
-    U8                  handle;     ///< Data handle identifier for confirmation
-    U8                  expiry;     ///< Time to expiration of this entry
+	buffer_t	*buf;
+	U8		dsn;
+	bool		ack_req;
+	address_t	addr;
+	U8		handle;
+	U8		expiry;
 } mac_indir_t;
-/*******************************************************************/
-/*!
-    This is the MAC protocol control block. It holds variables that
-    are used throughout the MAC layer.
-*/
-/*******************************************************************/
+
+/*
+ * This is the MAC protocol control block. It holds variables that
+ * are used throughout the MAC layer.
+ *
+ * mac_state: Current state
+ * mlme_tmr: Callback timer shared by MAC managment functions
+ * parent_addr: Address of parent this device is requesting to join
+ * assoc_req_dsn: DSN of association request
+ * original_pan_id: Original PAN ID before channel scan
+ * curr_scan_channel: Current channel being scanned
+ * channel_mask: Channel mask for this scan
+ * duration: Duration of this scan
+ * nwk_cnt: Number of networks found
+ * scan_type: ype of scan to be performed
+ * coor_realign_rcvd: Coordinator alignment received for orphan scan
+ * energy_list: Energy list to store values from energy scan
+ * total_xmit: Total number of transmissions attempted
+ * total_fail: Total number of transmissions failed
+ */
 typedef struct
 {
-    U8              mac_state;          ///< Current state
-    struct ctimer   mlme_tmr;           ///< Callback timer shared by MAC managment functions
+	U8		mac_state;
+	struct ctimer	mlme_tmr;
 
-    // association
-    address_t       parent_addr;        ///< Address of parent this device is requesting to join
-    U8              assoc_req_dsn;      ///< DSN of association request
+	/* association */
+	address_t	parent_addr;
+	U8		assoc_req_dsn;
 
-    // channel scanning
-    U16             original_pan_id;    ///< Original PAN ID before channel scan
-    U8              curr_scan_channel;  ///< Current channel being scanned
-    U32             channel_mask;       ///< Channel mask for this scan
-    U8              duration;           ///< Duration of this scan
-    U8              nwk_cnt;            ///< Number of networks found
-    U8              scan_type;          ///< Type of scan to be performed
-    bool            coor_realign_rcvd;  ///< Coordinator alignment received for orphan scan
-    U8              energy_list[MAC_MAX_CHANNELS];  ///< Energy list to store values from energy scan
+	/* channel scanning */
+	U16		original_pan_id;
+	U8		curr_scan_channel;
+	U32		channel_mask;
+	U8		duration;
+	U8		nwk_cnt;
+	U8		scan_type;
+	bool		coor_realign_rcvd;
+	U8		energy_list[MAC_MAX_CHANNELS];
 
-    // statistics
-    U16             total_xmit;         ///< Total number of transmissions attempted
-    U16             total_fail;         ///< Total number of transmissions failed
+	/* statistics */
+	U16		total_xmit;
+	U16		total_fail;
 } mac_pcb_t;
 /**********************************************************/
 
