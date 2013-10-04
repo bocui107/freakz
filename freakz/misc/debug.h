@@ -87,8 +87,8 @@ extern FILE *fp;
 	} while (0);
 
 #else
-#define DBG_PRINT(...)		printf(__VA_ARGS__);
-#define DBG_PRINT_RAW(...)	printf(__VA_ARGS__);
+#define DBG_PRINT(...)		printf(__VA_ARGS__)
+#define DBG_PRINT_RAW(...)	printf(__VA_ARGS__)
 #define DBG_PRINT_SIMONLY(...)
 #endif //TEST_SIM
 
