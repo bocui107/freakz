@@ -56,8 +56,8 @@
 /* this is the command table for the command line interface */
 typedef struct
 {
-    char *cmd;
-    void (*func)(U8 argc, char **argv);
+	char *cmd;
+	void (*func)(U8 argc, char **argv);
 } test_avr_cmd_t;
 
 void test_avr_init();

@@ -37,7 +37,6 @@
     \file test_avr.c
     \ingroup
 */
-/*******************************************************************/
 #include <string.h>
 #include "freakz.h"
 #include "test_avr_ravenusb.h"
@@ -48,64 +47,55 @@
 static U8 msg[MAX_MSG_SIZE];
 static U8 *msg_ptr;
 
-/**************************************************************************/
-/*!
-
-*/
-/**************************************************************************/
 void test_avr_init()
 {
-    test_app_init();
+	test_app_init();
 
-    // init the msg_ptr
-    msg_ptr = msg;
+	/* init the msg_ptr */
+	msg_ptr = msg;
 }
 
-/**************************************************************************/
-/*!
-
-*/
-/**************************************************************************/
 void test_avr_usb_rx_handler()
 {
-    U8 i, c, ep_num, len;
-    usb_pcb_t *pcb = usb_pcb_get();
+	U8 i, c, ep_num, len;
+	usb_pcb_t *pcb = usb_pcb_get();
 
-    // get the ep number of any endpoint with pending rx data
-    if ((ep_num = usb_buf_data_pending(DIR_OUT)) != 0xFF)
-    {
-        // get the length of data in the OUT buffer
-        len = pcb->fifo[ep_num].len;
+	/* get the ep number of any endpoint with pending rx data */
+	ep_num = usb_buf_data_pending(DIR_OUT);
+	if (ep_num != 0xFF)
+	{
+		/* get the length of data in the OUT buffer */
+		len = pcb->fifo[ep_num].len;
 
-        for (i=0; i<len; i++)
-        {
-            c = usb_buf_read(ep_num);
+		for (i = 0; i < len; i++)
+		{
+			c = usb_buf_read(ep_num);
 
-            switch (c)
-            {
-            case '\r':
-                // terminate the msg and reset the msg ptr. then send
-                // it to the handler for processing.
-                *msg_ptr = '\0';
-                DBG_PRINT("\n\r");
-                test_app_parse((char *)msg);
-                msg_ptr = msg;
-                break;
+			switch (c)
+			{
+			case '\r':
+				/*
+				 * terminate the msg and reset the msg ptr. then send
+				 * it to the handler for processing.
+				 */
+				*msg_ptr = '\0';
+				DBG_PRINT("\n\r");
+				test_app_parse((char *)msg);
+				msg_ptr = msg;
+				break;
+			case '\b':
+				if (msg_ptr != msg) {
+					usb_buf_write(EP_1, c);
+					msg_ptr--;
+				}
+				break;
 
-            case '\b':
-                if (msg_ptr != msg)
-                {
-                    usb_buf_write(EP_1, c);
-                    msg_ptr--;
-                }
-                break;
-
-            default:
-                usb_buf_write(EP_1, c);
-                *msg_ptr++ = c;
-                break;
-            }
-        }
-        pcb->flags |= (1 << TX_DATA_AVAIL);
-    }
+			default:
+				usb_buf_write(EP_1, c);
+				*msg_ptr++ = c;
+				break;
+			}
+		}
+		pcb->flags |= (1 << TX_DATA_AVAIL);
+	}
 }

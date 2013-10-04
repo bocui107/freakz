@@ -39,7 +39,6 @@
 
     This is the associated header file for test_zcl.c.
 */
-/**************************************************************************/
 #ifndef TEST_ZCL_H
 #define TEST_ZCL_H
 
@@ -50,11 +49,8 @@
 #define TEST_ZCL_MAX_BUF_SZ     ZCL_MAX_PAYLOAD_SIZE
 #define TEST_ZCL_MAX_ATTRIBS    32
 #define TEST_ZCL_CLUST_LIST_SZ  4
-/**************************************************************************/
-/*!
-    Function prototypes
-*/
-/**************************************************************************/
+
+/* Function prototypes */
 void test_zcl_init();
 void test_zcl_read_attrib(U8 argc, char **argv);
 void test_zcl_write_attrib(U8 argc, char **argv);

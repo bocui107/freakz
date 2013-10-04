@@ -47,8 +47,8 @@
 
 typedef struct
 {
-    char *cmd;
-    void (*func)(U8 argc, char **argv);
+	char *cmd;
+	void (*func)(U8 argc, char **argv);
 } test_app_cmd_t;
 
 void test_app_init();
