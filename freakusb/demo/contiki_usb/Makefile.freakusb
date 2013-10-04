@@ -1,6 +1,6 @@
 FREAKUSB  = freakusb_main.c cdc.c desc.c ep.c hw.c isr.c usb_buf.c usb.c ctrl.c \
 
-FREAKUSBDIRS += $(FREAKUSB_PATH) ${addprefix $(FREAKUSB_PATH)/, demo/contiki_usb class/CDC hw/at90usb usb }
+FREAKUSBDIRS += $(FREAKUSB_PATH) ${addprefix $(FREAKUSB_PATH)/, demo/contiki_usb class/cdc hw/at90usb usb }
 FREAKUSB_OBJFILES = ${addprefix $(OBJECTDIR)/,${call oname, $(FREAKUSB)}}
 
 SOURCEDIRS += $(FREAKUSB)
