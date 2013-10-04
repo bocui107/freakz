@@ -44,71 +44,62 @@
 #include "at90usb.h"
 #include "types.h"
 
-/**************************************************************************/
-/*!
-    Initialize the hardware.
-    1) Turn off the watchdog timer (in AVR MCUs)
-    2) Configure the PLL
-    3) Enable the USB and relevant peripherals
-    4) Enable the global interrupt.
-*/
-/**************************************************************************/
+/*
+ * Initialize the hardware.
+ * 1) Turn off the watchdog timer (in AVR MCUs)
+ * 2) Configure the PLL
+ * 3) Enable the USB and relevant peripherals
+ * 4) Enable the global interrupt.
+ */
 void hw_init()
 {
-    MCUSR &= ~(1 << WDRF);
-    wdt_disable();
+	MCUSR &= ~(1 << WDRF);
+	wdt_disable();
 
-    SET_DEVICE_MODE();
+	SET_DEVICE_MODE();
 
-    // config PLL and turn it on
-    PLLCSR  = (1 << PLLP1) | (1 << PLLP0);
-    PLLCSR |= (1 << PLLE);
-        while (!PLL_LOCKED);
+	/* config PLL and turn it on */
+	PLLCSR  = (1 << PLLP1) | (1 << PLLP0);
+	PLLCSR |= (1 << PLLE);
+	while (!PLL_LOCKED);
 
-    // enable the USB block
-    USBCON |= ((1 << USBE) | (1 << OTGPADE));
+	/* enable the USB block */
+	USBCON |= ((1 << USBE) | (1 << OTGPADE));
 
-    // unfreeze the clock
-    USBCON &= ~(1 << FRZCLK);
+	/* Select the device */
+	USBCON  &= ~(1 << HOST);
 
-    // set the speed
-    UDCON &= ~(1 << LSM);
+	/* unfreeze the clock */
+	USBCON &= ~(1 << FRZCLK);
 
-    // set the interrupts: vbus, suspend, and end of reset
-    USBCON |= (1 << VBUSTE);
-    UDIEN  |= (1 << SUSPE) | (1 << EORSTE);
+	/* set the speed */
+	UDCON &= ~(1 << LSM);
 
-    // turn on the global interrupts
-    sei();
+	/* set the interrupts: vbus, suspend, and end of reset */
+	USBCON |= (1 << VBUSTE);
+	UDIEN  |= (1 << SUSPE) | (1 << EORSTE);
+
+	/* turn on the global interrupts */
+	sei();
 }
 
-/**************************************************************************/
-/*!
-    Returns a byte stored in the flash. Some MCUs can't access the flash
-    memory from a standard pointer so they need a special function to handle it.
-*/
-/**************************************************************************/
+/*
+ * Returns a byte stored in the flash. Some MCUs can't access the flash
+ * memory from a standard pointer so they need a special function to handle it.
+ */
 U8 hw_flash_get_byte(U8 *addr)
 {
-    return pgm_read_byte(addr);
+	return pgm_read_byte(addr);
 }
 
-/**************************************************************************/
-/*!
-    Disable global interrupts
-*/
-/**************************************************************************/
+/* Disable global interrupts */
 void hw_intp_disable()
 {
-    cli();
+	cli();
 }
 
-/**************************************************************************/
-/*!
-    Enable global interrupts
-*/
-/**************************************************************************/
+/* Enable global interrupts */
 void hw_intp_enable()
 {
-    sei();
+	sei();
 }

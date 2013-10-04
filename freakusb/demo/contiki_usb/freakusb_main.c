@@ -44,79 +44,60 @@
 
 FILE file_str = FDEV_SETUP_STREAM(freakusb_putchar, NULL, _FDEV_SETUP_WRITE);
 
-/*********************** Process Declarations **********************/
 PROCESS(freakusb_process, "FreakUSB Process");
-/*******************************************************************/
 
-/**************************************************************************/
-/*!
-    This is the putchar function that is used by avr-libc's printf. We need
-    to hook this function into the stdout file stream using the FDEV_SETUP_STREAM
-    macro in avr-libc. Once the stream is set up, we hook the stream to stdout
-    and we can do printfs via USB.
-*/
-/**************************************************************************/
+/*
+ * This is the putchar function that is used by avr-libc's printf. We need
+ * to hook this function into the stdout file stream using the FDEV_SETUP_STREAM
+ * macro in avr-libc. Once the stream is set up, we hook the stream to stdout
+ * and we can do printfs via USB.
+ */
 int freakusb_putchar(char c, FILE *unused)
 {
-    usb_pcb_t *pcb = usb_pcb_get();
+	usb_pcb_t *pcb = usb_pcb_get();
 
-    if (!(pcb->flags & (1<<ENUMERATED)))
-    {
-        return 0;
-    }
+	if (!(pcb->flags & (1 << ENUMERATED)))
+		return 0;
 
-    if (c == '\n')
-    {
-        usb_buf_write(EP_1, '\n');
-        usb_buf_write(EP_1, '\r');
-    }
-    else
-    {
-        usb_buf_write(EP_1, (U8)c);
-    }
-    ep_write(EP_1);
-    return 0;
+	if (c == '\n') {
+		usb_buf_write(EP_1, '\n');
+		usb_buf_write(EP_1, '\r');
+	} else {
+		usb_buf_write(EP_1, (U8)c);
+	}
+
+	ep_write(EP_1);
+	return 0;
 }
 
-/**************************************************************************/
-/*!
-
-*/
-/**************************************************************************/
 static void freakusb_pollhandler(void)
 {
-    usb_poll();
-    process_poll(&freakusb_process);
+	usb_poll();
+	process_poll(&freakusb_process);
 }
 
-/**************************************************************************/
-/*!
-
-*/
-/**************************************************************************/
 PROCESS_THREAD(freakusb_process, ev, data_proc)
 {
 
-    PROCESS_POLLHANDLER(freakusb_pollhandler());
+	PROCESS_POLLHANDLER(freakusb_pollhandler());
 
-    PROCESS_BEGIN();
-    usb_init();
-    hw_init();
-    cdc_init();
+	PROCESS_BEGIN();
+	usb_init();
+	hw_init();
+	cdc_init();
 
-    // TODO: Implement this when we decide to accept commands over the USB
-    cdc_reg_rx_handler(test_avr_usb_rx_handler);
+	// TODO: Implement this when we decide to accept commands over the USB
+	cdc_reg_rx_handler(test_avr_usb_rx_handler);
 
-    // hook the putchar function to the printf and use it for stdout
-    stdout = &file_str;
+	// hook the putchar function to the printf and use it for stdout
+	stdout = &file_str;
 
-    // kick off the polling function
-    process_poll(&freakusb_process);
+	// kick off the polling function
+	process_poll(&freakusb_process);
 
-    while (1)
-    {
-        PROCESS_YIELD();
-    }
+	while (1) {
+		PROCESS_YIELD();
+	}
 
-    PROCESS_END();
+	PROCESS_END();
 }
