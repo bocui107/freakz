@@ -33,14 +33,14 @@
     Please post support questions to the FreakLabs forum.
 
 *******************************************************************/
-/*!
-    \file mac_start.c
-    \ingroup mac
-    \brief MAC device startup handler
-
-    The MAC start service is used to start up the MAC layer. Currently,
-    it doesn't do much other than set some default values.
-*/
+/*
+ * \file mac_start.c
+ * \ingroup mac
+ * \brief MAC device startup handler
+ *
+ * The MAC start service is used to start up the MAC layer. Currently,
+ * it doesn't do much other than set some default values.
+ */
 #include "freakz.h"
 
 /*

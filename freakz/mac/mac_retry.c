@@ -82,10 +82,9 @@ static mem_ptr_t *mac_retry_alloc()
 	mem_ptr_t *mem_ptr = NULL;
 
 	mem_ptr = mem_heap_alloc(sizeof(mac_retry_t));
-	if (mem_ptr)
-	{
-		RETRY_ENTRY(mem_ptr)->retries    = aMacMaxFrameRetries;
-		RETRY_ENTRY(mem_ptr)->expiry     = aMacAckWaitDuration;
+	if (mem_ptr) {
+		RETRY_ENTRY(mem_ptr)->retries = aMacMaxFrameRetries;
+		RETRY_ENTRY(mem_ptr)->expiry = aMacAckWaitDuration;
 		list_add(mac_retry_list, mem_ptr);
 	}
 	return mem_ptr;
@@ -135,8 +134,7 @@ void mac_retry_add(buffer_t *buf, U8 dsn, U8 handle)
 	mem_ptr_t *mem_ptr;
 
 	mem_ptr = mac_retry_alloc();
-	if (mem_ptr)
-	{
+	if (mem_ptr) {
 		RETRY_ENTRY(mem_ptr)->buf      = buf;
 		RETRY_ENTRY(mem_ptr)->dsn      = dsn;
 		RETRY_ENTRY(mem_ptr)->handle   = handle;
@@ -154,8 +152,7 @@ void mac_retry_ack_handler(U8 dsn)
 	mem_ptr_t *mem_ptr;
 
 	mem_ptr = mac_retry_find(dsn);
-	if (mem_ptr)
-	{
+	if (mem_ptr) {
 		mac_data_conf(MAC_SUCCESS, RETRY_ENTRY(mem_ptr)->handle);
 		mac_retry_free(mem_ptr);
 	}

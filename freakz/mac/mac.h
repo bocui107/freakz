@@ -173,205 +173,257 @@ typedef enum
 /* Enumerated definitions for the MAC status values */
 typedef enum
 {
-    // mac status
-    MAC_SUCCESS                     = 0x0,      ///< Transaction was successful
-    MAC_BEACON_LOSS                 = 0xE0,     ///< Beacon was lost (used in beacon'd networks)
-    MAC_CHANNEL_ACCESS_FAILURE      = 0xE1,     ///< Unable to transmit due to channel being busy
-    MAC_COUNTER_ERROR               = 0xDB,     ///< Frame counter of received frame is invalid
-    MAC_DENIED                      = 0xE2,     ///< GTS request denied
-    MAC_DISABLE_TRX_FAILURE         = 0xE3,     ///< Failed to disable the transceiver
-    MAC_SECURITY_ERROR              = 0xE4,     ///< Frame failed decryption
-    MAC_FRAME_TOO_LONG              = 0xE5,     ///< Frame exceeded maximum size
-    MAC_IMPROPER_KEY_TYPE           = 0xDC,     ///< Key not allowed to be used with this frame type
-    MAC_IMPROPER_SECURITY_LEVEL     = 0xDD,     ///< Frame does not meet min security level expected
-    MAC_INVALID_ADDRESS             = 0xF5,     ///< Data request failed because no src or dest address
-    MAC_INVALID_GTS                 = 0xE6,     ///< Invalid timeslot requested (beacon'd networks)
-    MAC_INVALID_HANDLE              = 0xE7,     ///< Invalid frame data handle
-    MAC_INVALID_INDEX               = 0xF9,     ///< Invalid index when trying to write MAC PIB
-    MAC_INVALID_PARAMETER           = 0xE8,     ///< Invalid parameter passed to service
-    MAC_LIMIT_REACHED               = 0xFA,     ///< Scan terminated because max pan descriptors reached
-    MAC_NO_ACK                      = 0xE9,     ///< ACK not received after tx with ack_req flag set
-    MAC_NO_BEACON                   = 0xEA,     ///< Beacon not returned after beacon request
-    MAC_NO_DATA                     = 0xEB,     ///< Data frame not returned after data request (indirect poll)
-    MAC_NO_SHORT_ADDRESS            = 0xEC,     ///< No short address allocated to this device (due to lack of address space)
-    MAC_ON_TIME_TOO_LONG            = 0xF6,     ///< Rx enable request failed. Spec'd number of symbols longer than beacon interval
-    MAC_OUT_OF_CAP                  = 0xED,     ///< Association failed due to lack of capacity (no nbor tbl entry or no address)
-    MAC_PAN_ID_CONFLICT             = 0xEE,     ///< Different networks within listening range have identical PAN IDs
-    MAC_PAST_TIME                   = 0xF7,     ///< Rx enable failed. Too late for current superframe and unable to be deferred
-    MAC_READ_ONLY                   = 0xFB,     ///< PIB attribute is read only
-    MAC_REALIGNMENT                 = 0xEF,     ///< Coordinator realignment received
-    MAC_SCAN_IN_PROGRESS            = 0xFC,     ///< Request to perform scan failed because scan already in progress
-    MAC_SUPERFRAME_OVERLAP          = 0xFD,     ///< Start time of beacon overlapped transmission time of coordinator beacon
-    MAC_TRACKING_OFF                = 0xF8,     ///< Device not tracking beacons but instructed to send beacons based on tracked beacons
-    MAC_TRANSACTION_EXPIRED         = 0xF0,     ///< Frame buffered in indirect queue expired
-    MAC_TRANSACTION_OVERFLOW        = 0xF1,     ///< Exceeded maximum amount of entries in indirect queue
-    MAC_TX_ACTIVE                   = 0xF2,     ///< Transmission in progress
-    MAC_UNAVAILABLE_KEY             = 0xF3,     ///< Security key unavailable
-    MAC_UNSUPPORTED_ATTRIBUTE       = 0xF4,     ///< Requested PIB attribute is not supported
-    MAC_UNSPECIFIED_FAILURE         = 0xF5,     ///< Unspecified failure occurs. This is catch all for any type of general failure.
-    MAC_UNSUPPORTED_LEGACY          = 0xDE,     ///< 802.15.4 2003 security on frame, but not supported by device
-    MAC_UNSUPPORTED_SECURITY        = 0xDF      ///< Security on received frame is not supported
+	/* mac status */
+	MAC_SUCCESS                 = 0x0,  // Transaction was successful
+	MAC_BEACON_LOSS             = 0xE0, // Beacon was lost (used in beacon'd networks)
+	MAC_CHANNEL_ACCESS_FAILURE  = 0xE1, // Unable to transmit due to channel being busy
+	MAC_COUNTER_ERROR           = 0xDB, // Frame counter of received frame is invalid
+	MAC_DENIED                  = 0xE2, // GTS request denied
+	MAC_DISABLE_TRX_FAILURE     = 0xE3, // Failed to disable the transceiver
+	MAC_SECURITY_ERROR          = 0xE4, // Frame failed decryption
+	MAC_FRAME_TOO_LONG          = 0xE5, // Frame exceeded maximum size
+	MAC_IMPROPER_KEY_TYPE       = 0xDC, // Key not allowed to be used with this frame type
+	MAC_IMPROPER_SECURITY_LEVEL = 0xDD, // Frame does not meet min security level expected
+	MAC_INVALID_ADDRESS         = 0xF5, // Data request failed because no src or dest address
+	MAC_INVALID_GTS             = 0xE6, // Invalid timeslot requested (beacon'd networks)
+	MAC_INVALID_HANDLE          = 0xE7, // Invalid frame data handle
+	MAC_INVALID_INDEX           = 0xF9, // Invalid index when trying to write MAC PIB
+	MAC_INVALID_PARAMETER       = 0xE8, // Invalid parameter passed to service
+	MAC_LIMIT_REACHED           = 0xFA, // Scan terminated because max pan descriptors reached
+	MAC_NO_ACK                  = 0xE9, // ACK not received after tx with ack_req flag set
+	MAC_NO_BEACON               = 0xEA, // Beacon not returned after beacon request
+	MAC_NO_DATA                 = 0xEB, // Data frame not returned after data request (indirect poll)
+	/* No short address allocated to this device (due to lack of address space) */
+	MAC_NO_SHORT_ADDRESS        = 0xEC,
+	/* Rx enable request failed. Spec'd number of symbols longer than beacon interval */
+	MAC_ON_TIME_TOO_LONG        = 0xF6,
+	/* Association failed due to lack of capacity (no nbor tbl entry or no address) */
+	MAC_OUT_OF_CAP              = 0xED,
+	/* Different networks within listening range have identical PAN IDs */
+	MAC_PAN_ID_CONFLICT         = 0xEE,
+	/* Rx enable failed. Too late for current superframe and unable to be deferred */
+	MAC_PAST_TIME               = 0xF7,
+	MAC_READ_ONLY               = 0xFB, // PIB attribute is read only
+	MAC_REALIGNMENT             = 0xEF, // Coordinator realignment received
+	/* Request to perform scan failed because scan already in progress */
+	MAC_SCAN_IN_PROGRESS        = 0xFC,
+	/* Start time of beacon overlapped transmission time of coordinator beacon */
+	MAC_SUPERFRAME_OVERLAP      = 0xFD,
+	/* Device not tracking beacons but instructed to send beacons based on tracked beacons */
+	MAC_TRACKING_OFF            = 0xF8,
+	MAC_TRANSACTION_EXPIRED     = 0xF0, // Frame buffered in indirect queue expired
+	MAC_TRANSACTION_OVERFLOW    = 0xF1, // Exceeded maximum amount of entries in indirect queue
+	MAC_TX_ACTIVE               = 0xF2, // Transmission in progress
+	MAC_UNAVAILABLE_KEY         = 0xF3, // Security key unavailable
+	MAC_UNSUPPORTED_ATTRIBUTE   = 0xF4, // Requested PIB attribute is not supported
+	/* Unspecified failure occurs. This is catch all for any type of general failure. */
+	MAC_UNSPECIFIED_FAILURE     = 0xF5,
+	MAC_UNSUPPORTED_LEGACY      = 0xDE, // 802.15.4 2003 security on frame, but not supported by device
+	MAC_UNSUPPORTED_SECURITY    = 0xDF  // Security on received frame is not supported
 } mac_status_enums_t;
 
-/****************************************************************/
-/*!
-    Miscellaneous enumerated definitions used by the MAC layer
-*/
-/****************************************************************/
+/* Miscellaneous enumerated definitions used by the MAC layer */
 typedef enum
 {
-    // tx options
-    MAC_ACK_REQUEST                     = 0x01,     ///< Ack is required for this transmission. MAC data request service.
-    MAC_INDIRECT_TRANS                  = 0x04,     ///< Frame will be sent indirectly. MAC data request service.
+	/* tx options */
+	MAC_ACK_REQUEST     = 0x01,   // Ack is required for this transmission. MAC data request service.
+	MAC_INDIRECT_TRANS  = 0x04,   // Frame will be sent indirectly. MAC data request service.
 
-    // broadcast address
-    MAC_BROADCAST_ADDR                  = 0xFFFF,   ///< MAC broadcast address
+	/* broadcast address */
+	MAC_BROADCAST_ADDR  = 0xFFFF, // MAC broadcast address
 
-    // 802.15.4 Frame Versions
-    MAC_802_15_4_2003                   = 0x0,      ///< Compliant to 802.15.4 2003 frame format
-    MAC_802_15_4_2006                   = 0x1,      ///< Compliant to 802.15.4 2006 frame format
+	/* 802.15.4 Frame Versio */
+	MAC_802_15_4_2003   = 0x0,    // Compliant to 802.15.4 2003 frame format
+	MAC_802_15_4_2006   = 0x1,    // Compliant to 802.15.4 2006 frame format
 
-    // scan types
-    MAC_ENERGY_SCAN                     = 0x00,     ///< Energy scan identifier
-    MAC_ACTIVE_SCAN                     = 0x01,     ///< Active scan identifier
-    MAC_ORPHAN_SCAN                     = 0x03,     ///< Orphan scan identifier
+	/* scan types */
+	MAC_ENERGY_SCAN     = 0x00,   // Energy scan identifier
+	MAC_ACTIVE_SCAN     = 0x01,   // Active scan identifier
+	MAC_ORPHAN_SCAN     = 0x03,   // Orphan scan identifier
 
-    MAC_MAX_CHANNELS                    = 16,       ///< Max number of channels supported by MAC
-    MAC_PHY_CHANNEL_OFFSET              = 11,       ///< Channel offset. 802.15.4 range is Ch 11-26
-    MAC_FCS_LENGTH                      = 2,        ///< Size of the MAC frame checksum
+	MAC_MAX_CHANNELS    = 16,     // Max number of channels supported by MAC
+	MAC_PHY_CHANNEL_OFFSET  = 11, // Channel offset. 802.15.4 range is Ch 11-26
+	MAC_FCS_LENGTH      = 2,      // Size of the MAC frame checksum
 
-    // mac management states
-    MLME_IDLE                           = 0x0,      ///< Idle state for the MAC management state machine
-    MLME_ASSOC_REQ                      = 0x1,      ///< Association request state of MAC management state machine
-    MLME_DATA_REQ                       = 0x2,      ///< Data request state of MAC management state machine
-    MLME_SCAN                           = 0x3       ///< Scan state of MAC management state machine
+	/* mac management states */
+	MLME_IDLE           = 0x0,    // Idle state for the MAC management state machine
+	MLME_ASSOC_REQ      = 0x1,    // Association request state of MAC management state machine
+	MLME_DATA_REQ       = 0x2,    // Data request state of MAC management state machine
+	MLME_SCAN           = 0x3     // Scan state of MAC management state machine
 } mac_misc_enums_t;
 
-/*******************************************************************/
-/*!
-    This is the MAC Information Base. It holds all of the config
-    info for the MAC layer.
-*/
-/*******************************************************************/
+/*
+ * This is the MAC Information Base. It holds all of the config
+ * info for the MAC layer.
+ *
+ * ack_wait_duration: Time to wait for ACK from a tx'd frame
+ * assoc_permit: Association is allowed
+ * coord_addr: Address of parent this device is joined to
+ * dsn: Current data sequence number
+ * min_be: Minimum backoff interval exponent (interval ~ 2^min_be)
+ * max_csma_backoffs: Max number of CSMA backoffs before the tx is failed
+ * pan_id: PAN ID that this device is joined to
+ * rx_on_when_idle: Receiver is always on
+ * resp_wait_time: Time to wait before polling potential parent for association response
+ * security_enb: Security is enabled
+ * short_addr: Short (network) address of this device
+ * ext_addr: Extended (IEEE) address of this device
+ * coord: This device is the coordinator
+ * curr_channel: Current active channel
+ */
 typedef struct
 {
-    U16         ack_wait_duration;      ///< Time to wait for ACK from a tx'd frame
-    bool        assoc_permit;           ///< Association is allowed
-    address_t   coord_addr;             ///< Address of parent this device is joined to
-    U8          dsn;                    ///< Current data sequence number
-    U8          min_be;                 ///< Minimum backoff interval exponent (interval ~ 2^min_be)
-    U8          max_csma_backoffs;      ///< Max number of CSMA backoffs before the tx is failed
-    U16         pan_id;                 ///< PAN ID that this device is joined to
-    bool        rx_on_when_idle;        ///< Receiver is always on
-    U16         resp_wait_time;         ///< Time to wait before polling potential parent for association response
-    bool        security_enb;           ///< Security is enabled
-    U16         short_addr;             ///< Short (network) address of this device
-    U64         ext_addr;               ///< Extended (IEEE) address of this device
-        bool        coord;                  ///< This device is the coordinator
-    U8          curr_channel;           ///< Current active channel
+	U16         ack_wait_duration;
+	bool        assoc_permit;
+	address_t   coord_addr;
+	U8          dsn;
+	U8          min_be;
+	U8          max_csma_backoffs;
+	U16         pan_id;
+	bool        rx_on_when_idle;
+	U16         resp_wait_time;
+	bool        security_enb;
+	U16         short_addr;
+	U64         ext_addr;
+	bool        coord;
+	U8          curr_channel;
 } mac_pib_t;
 
-/*******************************************************************/
-/*!
-    This struct holds the info for the MAC frame control field.
-*/
-/*******************************************************************/
+/*
+ * This struct holds the info for the MAC frame control field.
+ *
+ * frame_type Frame type this frame
+ * sec_enb: Security enabled
+ * frame_pending: Pending frame in the indirect queue
+ * ack_req: ACK requested for this frame
+ * pan_id_compr: Compress PAN ID if PAN ID is same for src and dest
+ * frame_ver: 802.15.4 version this frame supports (2003 or 2006)
+ */
 typedef struct
 {
-    U8      frame_type;     ///< Frame type this frame
-    bool    sec_enb;        ///< Security enabled
-    bool    frame_pending;  ///< Pending frame in the indirect queue
-    bool    ack_req;        ///< ACK requested for this frame
-    bool    pan_id_compr;   ///< Compress PAN ID if PAN ID is same for src and dest
-    U8      frame_ver;      ///< 802.15.4 version this frame supports (2003 or 2006)
+	U8      frame_type;
+	bool    sec_enb;
+	bool    frame_pending;
+	bool    ack_req;
+	bool    pan_id_compr;
+	U8      frame_ver;
 } mac_frm_ctrl_t;
 
-/*******************************************************************/
-/*!
-    This struct contains the fields for the MAC header.
-*/
-/*******************************************************************/
+/*
+ * This struct contains the fields for the MAC header.
+ *
+ * mac_frm_ctrl: Frame control field structure
+ * mac_fcf: Frame control field hex value (value after bit fields are assembled)
+ * dsn: Data sequence number
+ * dest_pan_id: Destination network ID
+ * dest_addr: Destination address
+ * src_pan_id: Source network ID
+ * src_addr: Source address
+ */
 typedef struct
 {
-    mac_frm_ctrl_t  mac_frm_ctrl;   ///< Frame control field structure
-    U16             mac_fcf;        ///< Frame control field hex value (value after bit fields are assembled)
-    U8              dsn;            ///< Data sequence number
-    U16             dest_pan_id;    ///< Destination network ID
-    address_t       dest_addr;      ///< Destination address
-    U16             src_pan_id;     ///< Source network ID
-    address_t       src_addr;       ///< Source address
+	mac_frm_ctrl_t  mac_frm_ctrl;
+	U16             mac_fcf;
+	U8              dsn;
+	U16             dest_pan_id;
+	address_t       dest_addr;
+	U16             src_pan_id;
+	address_t       src_addr;
 } mac_hdr_t;
 
-/*******************************************************************/
-/*!
-    Association request command format
-*/
+/*
+ * Association request command format
+ *
+ * cap_info: Capability info for this device
+ */
 typedef struct
 {
-    U8      cap_info;               ///< Capability info for this device
+	U8      cap_info;
 } cmd_assoc_req_t;
 
-/*******************************************************************/
-/*!
-    Association response command format
-*/
+/*
+ * Association response command format
+ *
+ * short_addr: Short address given to the device requesting association
+ * assoc_status: Assocation request status
+ */
 typedef struct
 {
-    U16     short_addr;             ///< Short address given to the device requesting association
-    U8      assoc_status;           ///< Assocation request status
+	U16     short_addr;
+	U8      assoc_status;
 } cmd_assoc_resp_t;
 
-/*******************************************************************/
-/*!
-    Coordinator realignment command format - Used for orphan responses
-*/
+/*
+ * Coordinator realignment command format - Used for orphan responses
+ *
+ * pan_id: Network ID for realignment frame_pending
+ * coord_short_addr: Coordinator or parent's network address
+ * channel: Channel the parent is operating on
+ * short_addr: Network address of the orphan
+ */
 typedef struct
 {
-    U16     pan_id;                 ///< Network ID for realignment frame_pending
-    U16     coord_short_addr;       ///< Coordinator or parent's network address
-    U8      channel;                ///< Channel the parent is operating on
-    U16     short_addr;             ///< Network address of the orphan
+	U16     pan_id;
+	U16     coord_short_addr;
+	U8      channel;
+	U16     short_addr;
 } cmd_coord_realign_t;
 
-/*******************************************************************/
-/*!
-    Union of MAC command formats that are used in this stack. Looks like
-    only three are used. ha ha ha.
-*/
+/*
+ * Union of MAC command formats that are used in this stack. Looks like
+ * only three are used. ha ha ha.
+ *
+ * cmd_id: MAC cmd frame command ID
+ * assoc_req: Assocation request cmd frame
+ * assoc_resp: Association response cmd frame
+ * coord_realign: Coordinator realign cmd frame
+ */
 typedef struct
 {
-    U8 cmd_id;                                  ///< MAC cmd frame command ID
-    union
-    {
-        cmd_assoc_req_t         assoc_req;      ///< Assocation request cmd frame
-        cmd_assoc_resp_t        assoc_resp;     ///< Association response cmd frame
-        cmd_coord_realign_t     coord_realign;  ///< Coordinator realign cmd frame
-    };
+	U8 cmd_id;
+	union
+	{
+		cmd_assoc_req_t         assoc_req;
+		cmd_assoc_resp_t        assoc_resp;
+		cmd_coord_realign_t     coord_realign;
+	};
 } mac_cmd_t;
 
-/*******************************************************************/
-/*!
-    This is the PAN descriptor, aka scan descriptor. The PAN descriptors
-    are used in the scan list when we do a MAC active scan. When we receive
-    the beacon responses, the information in the beacons go into these
-    fields.
-*/
-/*******************************************************************/
+/*
+ * This is the PAN descriptor, aka scan descriptor. The PAN descriptors
+ * are used in the scan list when we do a MAC active scan. When we receive
+ * the beacon responses, the information in the beacons go into these
+ * fields.
+ *
+ * coord_addr: Address of the router sending the beacon
+ * coord_pan_id: Network ID of this network
+ * channel: Channel this network is located on
+ * superfrm_spec: Misc info for this network
+ * link_quality: Quality of link to the sender of this beacon
+ * prot_id: Protocol ID - always 0
+ * stack_profile: Zigbee stack profile
+ * prot_ver: Zigbee Protocol version
+ * rtr_cap: Capacity available for routers to join
+ * depth: Network depth of this router
+ * end_dev_cap: Capacity available for end devices to join
+ * ext_pan_id: Extended PAN ID
+ * pot_parent: Potential Parent for this device
+ */
 typedef struct _pan_descr_t
 {
-    address_t   coord_addr;     ///< Address of the router sending the beacon
-    U16         coord_pan_id;   ///< Network ID of this network
-    U8          channel;        ///< Channel this network is located on
-    U16         superfrm_spec;  ///< Misc info for this network
-    U8          link_quality;   ///< Quality of link to the sender of this beacon
-    U8          prot_id;        ///< Protocol ID - always 0
-    U8          stack_profile;  ///< Zigbee stack profile
-    U8          prot_ver;       ///< Zigbee Protocol version
-    bool        rtr_cap;        ///< Capacity available for routers to join
-    U8          depth;          ///< Network depth of this router
-    bool        end_dev_cap;    ///< Capacity available for end devices to join
-    U64         ext_pan_id;     ///< Extended PAN ID
-    bool        pot_parent;     ///< Potential Parent for this device
+	address_t   coord_addr;
+	U16         coord_pan_id;
+	U8          channel;
+	U16         superfrm_spec;
+	U8          link_quality;
+	U8          prot_id;
+	U8          stack_profile;
+	U8          prot_ver;
+	bool        rtr_cap;
+	U8          depth;
+	bool        end_dev_cap;
+	U64         ext_pan_id;
+	bool        pot_parent;
 } pan_descr_t;
 
 /*

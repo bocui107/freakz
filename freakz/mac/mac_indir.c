@@ -55,10 +55,9 @@
 LIST(indir_list);
 
 /* Init the list used to implement the indirect queue */
-/**************************************************************************/
 void mac_indir_init()
 {
-    list_init(indir_list);
+	list_init(indir_list);
 }
 
 /*
