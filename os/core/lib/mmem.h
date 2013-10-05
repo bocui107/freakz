@@ -60,7 +60,6 @@
 #ifndef __MMEM_H__
 #define __MMEM_H__
 
-/*---------------------------------------------------------------------------*/
 /**
  * \brief      Get a pointer to the managed memory
  * \param m    A pointer to the struct mmem
@@ -75,19 +74,17 @@
  */
 #define MMEM_PTR(m) (struct mmem *)(m)->ptr
 struct mmem {
-  struct mmem *next;
-  unsigned int size;
-  void *ptr;
+	struct mmem *next;
+	unsigned int size;
+	void *ptr;
 };
 
 /* XXX: tagga minne med "interrupt usage", vilke gör att man är
-   speciellt varsam under free(). */
+ * speciellt varsam under free().
+ */
 
 int  mmem_alloc(struct mmem *m, unsigned int size);
 void mmem_free(struct mmem *);
 void mmem_init(void);
 
 #endif /* __MMEM_H__ */
-
-/** @} */
-/** @} */

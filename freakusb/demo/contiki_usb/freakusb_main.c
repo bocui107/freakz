@@ -35,7 +35,6 @@
     \file freakusb_main.c
     \ingroup
 */
-/*******************************************************************/
 #include <stdio.h>
 #include "freakusb_main.h"
 #include "freakusb.h"

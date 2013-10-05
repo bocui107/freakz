@@ -38,7 +38,6 @@
     \ingroup misc
     \brief Non fragmenting dynamic memory allocation heap controller header file
 */
-/*******************************************************************/
 #ifndef MEM_HEAP_H
 #define MEM_HEAP_H
 

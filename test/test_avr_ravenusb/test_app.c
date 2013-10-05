@@ -33,12 +33,6 @@
     Please post support questions to the FreakLabs forum.
 
 *******************************************************************/
-/*!
-    \file test_app.c
-    \ingroup
-
-
-*/
 #include "freakz.h"
 #include "test_app.h"
 #include "test_zdo.h"
@@ -167,16 +161,17 @@ static void test_app_zdo_start(U8 argc, char **argv)
 		if (!strcmp(argv[1], "c")) {
 			aib->desig_coord = true;
 		} else {
-		aib->desig_coord = false;
-		aib->desig_parent = (U16)strtol(argv[1], NULL, 10);
-		aib->use_desig_parent = true;
-		DBG_PRINT("ZDO_CMD_ZDO_START: Designated to join %04X\n", aib->desig_parent);
+			aib->desig_coord = false;
+			aib->desig_parent = (U16)strtol(argv[1], NULL, 10);
+			aib->use_desig_parent = true;
+			DBG_PRINT("ZDO_CMD_ZDO_START: Designated to join %04X\n", aib->desig_parent);
 		}
 	} else {
 		aib->desig_coord = false;
 	}
 
-	DBG_PRINT("ZDO_CMD_ZDO_START: Starting as a %s.\n", aib->desig_coord ? "Coordinator" : "Router");
+	DBG_PRINT("ZDO_CMD_ZDO_START: Starting as a %s.\n",
+		  aib->desig_coord ? "Coordinator" : "Router");
 	zdo_nwk_start();
 }
 

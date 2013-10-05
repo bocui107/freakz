@@ -44,16 +44,20 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#define SIM_ENV 1       ///< Define whether the sim environment is being used or not
+/* Define whether the sim environment is being used or not */
+#define SIM_ENV 1
 
-// Zigbee 2006 APS Defined Constants
-#define APS_MAX_FRAME_RETRIES       3   ///< Max frame retries at the APS level
-/// Define amount of time to wait in seconds for an ACK before timeout.
-/// Curr value is dummy value. Here is the real value: 0.05 * (2 * nwkcMaxDepth)
+/* Zigbee 2006 APS Defined Constants */
+/* Max frame retries at the APS level */
+#define APS_MAX_FRAME_RETRIES	3
+/*
+ * Define amount of time to wait in seconds for an ACK before timeout.
+ * Curr value is dummy value. Here is the real value: 0.05 * (2 * nwkcMaxDepth)
+ */
 #define APS_ACK_WAIT_DURATION       2
 
-// Zigbee 2007 NWK Defined constants
-#define NWK_COORDINATOR_CAPABLE     true                ///< Device is capable of being coordinator
+/* Zigbee 2007 NWK Defined constants */
+#define NWK_COORDINATOR_CAPABLE     true        ///< Device is capable of being coordinator
 #define NWK_DEFAULT_SECURITY_LEVEL  ENC_MIC_64  ///< Default security level
 #define NWK_DISCOVERY_RETRY_LIMIT   0x03        ///< Number of times to retry network discovery
 #define NWK_MIN_HDR_OVERHEAD        0x08        ///< Minimum num bytes for NWK header
@@ -159,13 +163,13 @@
 #define ZIGBEE_MAX_ENDPOINTS        10          ///< Max endpoints for this device
 #define ZIGBEE_MIN_BUFS_NEEDED      1           ///< Minimum number of frame buffers required
 
-// app layer rx defines
-#define END_MARKER_CLUST            0xFFFC      ///< Mark the end of a cluster
+/* app layer rx defines */
+/* Mark the end of a cluster */
+#define END_MARKER_CLUST	0xFFFC
 
-// misc
-#define INVALID_NWK_ADDR            0xFFFF                 ///< Invalid network address value
-#define INVALID_EXT_ADDR            0xFFFFFFFFFFFFFFFFULL   ///< Invalid extended address value
+/* Invalid network address value */
+#define INVALID_NWK_ADDR	0xFFFF
+/* Invalid extended address value */
+#define INVALID_EXT_ADDR	0xFFFFFFFFFFFFFFFFULL
 
 #endif // CONSTANTS_H
-
-
