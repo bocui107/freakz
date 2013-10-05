@@ -238,278 +238,299 @@ static void nwk_tx(buffer_t *buf, nwk_hdr_t *hdr, bool indirect)
  */
 void nwk_fwd(buffer_t *buf, nwk_hdr_t *hdr_in)
 {
-    U16 next_hop;
-    nwk_hdr_t hdr_out;
-    mac_hdr_t mac_hdr_out;
-    bool indirect = false;
-    address_t dest_addr;
-    mem_ptr_t *nbor_mem_ptr;
+	U16 next_hop;
+	nwk_hdr_t hdr_out;
+	mac_hdr_t mac_hdr_out;
+	bool indirect = false;
+	address_t dest_addr;
+	mem_ptr_t *nbor_mem_ptr;
 
-    hdr_out.mac_hdr         = &mac_hdr_out;
-    dest_addr.mode          = SHORT_ADDR;
-    dest_addr.short_addr    = hdr_in->dest_addr;
+	hdr_out.mac_hdr         = &mac_hdr_out;
+	dest_addr.mode          = SHORT_ADDR;
+	dest_addr.short_addr    = hdr_in->dest_addr;
 
-    // is it a broadcast?
-    if ((hdr_in->dest_addr & NWK_BROADCAST_MASK) == 0xFFF0)
-    {
-        // the buffer data ptr (dptr) is pointing to the nwk payload now. calc the length of the nwk
-        // payload. then we can re-use the buffer, slap on the nwk hdr, and send it back down
-        // the stack.
-        //
-        //lint -e{734} Info 734: Loss of precision (assignment) (31 bits to 8 bits)
-        // its okay since we're subtracting a value from a constant
-        buf->len = aMaxPHYPacketSize - (buf->dptr - buf->buf);
+	/* is it a broadcast? */
+	if ((hdr_in->dest_addr & NWK_BROADCAST_MASK) == 0xFFF0)
+	{
+		/*
+		 * the buffer data ptr (dptr) is pointing to the nwk
+		 * payload now. calc the length of the nwk payload.
+		 * then we can re-use the buffer, slap on the nwk hdr,
+		 * and send it back down the stack.
+		 *
+		 * its okay since we're subtracting a value from a constant
+		 */
+		buf->len = aMaxPHYPacketSize - (buf->dptr - buf->buf);
 
-        // need to change the mac dest address to broadcast in case it isn't. Also change the src
-        // addr to the address of this device.
-        hdr_out.mac_hdr->dest_addr.short_addr       = MAC_BROADCAST_ADDR;
-        hdr_out.src_addr                            = hdr_in->src_addr;
-    }
-    // is the dest in our neighbor table?
-    else if ((nbor_mem_ptr = nwk_neighbor_tbl_get_entry(&dest_addr)) != NULL)
-    {
+		/*
+		 * need to change the mac dest address to broadcast in case
+		 * it isn't. Also change the src addr to the address of this
+		 * device.
+		 */
+		hdr_out.mac_hdr->dest_addr.short_addr       = MAC_BROADCAST_ADDR;
+		hdr_out.src_addr                            = hdr_in->src_addr;
+	} else if ((nbor_mem_ptr = nwk_neighbor_tbl_get_entry(&dest_addr)) != NULL) {
+		/* is the dest in our neighbor table? */
 
-        // check to see if the dest address is in our neighbor table
-        if (hdr_in->src_addr != nib.short_addr)
-        {
-            //lint -e{734} Info 734: Loss of precision (assignment) (31 bits to 8 bits)
-            // its okay since we're subtracting a value from a constant
-            buf->len = aMaxPHYPacketSize - (buf->dptr - buf->buf);
-        }
+		/* check to see if the dest address is in our neighbor table */
+		if (hdr_in->src_addr != nib.short_addr) {
+			/* its okay since we're subtracting a value from a constant */
+			buf->len = aMaxPHYPacketSize - (buf->dptr - buf->buf);
+		}
 
-        // if the neighbor does not keep its rx on when idle (ie: sleeping), then we need to send
-        // the frame indirectly.
-        if (!NBOR_ENTRY(nbor_mem_ptr)->rx_on_when_idle)
-        {
-            indirect = true;
-        }
+		/*
+		 * if the neighbor does not keep its rx on when
+		 * idle (ie: sleeping), then we need to send
+		 * the frame indirectly.
+		 */
+		if (!NBOR_ENTRY(nbor_mem_ptr)->rx_on_when_idle) {
+			indirect = true;
+		}
 
-        // set the mac dest addr to the neighbor address
-        hdr_out.mac_hdr->dest_addr.short_addr       = hdr_in->dest_addr;
-        hdr_out.src_addr                            = hdr_in->src_addr;
-    }
-    // is the dest in our routing table?
-    else if ((next_hop = nwk_rte_tbl_get_next_hop(hdr_in->dest_addr)) != INVALID_NWK_ADDR)
-    {
-        // it's in the routing table. forward it.
-        // the buffer dptr is pointing to the nwk payload now. calc the length of the nwk
-        // payload. then we can re-use the buffer, slap on the nwk hdr, and send it back down
-        // the stack.
-        //
-        //lint -e{734} Info 734: Loss of precision (assignment) (31 bits to 8 bits)
-        // its okay since we're subtracting a value from a constant
-        buf->len = aMaxPHYPacketSize - (buf->dptr - buf->buf);
+		/* set the mac dest addr to the neighbor address */
+		hdr_out.mac_hdr->dest_addr.short_addr       = hdr_in->dest_addr;
+		hdr_out.src_addr                            = hdr_in->src_addr;
+	} else if ((next_hop = nwk_rte_tbl_get_next_hop(hdr_in->dest_addr)) != INVALID_NWK_ADDR) {
+		/* is the dest in our routing table? */
 
-        // set the mac dest addr to the next hop and the nwk src addr to the originator
-        hdr_out.mac_hdr->dest_addr.short_addr       = next_hop;
-        hdr_out.src_addr                            = hdr_in->src_addr;
-    }
-    // are we allowed to discover the route?
-    else if (hdr_in->nwk_frm_ctrl.disc_route)
-    {
-        // the destination isn't in our routing tables. discover route is enabled for the
-        // frame so we can buffer it and initiate route discovery.
-        nwk_pend_add_new(buf, hdr_in);
-        nwk_rte_mesh_disc_start(hdr_in->dest_addr);
-        return;
-    }
-    // if all else fails, route it along the tree
-    else
-    {
-        // tree routing is the default routing if everything else fails or we don't allow mesh routing.
-        // we'll just recycle the frame buffer and send it on its way out.
-        if ((next_hop = nwk_rte_tree_calc_next_hop(hdr_in->dest_addr)) == INVALID_NWK_ADDR)
-        {
-            // tree routing failed for some reason. collect the stat and go on with life.
-            pcb.failed_tree_rte++;
-            buf_free(buf);
-            DBG_PRINT("NWK: No such neighbor exists.\n");
-            return;
-        }
-        // the buffer dptr is pointing to the nwk payload now. calc the length of the nwk
-        // payload. then we can re-use the buffer, slap on the nwk hdr, and send it back down
-        // the stack.
-        //
-        //lint -e{734} Info 734: Loss of precision (assignment) (31 bits to 8 bits)
-        // its okay since we're subtracting a value from a constant
-        buf->len = aMaxPHYPacketSize - (buf->dptr - buf->buf);
+		/*
+		 * it's in the routing table. forward it. the buffer dptr
+		 * is pointing to the nwk payload now. calc the length of
+		 * the nwk payload. then we can re-use the buffer, slap on
+		 * the nwk hdr, and send it back down the stack.
+	 	 *
+		 * its okay since we're subtracting a value from a constant
+		 */
+		buf->len = aMaxPHYPacketSize - (buf->dptr - buf->buf);
 
-        // set the mac dest addr to the spec'd neighbor addr and the nwk src addr to the originator
-        hdr_out.mac_hdr->dest_addr.short_addr   = next_hop;
-        hdr_out.src_addr                        = hdr_in->src_addr;
-    }
+		/*
+		 * set the mac dest addr to the next hop and the nwk
+		 * src addr to the originator
+		 */
+		hdr_out.mac_hdr->dest_addr.short_addr       = next_hop;
+		hdr_out.src_addr                            = hdr_in->src_addr;
+	} else if (hdr_in->nwk_frm_ctrl.disc_route) {
+		// are we allowed to discover the route?
 
-    // fill out the rest of the fields that will be needed to forward this frame
-    hdr_out.nwk_frm_ctrl.frame_type             = hdr_in->nwk_frm_ctrl.frame_type;
-    hdr_out.seq_num                             = hdr_in->seq_num;
-    hdr_out.nwk_frm_ctrl.disc_route             = hdr_in->nwk_frm_ctrl.disc_route;;
-    hdr_out.radius                              = hdr_in->radius;
-    hdr_out.dest_addr                           = hdr_in->dest_addr;
-    hdr_out.handle                              = hdr_in->handle;
-    hdr_out.mac_hdr->src_addr.mode              = SHORT_ADDR;
-    hdr_out.mac_hdr->dest_addr.mode             = SHORT_ADDR;
-    hdr_out.mac_hdr->src_addr.short_addr        = nib.short_addr;
-    nwk_tx(buf, &hdr_out, indirect);
+		/*
+		 * the destination isn't in our routing tables.
+		 * discover route is enabled for the frame so we
+		 * can buffer it and initiate route discovery.
+		 */
+		nwk_pend_add_new(buf, hdr_in);
+		nwk_rte_mesh_disc_start(hdr_in->dest_addr);
+		return;
+	} else {
+		/* if all else fails, route it along the tree */
+
+		/*
+		 * tree routing is the default routing if everything else
+		 * fails or we don't allow mesh routing. we'll just recycle
+		 * the frame buffer and send it on its way out.
+		 */
+		if ((next_hop = nwk_rte_tree_calc_next_hop(hdr_in->dest_addr)) == INVALID_NWK_ADDR)
+		{
+			/*
+			 * tree routing failed for some reason.
+			 * collect the stat and go on with life.
+			 */
+			pcb.failed_tree_rte++;
+			buf_free(buf);
+			DBG_PRINT("NWK: No such neighbor exists.\n");
+			return;
+		}
+		/*
+		 * the buffer dptr is pointing to the nwk payload now.
+		 * calc the length of the nwk payload. then we can
+		 * re-use the buffer, slap on the nwk hdr, and send
+		 * it back down the stack.
+		 *
+		 * its okay since we're subtracting a value from a constant
+		 */
+		buf->len = aMaxPHYPacketSize - (buf->dptr - buf->buf);
+
+		/*
+		 * set the mac dest addr to the spec'd neighbor
+		 * addr and the nwk src addr to the originator
+		 */
+		hdr_out.mac_hdr->dest_addr.short_addr   = next_hop;
+		hdr_out.src_addr                        = hdr_in->src_addr;
+	}
+
+	// fill out the rest of the fields that will be needed to forward this frame
+	hdr_out.nwk_frm_ctrl.frame_type             = hdr_in->nwk_frm_ctrl.frame_type;
+	hdr_out.seq_num                             = hdr_in->seq_num;
+	hdr_out.nwk_frm_ctrl.disc_route             = hdr_in->nwk_frm_ctrl.disc_route;;
+	hdr_out.radius                              = hdr_in->radius;
+	hdr_out.dest_addr                           = hdr_in->dest_addr;
+	hdr_out.handle                              = hdr_in->handle;
+	hdr_out.mac_hdr->src_addr.mode              = SHORT_ADDR;
+	hdr_out.mac_hdr->dest_addr.mode             = SHORT_ADDR;
+	hdr_out.mac_hdr->src_addr.short_addr        = nib.short_addr;
+	nwk_tx(buf, &hdr_out, indirect);
 }
 
-/**************************************************************************/
-/*!
-    This function handles the incoming rx data to the NWK layer. There are only
-    two types of frames, command and data. A command frame will be parsed and
-    routed to the appropriate command function handler. A data frame will be
-    checked to see if this device is its destination. If so, then it will
-    be sent to the next higher layer. If not, then it will be sent to the
-    nwk_fwd function to be forwarded to the next device.
-*/
-/**************************************************************************/
+/*
+ * This function handles the incoming rx data to the NWK layer. There are only
+ * two types of frames, command and data. A command frame will be parsed and
+ * routed to the appropriate command function handler. A data frame will be
+ * checked to see if this device is its destination. If so, then it will
+ * be sent to the next higher layer. If not, then it will be sent to the
+ * nwk_fwd function to be forwarded to the next device.
+ */
 void mac_data_ind(buffer_t *buf, mac_hdr_t *mac_hdr)
 {
-    nwk_hdr_t hdr;
-    buffer_t *buf_in;
-    nwk_cmd_t cmd;
-    U8 index;
+	nwk_hdr_t hdr;
+	buffer_t *buf_in;
+	nwk_cmd_t cmd;
+	U8 index;
 
-    // assign incoming mac hdr to the data struct, then parse the frame for the nwk hdr
-    hdr.mac_hdr = mac_hdr;
-    nwk_parse_hdr(buf, &hdr);
-    debug_dump_nwk_hdr(&hdr);
+	/*
+	 * assign incoming mac hdr to the data struct,
+	 * then parse the frame for the nwk hdr
+	 */
+	hdr.mac_hdr = mac_hdr;
+	nwk_parse_hdr(buf, &hdr);
+	debug_dump_nwk_hdr(&hdr);
 
-    // if it's a broadcast and the device type doesn't match our device, then discard it.
-    if ((hdr.dest_addr & NWK_BROADCAST_MASK) == NWK_BROADCAST_MASK)
-    {
-        if (!nwk_brc_check_dev_match(hdr.dest_addr))
-        {
-            buf_free(buf);
-            return;
-        }
-    }
+	/*
+	 * if it's a broadcast and the device type doesn't
+	 * match our device, then discard it.
+	 */
+	if ((hdr.dest_addr & NWK_BROADCAST_MASK) == NWK_BROADCAST_MASK)
+	{
+		if (!nwk_brc_check_dev_match(hdr.dest_addr)) {
+			buf_free(buf);
+			return;
+		}
+	}
 
-    switch(hdr.nwk_frm_ctrl.frame_type)
-    {
-    case NWK_DATA_FRM:
-        // How we handle this depends on the destination address
-        if (hdr.dest_addr == nib.short_addr)
-        {
-            // we're the dest. send it up for further processing.
-            nwk_data_ind(buf, &hdr);
+	switch(hdr.nwk_frm_ctrl.frame_type) {
+	case NWK_DATA_FRM:
+		/* How we handle this depends on the destination address */
+		if (hdr.dest_addr == nib.short_addr)
+		{
+			/* we're the dest. send it up for further processing */
+			nwk_data_ind(buf, &hdr);
 
-            // check for the radius here. we can't let a frame with a 0 radius get sent out again.
-            // if the radius is zero, then drop the frame.
-            if (hdr.radius == 0)
-            {
-                buf_free(buf);
-                return;
-            }
+			/*
+			 * check for the radius here. we can't let a frame with
+			 * a 0 radius get sent out again. if the radius is zero,
+			 * then drop the frame.
+			 */
+			if (hdr.radius == 0) {
+				buf_free(buf);
+				return;
+			}
 
-            // decrement the radius
-            hdr.radius--;
-            break;
-        }
-        else if ((hdr.dest_addr & NWK_BROADCAST_MASK) == 0xFFF0)
-        {
-            // make copy of brc frame, adjust the data pointer, and then send it up
-            BUF_ALLOC(buf_in, RX);
-            index = buf_in->index;
-            memcpy(buf_in, buf, sizeof(buffer_t));
-            buf_in->index = index;
-            buf_in->dptr = buf_in->buf + (buf->dptr - buf->buf);
-            nwk_data_ind(buf_in, &hdr);
+			/* decrement the radius */
+			hdr.radius--;
+			break;
+		} else if ((hdr.dest_addr & NWK_BROADCAST_MASK) == 0xFFF0) {
+			/*
+			 * make copy of brc frame, adjust the data pointer,
+			 * and then send it up
+			 */
+			BUF_ALLOC(buf_in, RX);
+			index = buf_in->index;
+			memcpy(buf_in, buf, sizeof(buffer_t));
+			buf_in->index = index;
+			buf_in->dptr = buf_in->buf + (buf->dptr - buf->buf);
+			nwk_data_ind(buf_in, &hdr);
 
-            // check for the radius here. we can't let a frame with a 0 radius get sent out again.
-            // if the radius is zero, then drop the frame.
-            if (hdr.radius == 0)
-            {
-                buf_free(buf);
-                return;
-            }
+			/*
+			 * check for the radius here. we can't let a frame with
+			 * a 0 radius get sent out again. if the radius is zero,
+			 * then drop the frame.
+			 */
+			if (hdr.radius == 0) {
+				buf_free(buf);
+				return;
+			}
 
-            // decrement the radius
-            hdr.radius--;
+			/* decrement the radius */
+			hdr.radius--;
 
-            // check to see if the sender is in our brc table. if not, then add the senders addr.
-            nwk_brc_add_new_sender(hdr.src_addr, hdr.seq_num);
+			/*
+			 * check to see if the sender is in our brc table.
+			 * if not, then add the senders addr.
+			 */
+			nwk_brc_add_new_sender(hdr.src_addr, hdr.seq_num);
 
-            // now check if its a new brc. if its not, then just discard the frame.
-            if (hdr.seq_num == pcb.brc_seq)
-            {
-                buf_free(buf);
-                return;
-            }
+			/*
+			 * now check if its a new brc. if its not,
+			 * then just discard the frame.
+			 */
+			if (hdr.seq_num == pcb.brc_seq) {
+				buf_free(buf);
+				return;
+			}
 
-            // looks like its a new brc. initiate the brc params and start the brc transmission procedure.
-            // note: the header src address gets changed inside the brc_start function.
-            if (nwk_brc_start(buf, &hdr) != NWK_SUCCESS)
-            {
-                return;
-            }
-        }
+			/*
+			 * looks like its a new brc. initiate the brc params
+			 * and start the brc transmission procedure.
+			 *
+			 * note: the header src address gets changed inside
+			 * the brc_start function.
+			 */
+			if (nwk_brc_start(buf, &hdr) != NWK_SUCCESS) {
+				return;
+			}
+		}
 
-        // we're not the destination. forward it to the dest address.
-        nwk_fwd(buf, &hdr);
-        break;
+		/* we're not the destination. forward it to the dest address */
+		nwk_fwd(buf, &hdr);
+		break;
+	case NWK_CMD_FRM:
+		/* Parse command frame and then send to appropriate handler */
+		nwk_parse_cmd(buf, &cmd);
+		debug_dump_nwk_cmd(&cmd);
 
-    case NWK_CMD_FRM:
-        // Parse command frame and then send to appropriate handler
-        nwk_parse_cmd(buf, &cmd);
-        debug_dump_nwk_cmd(&cmd);
+		/*
+		 * Free the buffer since we're finished with it now.
+		 * Then handle the command.
+		 */
+		buf_free(buf);
 
-        // Free the buffer since we're finished with it now. Then handle the command.
-        buf_free(buf);
-
-        // command frame handler
-        switch (cmd.cmd_frm_id)
-        {
-        case NWK_CMD_RTE_REQ:
-            nwk_rte_mesh_rreq_handler(&hdr, &cmd);
-            break;
-
-        case NWK_CMD_RTE_REP:
-            nwk_rte_mesh_rrep_handler(&hdr, &cmd);
-            break;
-
-        case NWK_CMD_LEAVE:
-            nwk_leave_handler(&hdr, &cmd);
-            break;
-
-        default:
-            break;
-        }
-        break;
-
-    default:
-        break;
-    }
+		/* command frame handler */
+		switch (cmd.cmd_frm_id)
+		{
+		case NWK_CMD_RTE_REQ:
+			nwk_rte_mesh_rreq_handler(&hdr, &cmd);
+			break;
+		case NWK_CMD_RTE_REP:
+			nwk_rte_mesh_rrep_handler(&hdr, &cmd);
+			break;
+		case NWK_CMD_LEAVE:
+			nwk_leave_handler(&hdr, &cmd);
+			break;
+		default:
+			break;
+		}
+		break;
+	default:
+		break;
+	}
 }
 
-/**************************************************************************/
-/*!
-    Handle the data confirmation from the MAC layer and sends it to the
-    application layer.
-*/
-/**************************************************************************/
+/*
+ * Handle the data confirmation from the MAC layer and sends it to the
+ * application layer.
+ */
 void mac_data_conf(U8 status, U8 handle)
 {
-    nwk_data_conf(status, handle);
+	nwk_data_conf(status, handle);
 }
 
-/**************************************************************************/
-/*!
-    Handles the data poll confirmation.
-*/
-/**************************************************************************/
-//lint -e{715} Symbol 'status' not referenced
-// its an empty function for now
+/* Handles the data poll confirmation */
 void mac_poll_conf(U8 status)
 {
 }
 
-/**************************************************************************/
-/*!
-    Handles the comm status indication. The comm status indication usually
-    goes out when an indirect frame is transmitted or times out.
-*/
-/**************************************************************************/
-//lint -e{715} Symbol 'dest_addr' not referenced
+/*
+ * Handles the comm status indication. The comm status indication usually
+ * goes out when an indirect frame is transmitted or times out.
+ */
 void mac_comm_status_ind(U16 pan_id, address_t dest_addr, U8 status, U8 handle)
 {
     nwk_data_conf(status, handle);

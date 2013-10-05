@@ -44,171 +44,133 @@
 
     \todo Implement aging algorithm for routing table entries
 */
-/*******************************************************************/
 #include "freakz.h"
 
-/**************************************************************************/
-/*!
-        List head for the routing table. The routing table contains routing
-        entries that hold the next hop addresses for destinations that aren't
-        within a single hop from this device. It's the main mechanism to implement
-        the Zigbee multi-hop routing.
-*/
-/**************************************************************************/
+/*
+ * List head for the routing table. The routing table contains routing
+ * entries that hold the next hop addresses for destinations that aren't
+ * within a single hop from this device. It's the main mechanism to implement
+ * the Zigbee multi-hop routing.
+ */
 LIST(rte_tbl);
 
-/**************************************************************************/
-/*!
-    Init the routing table
-*/
-/**************************************************************************/
+/* Init the routing table */
 void nwk_rte_tbl_init()
 {
-    list_init(rte_tbl);
+	list_init(rte_tbl);
 }
 
-/**************************************************************************/
-/*!
-        Return the lsit head for the routing table
-*/
-/**************************************************************************/
+/* Return the lsit head for the routing table */
 mem_ptr_t *nwk_rte_tbl_get_head()
 {
-    return list_head(rte_tbl);
+	return list_head(rte_tbl);
 }
 
-/**************************************************************************/
-/*!
-    Find a free entry from the rte pool and add it to the rte table.
-*/
-/**************************************************************************/
+/* Find a free entry from the rte pool and add it to the rte table */
 static mem_ptr_t *nwk_rte_tbl_alloc()
 {
-    mem_ptr_t *mem_ptr;
+	mem_ptr_t *mem_ptr;
 
-    if ((mem_ptr = mem_heap_alloc(sizeof(rte_entry_t))) != NULL)
-    {
-        list_add(rte_tbl, mem_ptr);
-    }
-    return mem_ptr;
+	if ((mem_ptr = mem_heap_alloc(sizeof(rte_entry_t))) != NULL)
+	{
+		list_add(rte_tbl, mem_ptr);
+	}
+	return mem_ptr;
 }
 
-/**************************************************************************/
-/*!
-    Remove the entry from the route table and free it.
-*/
-/**************************************************************************/
+/* Remove the entry from the route table and free it */
 void nwk_rte_tbl_free(mem_ptr_t *mem_ptr)
 {
-    if (mem_ptr)
-    {
-        list_remove(rte_tbl, mem_ptr);
-        mem_heap_free(mem_ptr);
-    }
+	if (mem_ptr) {
+		list_remove(rte_tbl, mem_ptr);
+		mem_heap_free(mem_ptr);
+	}
 }
 
-/**************************************************************************/
-/*!
-    Remove all entries from the routing table.
-*/
-/**************************************************************************/
+/* Remove all entries from the routing table */
 void nwk_rte_tbl_clear()
 {
-    mem_ptr_t *mem_ptr;
+	mem_ptr_t *mem_ptr;
 
-    for (mem_ptr = list_chop(rte_tbl); mem_ptr != NULL; mem_ptr = list_chop(rte_tbl))
-    {
-        nwk_rte_tbl_free(mem_ptr);
-    }
+	for (mem_ptr = list_chop(rte_tbl); mem_ptr != NULL; mem_ptr = list_chop(rte_tbl))
+	{
+		nwk_rte_tbl_free(mem_ptr);
+	}
 }
 
-/**************************************************************************/
-/*!
-    Find an entry with the specified destination network address.
-*/
-/**************************************************************************/
+/* Find an entry with the specified destination network address */
 mem_ptr_t *nwk_rte_tbl_find(U16 dest_addr)
 {
-    mem_ptr_t *mem_ptr;
+	mem_ptr_t *mem_ptr;
 
-    for (mem_ptr = list_head(rte_tbl); mem_ptr != NULL; mem_ptr = mem_ptr->next)
-    {
-        if (RTE_ENTRY(mem_ptr)->dest_addr == dest_addr)
-        {
-            break;
-        }
-    }
-    return mem_ptr;
+	for (mem_ptr = list_head(rte_tbl); mem_ptr != NULL; mem_ptr = mem_ptr->next)
+	{
+		if (RTE_ENTRY(mem_ptr)->dest_addr == dest_addr)
+			break;
+	}
+	return mem_ptr;
 }
 
-/**************************************************************************/
-/*!
-    Remove the destination address from the routing tables.
-*/
-/**************************************************************************/
+/* Remove the destination address from the routing tables */
 void nwk_rte_tbl_rem(U16 addr)
 {
-    nwk_rte_tbl_free(nwk_rte_tbl_find(addr));
+	nwk_rte_tbl_free(nwk_rte_tbl_find(addr));
 }
 
-/**************************************************************************/
-/*!
-        Get the next hop value from the routing table
-*/
-/**************************************************************************/
+/* Get the next hop value from the routing table */
 U16 nwk_rte_tbl_get_next_hop(U16 dest_addr)
 {
-    mem_ptr_t *mem_ptr;
+	mem_ptr_t *mem_ptr;
 
-    if ((mem_ptr = nwk_rte_tbl_find(dest_addr)) != NULL)
-    {
-        if ((RTE_ENTRY(mem_ptr)->status == NWK_ACTIVE) || (RTE_ENTRY(mem_ptr)->status == NWK_VALIDATION_UNDERWAY))
-        {
-            // set the status to active no matter if it is active or validation underway
-            // since we're going to use the route.
-            RTE_ENTRY(mem_ptr)->status = NWK_ACTIVE;
-            return RTE_ENTRY(mem_ptr)->next_hop;
-        }
-    }
-    return INVALID_NWK_ADDR;
+	if ((mem_ptr = nwk_rte_tbl_find(dest_addr)) != NULL)
+	{
+		if ((RTE_ENTRY(mem_ptr)->status == NWK_ACTIVE) ||
+		    (RTE_ENTRY(mem_ptr)->status == NWK_VALIDATION_UNDERWAY))
+		{
+			/*
+			 * set the status to active no matter if it is
+			 * active or validation underway since we're
+			 * going to use the route.
+			 */
+			RTE_ENTRY(mem_ptr)->status = NWK_ACTIVE;
+			return RTE_ENTRY(mem_ptr)->next_hop;
+		}
+	}
+	return INVALID_NWK_ADDR;
 }
 
-/**************************************************************************/
-/*!
-    Check if a route exists in the table.
-*/
-/**************************************************************************/
+/* Check if a route exists in the table */
 bool nwk_rte_tbl_rte_exists(U16 dest_addr)
 {
-    return (nwk_rte_tbl_find(dest_addr)) ? true : false;
+	return (nwk_rte_tbl_find(dest_addr)) ? true : false;
 }
 
-/**************************************************************************/
-/*!
-    Add an entry to the routing table with the specified destination address
-    and status. First check to see if the entry already exists. If it does,
-    then just update the status. If not, then add it to the table.
-*/
-/**************************************************************************/
+/*
+ * Add an entry to the routing table with the specified destination address
+ * and status. First check to see if the entry already exists. If it does,
+ * then just update the status. If not, then add it to the table.
+ */
 void nwk_rte_tbl_add_new(U16 dest_addr, U8 status)
 {
-    mem_ptr_t *mem_ptr;
+	mem_ptr_t *mem_ptr;
 
-    // first check to see if the destination exists
-    for (mem_ptr = list_head(rte_tbl); mem_ptr != NULL; mem_ptr = mem_ptr->next)
-    {
-        if (RTE_ENTRY(mem_ptr)->dest_addr == dest_addr)
-        {
-            RTE_ENTRY(mem_ptr)->status = status;
-            return;
-        }
-    }
+	/* first check to see if the destination exists */
+	for (mem_ptr = list_head(rte_tbl); mem_ptr != NULL; mem_ptr = mem_ptr->next)
+	{
+		if (RTE_ENTRY(mem_ptr)->dest_addr == dest_addr)
+		{
+			RTE_ENTRY(mem_ptr)->status = status;
+			return;
+		}
+	}
 
-    // looks like the destination entry doesn't exist. allocate a new entry and add
-    // it to the routing table.
-    if ((mem_ptr = nwk_rte_tbl_alloc()) != NULL)
-    {
-        RTE_ENTRY(mem_ptr)->dest_addr    = dest_addr;
-        RTE_ENTRY(mem_ptr)->status       = status;
-    }
+	/*
+	 * looks like the destination entry doesn't exist.
+	 * allocate a new entry and add it to the routing table.
+	 */
+	if ((mem_ptr = nwk_rte_tbl_alloc()) != NULL)
+	{
+		RTE_ENTRY(mem_ptr)->dest_addr    = dest_addr;
+		RTE_ENTRY(mem_ptr)->status       = status;
+	}
 }

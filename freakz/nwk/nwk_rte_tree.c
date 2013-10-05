@@ -190,39 +190,37 @@ down that branch of the network.
 /**************************************************************************/
 U16 nwk_rte_tree_calc_next_hop(U16 dest)
 {
-        U16 cskip_parent;
-    U16 dest_addr;
-        bool route_down;
-    nwk_nib_t *nib = nwk_nib_get();
+	U16 cskip_parent;
+	U16 dest_addr;
+	bool route_down;
+	nwk_nib_t *nib = nwk_nib_get();
 
-    // if cskip is uninitialized, then calculate the value for this device
-    // and save it in the nib.
-    if (nib->cskip == 0xFFFF)
-    {
-        nib->cskip = nwk_rte_tree_calc_cskip(nib->depth);
-    }
+	/*
+	 * if cskip is uninitialized, then calculate the
+	 * value for this device and save it in the nib.
+	 */
+	if (nib->cskip == 0xFFFF) {
+		nib->cskip = nwk_rte_tree_calc_cskip(nib->depth);
+	}
 
-    // we need the depth one layer up to calculate the parent's cskip value.
-    // if we're the coordinator, then we don't care because we will route down
-    // no matter what. otherwise, we use the parent's cskip value to calc
-    // whether to route up or down.
-    cskip_parent = (nib->depth != 0) ? nwk_rte_tree_calc_cskip(nib->depth - 1) : 0;
-        route_down = ((dest > nib->short_addr) && (dest < (nib->short_addr + cskip_parent)));
+	/*
+	 * we need the depth one layer up to calculate the parent's
+	 * cskip value. if we're the coordinator, then we don't care
+	 * because we will route down no matter what. otherwise, we
+	 * use the parent's cskip value to calc whether to route up or down.
+	 */
+	cskip_parent = (nib->depth != 0) ? nwk_rte_tree_calc_cskip(nib->depth - 1) : 0;
+	route_down = ((dest > nib->short_addr) && (dest < (nib->short_addr + cskip_parent)));
 
-    // if we're the coordinator or we calculate that we need to route down, then
-    // look for the child that will be our next hop. otherwise, just send it to
-    // our parent.
-    if ((nib->short_addr == 0) || route_down)
-    {
-        dest_addr = nwk_rte_tree_get_dwnstrm_rtr_addr(dest);
-    }
-    else
-    {
-        dest_addr = nwk_neighbor_tbl_get_parent();
-    }
-    return dest_addr;
+	/*
+	 * if we're the coordinator or we calculate that we need to
+	 * route down, then look for the child that will be our next
+	 * hop. otherwise, just send it to our parent.
+	 */
+	if ((nib->short_addr == 0) || route_down)
+		dest_addr = nwk_rte_tree_get_dwnstrm_rtr_addr(dest);
+	else
+		dest_addr = nwk_neighbor_tbl_get_parent();
+
+	return dest_addr;
 }
-
-
-
-

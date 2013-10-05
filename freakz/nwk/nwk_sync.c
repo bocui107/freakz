@@ -42,56 +42,46 @@
     Since beacon mode is not supported in this stack, the sync function
     will only generate a poll request.
 */
-/**************************************************************************/
 #include "freakz.h"
 
-static struct ctimer sync_tmr;  ///< Callback timer for the sync poll
+/* Callback timer for the sync poll */
+static struct ctimer sync_tmr;
 
-/**************************************************************************/
-/*!
-    Generate a MAC poll request to extract indirect data from the parent.
-*/
-/**************************************************************************/
+/* Generate a MAC poll request to extract indirect data from the parent */
 void nwk_sync_req()
 {
-    mac_poll_req();
+	mac_poll_req();
 
-    // that was easy, wasn't it...
+	/* that was easy, wasn't it... */
 }
 
-/**************************************************************************/
-/*!
-    For a sleepy device, a polling interval is usually set so that it will
-    wake up every polling period and poll the parent for any data. If no data exists,
-    then the device will just go back to sleep. This function will start the
-    polling timer which determines when the device will poll the parent for data.
-*/
-/**************************************************************************/
+/*
+ * For a sleepy device, a polling interval is usually set so that it will
+ * wake up every polling period and poll the parent for any data. If no
+ * data exists, then the device will just go back to sleep. This function
+ * will start the polling timer which determines when the device will poll
+ * the parent for data.
+ */
 void nwk_sync_start()
 {
-    ctimer_set(&sync_tmr, ZIGBEE_POLL_INTERVAL * CLOCK_SECOND, nwk_sync_periodic, NULL);
+	ctimer_set(&sync_tmr,
+		   ZIGBEE_POLL_INTERVAL * CLOCK_SECOND,
+		   nwk_sync_periodic,
+		   NULL);
 }
 
-/**************************************************************************/
-/*!
-    This is a periodic function that will poll the parent for indirect
-    data.
-*/
-/**************************************************************************/
-//lint -e{715} Info 715: Symbol 'ptr' not referenced
-//lint -e{818} Info 818: Pointer parameter ptr' could be declared as pointing to const
+/*
+ * This is a periodic function that will poll the parent for indirect
+ * data.
+ */
 void nwk_sync_periodic(void *ptr)
 {
-    nwk_sync_req();
-    ctimer_set(&sync_tmr, ZIGBEE_POLL_INTERVAL * CLOCK_SECOND, nwk_sync_periodic, NULL);
+	nwk_sync_req();
+	ctimer_set(&sync_tmr, ZIGBEE_POLL_INTERVAL * CLOCK_SECOND, nwk_sync_periodic, NULL);
 }
 
-/**************************************************************************/
-/*!
-    Stop the NWK sync timer.
-*/
-/**************************************************************************/
+/* Stop the NWK sync timer */
 void nwk_sync_stop_tmr()
 {
-    ctimer_stop(&sync_tmr);
+	ctimer_stop(&sync_tmr);
 }

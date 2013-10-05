@@ -42,226 +42,175 @@
     table. The neighbor table keeps track of all devices within
     listening range of this one.
 */
-/*******************************************************************/
 #include "freakz.h"
 
-/**************************************************************************/
-/*!
-        List head for the network neighbor table. The neighbor table contains
-        all devices that are within listening range of us that we know about.
-        They should be all the single hop devices around and this table is the first
-        one we turn to when we need to decide how to forward a frame.
-*/
-/**************************************************************************/
+/*
+ * List head for the network neighbor table. The neighbor table contains
+ * all devices that are within listening range of us that we know about.
+ * They should be all the single hop devices around and this table is the first
+ * one we turn to when we need to decide how to forward a frame.
+ */
 LIST(nbor_tbl);
 
-/**************************************************************************/
-/*!
-    Init the neighbor table.
-*/
-/**************************************************************************/
+/* Init the neighbor table */
 void nwk_neighbor_tbl_init()
 {
-    list_init(nbor_tbl);
+	list_init(nbor_tbl);
 }
 
-/**************************************************************************/
-/*!
-    Search the array for a free entry. If one is found, insert it
-    into the neighbor table and return it.
-*/
-/**************************************************************************/
+/*
+ * Search the array for a free entry. If one is found, insert it
+ * into the neighbor table and return it.
+ */
 static mem_ptr_t *nwk_neighbor_tbl_alloc()
 {
-    mem_ptr_t *mem_ptr;
+	mem_ptr_t *mem_ptr;
 
-    if ((mem_ptr = mem_heap_alloc(sizeof(nbor_tbl_entry_t))) != NULL)
-    {
-        list_add(nbor_tbl, mem_ptr);
-    }
-    return mem_ptr;
+	if ((mem_ptr = mem_heap_alloc(sizeof(nbor_tbl_entry_t))) != NULL)
+		list_add(nbor_tbl, mem_ptr);
+
+	return mem_ptr;
 }
 
-/**************************************************************************/
-/*!
-    Remove the entry from the neighbor table and free it.
-*/
-/**************************************************************************/
+/* Remove the entry from the neighbor table and free it */
 static void nwk_neighbor_tbl_free(mem_ptr_t *mem_ptr)
 {
-    if (mem_ptr)
-    {
-        list_remove(nbor_tbl, mem_ptr);
-        mem_heap_free(mem_ptr);
-    }
+	if (mem_ptr)
+	{
+		list_remove(nbor_tbl, mem_ptr);
+		mem_heap_free(mem_ptr);
+	}
 }
 
-/**************************************************************************/
-/*!
-    Remove all entries from the neighbor table.
-*/
-/**************************************************************************/
+/* Remove all entries from the neighbor table */
 void nwk_neighbor_tbl_clear()
 {
-    mem_ptr_t *mem_ptr;
+	mem_ptr_t *mem_ptr;
 
-    for (mem_ptr = list_chop(nbor_tbl); mem_ptr != NULL; mem_ptr = list_chop(nbor_tbl))
-    {
-        nwk_neighbor_tbl_free(mem_ptr);
-    }
+	for (mem_ptr = list_chop(nbor_tbl); mem_ptr != NULL; mem_ptr = list_chop(nbor_tbl))
+	{
+		nwk_neighbor_tbl_free(mem_ptr);
+	}
 }
 
-/**************************************************************************/
-/*!
-    Returns a pointer to the head of the neighbor table.
-*/
-/**************************************************************************/
+/* Returns a pointer to the head of the neighbor table */
 mem_ptr_t *nwk_neighbor_tbl_get_head()
 {
-    return list_head(nbor_tbl);
+	return list_head(nbor_tbl);
 }
 
-/**************************************************************************/
-/*!
-    Find the specified address in the neighbor table.
-*/
-/**************************************************************************/
+/* Find the specified address in the neighbor table */
 static mem_ptr_t *nwk_neighbor_tbl_find(address_t *addr, U16 pan_id)
 {
-    mem_ptr_t *mem_ptr;
+	mem_ptr_t *mem_ptr;
 
-    for (mem_ptr = list_head(nbor_tbl); mem_ptr != NULL; mem_ptr = mem_ptr->next)
-    {
-        if (addr->mode == SHORT_ADDR)
-        {
-            if ((NBOR_ENTRY(mem_ptr)->nwk_addr == addr->short_addr) &&
-                (NBOR_ENTRY(mem_ptr)->pan_id == pan_id))
-            {
-                break;
-            }
-        }
-        else if (addr->mode == LONG_ADDR)
-        {
-            if ((NBOR_ENTRY(mem_ptr)->ext_addr == addr->long_addr) &&
-                (NBOR_ENTRY(mem_ptr)->pan_id == pan_id))
-            {
-                break;
-            }
-        }
-    }
-    return mem_ptr;
+	for (mem_ptr = list_head(nbor_tbl); mem_ptr != NULL; mem_ptr = mem_ptr->next)
+	{
+		if (addr->mode == SHORT_ADDR)
+		{
+			if ((NBOR_ENTRY(mem_ptr)->nwk_addr == addr->short_addr) &&
+			    (NBOR_ENTRY(mem_ptr)->pan_id == pan_id))
+				break;
+		} else if (addr->mode == LONG_ADDR) {
+		if ((NBOR_ENTRY(mem_ptr)->ext_addr == addr->long_addr) &&
+		    (NBOR_ENTRY(mem_ptr)->pan_id == pan_id))
+			break;
+		}
+	}
+	return mem_ptr;
 }
 
-/**************************************************************************/
-/*!
-    Add an entry to the neighbor table.
-*/
-/**************************************************************************/
+/* Add an entry to the neighbor table */
 void nwk_neighbor_tbl_add(nbor_tbl_entry_t *entry)
 {
-    mem_ptr_t *mem_ptr;
-    address_t addr;
+	mem_ptr_t *mem_ptr;
+	address_t addr;
 
-    if (entry)
-    {
-        // we need to check for a duplicate entry
-        addr.mode = SHORT_ADDR;
-        addr.short_addr = entry->nwk_addr;
+	if (entry) {
+		/* we need to check for a duplicate entry */
+		addr.mode = SHORT_ADDR;
+		addr.short_addr = entry->nwk_addr;
 
-        if ((mem_ptr = nwk_neighbor_tbl_find(&addr, entry->pan_id)) != NULL)
-        {
-            // it's a dupe. use this entry and update it with all new info.
-            memcpy(NBOR_ENTRY(mem_ptr), entry, sizeof(nbor_tbl_entry_t));
-            return;
-        }
+		if ((mem_ptr = nwk_neighbor_tbl_find(&addr, entry->pan_id)) != NULL)
+		{
+			/*
+			 * it's a dupe. use this entry and
+			 * update it with all new info
+			 */
+			memcpy(NBOR_ENTRY(mem_ptr), entry, sizeof(nbor_tbl_entry_t));
+			return;
+		}
 
-        // passed the dupe check. it's a new entry so alloc a mem block and copy the info
-        if ((mem_ptr = nwk_neighbor_tbl_alloc()) != NULL)
-        {
-            memcpy(NBOR_ENTRY(mem_ptr), entry, sizeof(nbor_tbl_entry_t));
-        }
-    }
+		/*
+		 * passed the dupe check. it's a new entry so alloc
+		 * a mem block and copy the info
+		 */
+		if ((mem_ptr = nwk_neighbor_tbl_alloc()) != NULL)
+			memcpy(NBOR_ENTRY(mem_ptr), entry, sizeof(nbor_tbl_entry_t));
+	}
 }
 
-/**************************************************************************/
-/*!
-    Remove the address from the neighbor table. Only works for devices in the
-    same PAN.
-*/
-/**************************************************************************/
+/*
+ * Remove the address from the neighbor table. Only works for devices in the
+ * same PAN.
+ */
 void nwk_neighbor_tbl_rem(address_t *addr)
 {
-    mac_pib_t *pib = mac_pib_get();
-    nwk_neighbor_tbl_free(nwk_neighbor_tbl_find(addr, pib->pan_id));
+	mac_pib_t *pib = mac_pib_get();
+	nwk_neighbor_tbl_free(nwk_neighbor_tbl_find(addr, pib->pan_id));
 }
 
-/**************************************************************************/
-/*!
-    Return the parent of this node.
-*/
-/**************************************************************************/
+/* Return the parent of this node */
 U16 nwk_neighbor_tbl_get_parent()
 {
-    mem_ptr_t *mem_ptr;
+	mem_ptr_t *mem_ptr;
 
-    for (mem_ptr = list_head(nbor_tbl); mem_ptr != NULL; mem_ptr = mem_ptr->next)
-    {
-        if (NBOR_ENTRY(mem_ptr)->relationship == NWK_PARENT)
-        {
-            return NBOR_ENTRY(mem_ptr)->nwk_addr;
-        }
-    }
-    return INVALID_NWK_ADDR;
+	for (mem_ptr = list_head(nbor_tbl); mem_ptr != NULL; mem_ptr = mem_ptr->next)
+	{
+		if (NBOR_ENTRY(mem_ptr)->relationship == NWK_PARENT)
+			return NBOR_ENTRY(mem_ptr)->nwk_addr;
+	}
+	return INVALID_NWK_ADDR;
 }
 
-/**************************************************************************/
-/*!
-    Check to see if the dest address exists in the neighbor table. This only
-    works for addresses within the same pan.
-*/
-/**************************************************************************/
+/*
+ * Check to see if the dest address exists in the neighbor table. This only
+ * works for addresses within the same pan.
+ */
 bool nwk_neighbor_tbl_addr_exists(address_t *addr)
 {
-    mac_pib_t *pib = mac_pib_get();
-    mem_ptr_t *mem_ptr;
+	mac_pib_t *pib = mac_pib_get();
+	mem_ptr_t *mem_ptr;
 
-    if ((mem_ptr = nwk_neighbor_tbl_find(addr, pib->pan_id)) != NULL)
-    {
-        return true;
-    }
-    return false;
+	mem_ptr = nwk_neighbor_tbl_find(addr, pib->pan_id);
+	if (mem_ptr)
+		return true;
+	else
+		return false;
 }
 
-/**************************************************************************/
-/*!
-    Get the neighbor entry from the same PAN with the spec'd address.
-*/
-/**************************************************************************/
+/* Get the neighbor entry from the same PAN with the spec'd address */
 mem_ptr_t *nwk_neighbor_tbl_get_entry(address_t *addr)
 {
-    mac_pib_t *pib = mac_pib_get();
-    mem_ptr_t *mem_ptr;
+	mac_pib_t *pib = mac_pib_get();
+	mem_ptr_t *mem_ptr;
 
-    if ((mem_ptr = nwk_neighbor_tbl_find(addr, pib->pan_id)) != NULL)
-    {
-        return mem_ptr;
-    }
-    return NULL;
+	if ((mem_ptr = nwk_neighbor_tbl_find(addr, pib->pan_id)) != NULL)
+	{
+		return mem_ptr;
+	}
+	return NULL;
 }
 
-/**************************************************************************/
-/*!
-    Return the number of entries in the neighbor table.
-*/
-/**************************************************************************/
+/* Return the number of entries in the neighbor table */
 U8 nwk_neighbor_get_cnt()
 {
-    mem_ptr_t *mem_ptr;
-    U8 i = 0;
+	mem_ptr_t *mem_ptr;
+	U8 i = 0;
 
-    for (mem_ptr = list_head(nbor_tbl); mem_ptr != NULL; mem_ptr = mem_ptr->next)
-    {
-        i++;
-    }
-    return i;
+	for (mem_ptr = list_head(nbor_tbl); mem_ptr != NULL; mem_ptr = mem_ptr->next)
+	{
+		i++;
+	}
+	return i;
 }

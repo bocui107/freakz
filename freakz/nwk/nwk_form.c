@@ -45,7 +45,6 @@
     be joined. If there are none, then the energy scan and scan descriptor
     data is used to decide which channel to start the network on.
 */
-/*******************************************************************/
 #include "freakz.h"
 
 /*

@@ -40,52 +40,45 @@
 
     This file contains functions that implement the permit_join service.
 */
-/*******************************************************************/
 #include "freakz.h"
 
 static struct ctimer permit_join_tmr;           ///< Callback timer to timeout the permit join
 
-/**************************************************************************/
-/*!
-    Request to permit joining for a specified duration. The value specified
-    is in units of seconds. A duration of 0 will disable joining for this device.
-    A value of 0xFF will permanently enable joining for this device.
-*/
-/**************************************************************************/
+/*
+ * Request to permit joining for a specified duration. The value specified
+ * is in units of seconds. A duration of 0 will disable joining for this device.
+ * A value of 0xFF will permanently enable joining for this device.
+ */
 void nwk_permit_join_req(U8 duration)
 {
-    mac_pib_t *pib = mac_pib_get();
+	mac_pib_t *pib = mac_pib_get();
 
-    switch (duration)
-    {
-    case NWK_PERMIT_JOIN_DISABLE:
-        pib->assoc_permit = false;
-        break;
-
-    case NWK_PERMIT_JOIN_ENABLE:
-        pib->assoc_permit = true;
-        break;
-
-    default:
-        pib->assoc_permit = true;
-        ctimer_set(&permit_join_tmr, duration * CLOCK_SECOND, nwk_permit_join_disable, NULL);
-        break;
-    }
+	switch (duration)
+	{
+	case NWK_PERMIT_JOIN_DISABLE:
+		pib->assoc_permit = false;
+		break;
+	case NWK_PERMIT_JOIN_ENABLE:
+		pib->assoc_permit = true;
+		break;
+	default:
+		pib->assoc_permit = true;
+		ctimer_set(&permit_join_tmr,
+			   duration * CLOCK_SECOND,
+			   nwk_permit_join_disable,
+			   NULL);
+		break;
+	}
 }
 
-/**************************************************************************/
-/*!
-    Disable the nwk permit join. When nwk_permit_join is called, it will set
-    a timer for the duration that devices are allowed to join. Once the duration
-    expires, this function will be called to disable joining.
-*/
-/**************************************************************************/
+/*
+ * Disable the nwk permit join. When nwk_permit_join is called, it will set
+ * a timer for the duration that devices are allowed to join. Once the duration
+ * expires, this function will be called to disable joining.
+ */
 void nwk_permit_join_disable()
 {
-    mac_pib_t *pib = mac_pib_get();
+	mac_pib_t *pib = mac_pib_get();
 
-    pib->assoc_permit = false;
+	pib->assoc_permit = false;
 }
-
-
-

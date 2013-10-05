@@ -43,206 +43,178 @@
     It can be used to look up a device's nwk address as long as the extended
     address is known, or vice versa.
 */
-/**************************************************************************/
 #include "freakz.h"
 
-/**************************************************************************/
-/*!
-        List head for the address map. The address map contains the corresponding
-        extended addresses for each network address nickname contained in this table.
-        The extended address is sometimes used for things like service discovery or
-        some other stuff that the spec writers decided to torture stack writers with.
-*/
-/**************************************************************************/
+/*
+ * List head for the address map. The address map contains the corresponding
+ * extended addresses for each network address nickname contained in this table.
+ * The extended address is sometimes used for things like service discovery or
+ * some other stuff that the spec writers decided to torture stack writers with.
+ */
 LIST(addr_map);
 
-/**************************************************************************/
-/*!
-    Initialize the NWK address map table.
-*/
-/**************************************************************************/
+/* Initialize the NWK address map table */
 void nwk_addr_map_init()
 {
-    list_init(addr_map);
+	list_init(addr_map);
 }
 
-/**************************************************************************/
-/*!
-    Allocate an address map entry to be used to store a device's nwk and extended
-    address.
-*/
-/**************************************************************************/
+/*
+ * Allocate an address map entry to be used to store a device's nwk and extended
+ * address.
+ */
 static mem_ptr_t *nwk_addr_map_alloc()
 {
-    mem_ptr_t *mem_ptr;
+	mem_ptr_t *mem_ptr;
 
-    if ((mem_ptr = mem_heap_alloc(sizeof(nwk_addr_map_t))) != NULL)
-    {
-        list_add(addr_map, mem_ptr);
-    }
-    return mem_ptr;
+	if ((mem_ptr = mem_heap_alloc(sizeof(nwk_addr_map_t))) != NULL)
+	{
+		list_add(addr_map, mem_ptr);
+	}
+	return mem_ptr;
 }
 
-/**************************************************************************/
-/*!
-    Remove the addr map entry from the list and free it.
-*/
-/**************************************************************************/
+/* Remove the addr map entry from the list and free it */
 static void nwk_addr_map_free(mem_ptr_t *mem_ptr)
 {
-    if (mem_ptr)
-    {
-        list_remove(addr_map, mem_ptr);
-        mem_heap_free(mem_ptr);
-    }
+	if (mem_ptr) {
+		list_remove(addr_map, mem_ptr);
+		mem_heap_free(mem_ptr);
+	}
 }
 
-/**************************************************************************/
-/*!
-    Clear the address map of all entries.
-*/
-/**************************************************************************/
+/* Clear the address map of all entries */
 void nwk_addr_map_clear()
 {
-    mem_ptr_t *mem_ptr;
+	mem_ptr_t *mem_ptr;
 
-    for (mem_ptr = list_chop(addr_map); mem_ptr != NULL; mem_ptr = list_chop(addr_map))
-    {
-        nwk_addr_map_free(mem_ptr);
-    }
+	for (mem_ptr = list_chop(addr_map); mem_ptr != NULL; mem_ptr = list_chop(addr_map))
+	{
+		nwk_addr_map_free(mem_ptr);
+	}
 }
 
-/**************************************************************************/
-/*!
-    Find an addr map entry by the given address. The address structure is used
-    to indicate whether we will be looking for an extended addr or a short addr.
-*/
-/**************************************************************************/
+/*
+ * Find an addr map entry by the given address. The address structure is used
+ * to indicate whether we will be looking for an extended addr or a short addr.
+ */
 static mem_ptr_t *nwk_addr_map_find(address_t *addr)
 {
-    mem_ptr_t *mem_ptr;
+	mem_ptr_t *mem_ptr;
 
-    for (mem_ptr = list_head(addr_map); mem_ptr != NULL; mem_ptr = mem_ptr->next)
-    {
-        if (((addr->mode == SHORT_ADDR) && (addr->short_addr == ADDR_MAP_ENTRY(mem_ptr)->nwk_addr)) ||
-            ((addr->mode == LONG_ADDR) && (addr->long_addr == ADDR_MAP_ENTRY(mem_ptr)->ext_addr)))
-        {
-            break;
-        }
-    }
-    return mem_ptr;
+	for (mem_ptr = list_head(addr_map); mem_ptr != NULL; mem_ptr = mem_ptr->next)
+	{
+		if (((addr->mode == SHORT_ADDR) &&
+		     (addr->short_addr == ADDR_MAP_ENTRY(mem_ptr)->nwk_addr)) ||
+		    ((addr->mode == LONG_ADDR) &&
+		     (addr->long_addr == ADDR_MAP_ENTRY(mem_ptr)->ext_addr)))
+		{
+			break;
+		}
+	}
+	return mem_ptr;
 }
 
-/**************************************************************************/
-/*!
-    Add an address map entry to the address map. Check to see if the entry
-    exists first. If not, then allocate a new one and add it.
-*/
-/**************************************************************************/
+/*
+ * Add an address map entry to the address map. Check to see if the entry
+ * exists first. If not, then allocate a new one and add it.
+ */
 void nwk_addr_map_add(U16 nwk_addr, U64 ext_addr, U8 capab)
 {
-    mem_ptr_t *mem_ptr;
-    address_t addr;
+	mem_ptr_t *mem_ptr;
+	address_t addr;
 
-    // first check to see if the address exists inside our map
-    addr.mode = SHORT_ADDR;
-    addr.short_addr = nwk_addr;
+	/* first check to see if the address exists inside our map */
+	addr.mode = SHORT_ADDR;
+	addr.short_addr = nwk_addr;
 
-    if ((mem_ptr = nwk_addr_map_find(&addr)) == NULL)
-    {
-        // short address doesnt exist in the addr map. try the long addr.
-        addr.mode = LONG_ADDR;
-        addr.long_addr = ext_addr;
-        if ((mem_ptr = nwk_addr_map_find(&addr)) == NULL)
-        {
-            // long addr doesnt exist in the addr map either. try to alloc an address.
-            if ((mem_ptr = nwk_addr_map_alloc()) == NULL)
-            {
-                // if no memory, then just return.
-                return;
-            }
-        }
-    }
+	mem_ptr = nwk_addr_map_find(&addr);
+	if (!mem_ptr)
+	{
+		/* short address doesnt exist in the addr map. try the long addr */
+		addr.mode = LONG_ADDR;
+		addr.long_addr = ext_addr;
+		mem_ptr = nwk_addr_map_find(&addr);
+		if (!mem_ptr)
+		{
+			/*
+			 * long addr doesnt exist in the addr
+			 * map either. try to alloc an address.
+			 */
+			mem_ptr = nwk_addr_map_alloc();
+			if (!mem_ptr) {
+				/* if no memory, then just return */
+				return;
+			}
+		}
+	}
 
-    // if we made it this far, then there must be something on the mem pointer. Overwrite the entry with
-    // the address info. only overwrite the capab info if its not 0xff.
-    if (mem_ptr)
-    {
-        ADDR_MAP_ENTRY(mem_ptr)->nwk_addr = nwk_addr;
-        ADDR_MAP_ENTRY(mem_ptr)->ext_addr = ext_addr;
+	/*
+	 * if we made it this far, then there must be something on
+	 * the mem pointer. Overwrite the entry with the address info.
+	 * only overwrite the capab info if its not 0xff.
+	 */
+	if (mem_ptr) {
+		ADDR_MAP_ENTRY(mem_ptr)->nwk_addr = nwk_addr;
+		ADDR_MAP_ENTRY(mem_ptr)->ext_addr = ext_addr;
 
-        // don't overwrite the capability info if its 0xff (an impossible value)
-        if (capab != 0xff)
-        {
-            ADDR_MAP_ENTRY(mem_ptr)->capab = capab;
-        }
-    }
+		/*
+		 * don't overwrite the capability info if its 0xff
+		 * (an impossible value)
+		 */
+		if (capab != 0xff) {
+			ADDR_MAP_ENTRY(mem_ptr)->capab = capab;
+		}
+	}
 }
 
-/**************************************************************************/
-/*!
-    Remove the specified nwk address entry from the address map.
-*/
-/**************************************************************************/
+/* Remove the specified nwk address entry from the address map */
 void nwk_addr_map_rem_nwk_addr(U16 nwk_addr)
 {
-    address_t addr;
+	address_t addr;
 
-    addr.mode = SHORT_ADDR;
-    addr.short_addr = nwk_addr;
-    nwk_addr_map_free(nwk_addr_map_find(&addr));
+	addr.mode = SHORT_ADDR;
+	addr.short_addr = nwk_addr;
+	nwk_addr_map_free(nwk_addr_map_find(&addr));
 }
 
-/**************************************************************************/
-/*!
-    Remove the specified ext address entry from the address map.
-*/
-/**************************************************************************/
+/* Remove the specified ext address entry from the address map */
 void nwk_addr_map_rem_ext_addr(U64 ext_addr)
 {
-    address_t addr;
+	address_t addr;
 
-    addr.mode = LONG_ADDR;
-    addr.long_addr = ext_addr;
-    nwk_addr_map_free(nwk_addr_map_find(&addr));
+	addr.mode = LONG_ADDR;
+	addr.long_addr = ext_addr;
+	nwk_addr_map_free(nwk_addr_map_find(&addr));
 }
 
-/**************************************************************************/
-/*!
-    Get the network address, given the extended address.
-*/
-/**************************************************************************/
+/* Get the network address, given the extended address */
 U16 nwk_addr_map_get_nwk_addr(U64 ext_addr)
 {
-    mem_ptr_t *mem_ptr;
-    address_t addr;
+	mem_ptr_t *mem_ptr;
+	address_t addr;
 
-    addr.mode = LONG_ADDR;
-    addr.long_addr = ext_addr;
+	addr.mode = LONG_ADDR;
+	addr.long_addr = ext_addr;
 
-    if ((mem_ptr = nwk_addr_map_find(&addr)) != NULL)
-    {
-        return ADDR_MAP_ENTRY(mem_ptr)->nwk_addr;
-    }
-    return INVALID_NWK_ADDR;
+	if ((mem_ptr = nwk_addr_map_find(&addr)) != NULL) {
+		return ADDR_MAP_ENTRY(mem_ptr)->nwk_addr;
+	}
+	return INVALID_NWK_ADDR;
 }
 
-/**************************************************************************/
-/*!
-    Get the extended address, given the network address.
-*/
-/**************************************************************************/
+/* Get the extended address, given the network address */
 U64 nwk_addr_map_get_ext_addr(U16 nwk_addr)
 {
-    mem_ptr_t *mem_ptr;
-    address_t addr;
+	mem_ptr_t *mem_ptr;
+	address_t addr;
 
-    addr.mode = SHORT_ADDR;
-    addr.short_addr = nwk_addr;
+	addr.mode = SHORT_ADDR;
+	addr.short_addr = nwk_addr;
 
-    if ((mem_ptr = nwk_addr_map_find(&addr)) != NULL)
-    {
-        return ADDR_MAP_ENTRY(mem_ptr)->ext_addr;
-    }
-    return INVALID_EXT_ADDR;
+	mem_ptr = nwk_addr_map_find(&addr);
+	if (mem_ptr) {
+		return ADDR_MAP_ENTRY(mem_ptr)->ext_addr;
+	}
+	return INVALID_EXT_ADDR;
 }
