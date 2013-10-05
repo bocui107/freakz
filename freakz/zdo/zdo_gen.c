@@ -48,171 +48,158 @@
 /**************************************************************************/
 #include "freakz.h"
 
-/**************************************************************************/
-/*!
-    This is where all the requests in the ZDO are generated. A request structure
-    and dest address is passed in. From there, the request is generated and
-    sent out.
-*/
-/**************************************************************************/
+/*
+ * This is where all the requests in the ZDO are generated. A request structure
+ * and dest address is passed in. From there, the request is generated and
+ * sent out.
+ */
 U8 zdo_gen_req(U16 dest_addr, zdo_req_t *params)
 {
-    U8 handle, size, *req, req_data[ZDO_REQ_MAX_BUF_SIZE];
+	U8 handle, size, *req, req_data[ZDO_REQ_MAX_BUF_SIZE];
 
-    req = req_data;
-    *req++ = params->seq;
+	req = req_data;
+	*req++ = params->seq;
 
-    switch (params->clust)
-    {
-    /************************************************************************/
-    // ZDO Discovery Manager requests
-    /************************************************************************/
-    case NWK_ADDR_REQ_CLUST:
-        *(U64 *)req = params->type.nwk_addr.ext_addr;
-        req += sizeof(U64);
-        *req++ = params->type.nwk_addr.req_type;
-        *req++ = params->type.nwk_addr.start_index;
-        break;
+	switch (params->clust)
+	{
+	/* ZDO Discovery Manager requests */
+	case NWK_ADDR_REQ_CLUST:
+		*(U64 *)req = params->type.nwk_addr.ext_addr;
+		req += sizeof(U64);
+		*req++ = params->type.nwk_addr.req_type;
+		*req++ = params->type.nwk_addr.start_index;
+		break;
+	case IEEE_ADDR_REQ_CLUST:
+		*(U16 *)req = params->type.ieee_addr.nwk_addr;
+		req += sizeof(U16);
+		*req++ = params->type.ieee_addr.req_type;
+		*req++ = params->type.ieee_addr.start_index;
+		break;
+	case NODE_DESC_REQ_CLUST:
+	case PWR_DESC_REQ_CLUST:
+	case ACTIVE_EP_REQ_CLUST:
+		*(U16 *)req = params->type.node_desc.nwk_addr;
+		req += sizeof(U16);
+		break;
+	case SIMPLE_DESC_REQ_CLUST:
+		*(U16 *)req = params->type.simple_desc.nwk_addr;
+		req += sizeof(U16);
+		*req++ = params->type.simple_desc.ep;
+		break;
+	case DEV_ANNCE_REQ_CLUST:
+		*(U16 *)req = params->type.dev_annce.nwk_addr;
+		req += sizeof(U16);
+		*(U64 *)req = params->type.dev_annce.ext_addr;
+		req += sizeof(U64);
+		*req++ = params->type.dev_annce.capab_info;
+		break;
+	/* ZDO Network Manager requests */
+	case NWK_DISC_REQ_CLUST:
+		*(U32 *)req = params->type.nwk_disc.scan_channels;
+		req += sizeof(U32);
+		*req++ = params->type.nwk_disc.scan_duration;
+		*req++ = params->type.nwk_disc.start_index;
+		break;
+	case NWK_LQI_REQ_CLUST:
+		*req++ = params->type.nwk_lqi.start_index;
+		break;
+	case NWK_PERMIT_JOIN_REQ_CLUST:
+		*req++ = params->type.permit_join.duration;
+		*req++ = params->type.permit_join.tc_sig;
+		break;
+	case NWK_LEAVE_REQ_CLUST:
+		*(U64 *)req = params->type.leave.addr;
+		req += sizeof(U64);
+		*req++ = ((params->type.leave.rem_children << 1) | params->type.leave.rejoin) & 0x3;
+		break;
+	case NWK_UPDATE_REQ_CLUST:
+		/*
+		 * Generate a NWK update request. A NWK update is used for various
+		 * purposes.
+		 * - Change the active channel for the device. This is used for
+		 *   frequency agility so that all devices can be told to change
+		 *   to the specified channel if one channel becomes overly noisy.
+		 * - Change the channel mask. The requesting device can instruct
+		 *   the destination device/s to add or remove channels to the mask.
+		 * - Energy scan. Scan the network and report back the energy conditions
+		 *   on each channel. The info can then be used to see if a channel
+		 *   switch is necessary (freq agility) and which channel to switch to.
+		*/
 
-    case IEEE_ADDR_REQ_CLUST:
-        *(U16 *)req = params->type.ieee_addr.nwk_addr;
-        req += sizeof(U16);
-        *req++ = params->type.ieee_addr.req_type;
-        *req++ = params->type.ieee_addr.start_index;
-        break;
+		*(U32 *)req = params->type.nwk_update.scan_channels;
+		req += sizeof(U32);
+		*req++ = params->type.nwk_update.scan_duration;
 
-    case NODE_DESC_REQ_CLUST:
-    case PWR_DESC_REQ_CLUST:
-    case ACTIVE_EP_REQ_CLUST:
-        *(U16 *)req = params->type.node_desc.nwk_addr;
-        req += sizeof(U16);
-        break;
+		if (params->type.nwk_update.scan_duration == 0xFE)
+		{
+			/* requesting a channel change */
+			*req++ = params->type.nwk_update.nwk_update_id;
+		} else if (params->type.nwk_update.scan_duration == 0xFF) {
+			/* requesting a new channel mask and nwk manager address */
+			*req++ = params->type.nwk_update.nwk_update_id;
+			*(U16 *)req = params->type.nwk_update.nwk_mngr_addr;
+			req += sizeof(U16);
+		} else if (params->type.nwk_update.scan_duration <= 5) 	{
+			*req++ = params->type.nwk_update.scan_cnt;
+		}
+		break;
+	/* ZDO Binding Manager requests */
+	case END_DEV_BIND_REQ_CLUST:
+		*(U16 *)req = params->type.ed_bind.target;
+		req += sizeof(U16);
+		*(U64 *)req = params->type.ed_bind.src_ext_addr;
+		req += sizeof(U64);
+		*req++ = params->type.ed_bind.src_ep;
+		*(U16 *)req = params->type.ed_bind.prof_id;
+		req += sizeof(U16);
+		*req++ = params->type.ed_bind.num_in_clust;
+		memcpy(req, params->type.ed_bind.in_clust, params->type.ed_bind.num_in_clust * 2);
+		req += 2 * params->type.ed_bind.num_in_clust;
+		*req++ = params->type.ed_bind.num_out_clust;
+		memcpy(req, params->type.ed_bind.out_clust, params->type.ed_bind.num_out_clust * 2);
+		req += 2 * params->type.ed_bind.num_out_clust;
+		break;
+	case BIND_REQ_CLUST:
+	case UNBIND_REQ_CLUST:
+		/*
+		 * bind and unbind requests have the same format.
+		 * The only difference is the target cluster.
+		 */
+		*(U64 *)req = params->type.bind.src_addr;
+		req += sizeof(U64);
+		*req++ = params->type.bind.src_ep;
+		*(U16 *)req = params->type.bind.clust;
+		req += sizeof(U16);
+		*req++ = params->type.bind.dest_addr.mode;
 
-    case SIMPLE_DESC_REQ_CLUST:
-        *(U16 *)req = params->type.simple_desc.nwk_addr;
-        req += sizeof(U16);
-        *req++ = params->type.simple_desc.ep;
-        break;
+		/*
+		 * in this case, the address modes are slightly
+		 * different than those defined for the MAC
+		 */
+		if (params->type.bind.dest_addr.mode == BIND_GRP_ADDR)
+		{
+			/*
+			 * if the dest addr is for group addr, then
+			 * don't include the dest ep
+			 */
+			*(U16 *)req = params->type.bind.dest_addr.short_addr;
+			req += sizeof(U16);
+		} else if (params->type.bind.dest_addr.mode == BIND_EXT_ADDR) {
+			/*
+			 * if the dest addr is an extended one, then include
+			 * the dest ep
+			 */
+			*(U64 *)req = params->type.bind.dest_addr.long_addr;
+			req += sizeof(U64);
+			*req++ = params->type.bind.dest_ep;
+		}
+		break;
+	default:
+		return AF_INV_REQUESTTYPE;
+	}
 
-    case DEV_ANNCE_REQ_CLUST:
-        *(U16 *)req = params->type.dev_annce.nwk_addr;
-        req += sizeof(U16);
-        *(U64 *)req = params->type.dev_annce.ext_addr;
-        req += sizeof(U64);
-        *req++ = params->type.dev_annce.capab_info;
-        break;
-
-    /************************************************************************/
-    // ZDO Network Manager requests
-    /************************************************************************/
-    case NWK_DISC_REQ_CLUST:
-        *(U32 *)req = params->type.nwk_disc.scan_channels;
-        req += sizeof(U32);
-        *req++ = params->type.nwk_disc.scan_duration;
-        *req++ = params->type.nwk_disc.start_index;
-        break;
-
-    case NWK_LQI_REQ_CLUST:
-        *req++ = params->type.nwk_lqi.start_index;
-        break;
-
-    case NWK_PERMIT_JOIN_REQ_CLUST:
-        *req++ = params->type.permit_join.duration;
-        *req++ = params->type.permit_join.tc_sig;
-        break;
-
-    case NWK_LEAVE_REQ_CLUST:
-        *(U64 *)req = params->type.leave.addr;
-        req += sizeof(U64);
-        *req++ = ((params->type.leave.rem_children << 1) | params->type.leave.rejoin) & 0x3;
-        break;
-
-    case NWK_UPDATE_REQ_CLUST:
-        /*    Generate a NWK update request. A NWK update is used for various purposes.
-        - Change the active channel for the device. This is used for frequency agility
-        so that all devices can be told to change to the specified channel if one
-        channel becomes overly noisy.
-        - Change the channel mask. The requesting device can instruct the destination
-        device/s to add or remove channels to the mask.
-        - Energy scan. Scan the network and report back the energy conditions on each
-        channel. The info can then be used to see if a channel switch is necessary
-        (freq agility) and which channel to switch to.
-        */
-
-        *(U32 *)req = params->type.nwk_update.scan_channels;
-        req += sizeof(U32);
-        *req++ = params->type.nwk_update.scan_duration;
-
-        if (params->type.nwk_update.scan_duration == 0xFE)
-        {
-            // requesting a channel change
-            *req++ = params->type.nwk_update.nwk_update_id;
-        }
-        else if (params->type.nwk_update.scan_duration == 0xFF)
-        {
-            // requesting a new channel mask and nwk manager address
-            *req++ = params->type.nwk_update.nwk_update_id;
-            *(U16 *)req = params->type.nwk_update.nwk_mngr_addr;
-            req += sizeof(U16);
-        }
-        else if (params->type.nwk_update.scan_duration <= 5)
-        {
-            *req++ = params->type.nwk_update.scan_cnt;
-        }
-        break;
-
-    /************************************************************************/
-    // ZDO Binding Manager requests
-    /************************************************************************/
-    case END_DEV_BIND_REQ_CLUST:
-        *(U16 *)req = params->type.ed_bind.target;
-        req += sizeof(U16);
-        *(U64 *)req = params->type.ed_bind.src_ext_addr;
-        req += sizeof(U64);
-        *req++ = params->type.ed_bind.src_ep;
-        *(U16 *)req = params->type.ed_bind.prof_id;
-        req += sizeof(U16);
-        *req++ = params->type.ed_bind.num_in_clust;
-        memcpy(req, params->type.ed_bind.in_clust, params->type.ed_bind.num_in_clust * 2);
-        req += 2 * params->type.ed_bind.num_in_clust;
-        *req++ = params->type.ed_bind.num_out_clust;
-        memcpy(req, params->type.ed_bind.out_clust, params->type.ed_bind.num_out_clust * 2);
-        req += 2 * params->type.ed_bind.num_out_clust;
-        break;
-
-    case BIND_REQ_CLUST:
-    case UNBIND_REQ_CLUST:
-        // bind and unbind requests have the same format. The only difference is the target cluster.
-        *(U64 *)req = params->type.bind.src_addr;
-        req += sizeof(U64);
-        *req++ = params->type.bind.src_ep;
-        *(U16 *)req = params->type.bind.clust;
-        req += sizeof(U16);
-        *req++ = params->type.bind.dest_addr.mode;
-
-        // in this case, the address modes are slightly different than those defined
-        // for the MAC
-        if (params->type.bind.dest_addr.mode == BIND_GRP_ADDR)
-        {
-            // if the dest addr is for group addr, then don't include the dest ep
-            *(U16 *)req = params->type.bind.dest_addr.short_addr;
-            req += sizeof(U16);
-        }
-        else if (params->type.bind.dest_addr.mode == BIND_EXT_ADDR)
-        {
-            // if the dest addr is an extended one, then include the dest ep
-            *(U64 *)req = params->type.bind.dest_addr.long_addr;
-            req += sizeof(U64);
-            *req++ = params->type.bind.dest_ep;
-        }
-        break;
-
-    default:
-        return AF_INV_REQUESTTYPE;
-    }
-
-    size = req - req_data;
-    handle = af_handle_get();
-    zdo_tx(req_data, size, dest_addr, params->clust, 0, handle);
-    return AF_SUCCESS;
+	size = req - req_data;
+	handle = af_handle_get();
+	zdo_tx(req_data, size, dest_addr, params->clust, 0, handle);
+	return AF_SUCCESS;
 }
