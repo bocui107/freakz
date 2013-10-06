@@ -270,20 +270,6 @@
 #define HAL_ENABLE_OVERFLOW_INTERRUPT()	(TIMSK1 |= (1 << TOIE1))
 #define HAL_DISABLE_OVERFLOW_INTERRUPT() (TIMSK1 &= ~(1 << TOIE1))
 
-/* This macro will protect the following code from interrupts.*/
-#define AVR_ENTER_CRITICAL_REGION() {	\
-	U8 volatile saved_sreg = SREG;	\
-	cli()				\
-}
-
-/*
- * This macro must always be used in conjunction with AVR_ENTER_CRITICAL_REGION
- * so that interrupts are enabled again.
- */
-#define AVR_LEAVE_CRITICAL_REGION()	\
-	SREG = saved_sreg;		\
-}
-
 /* Enable the interrupt from the radio transceiver */
 #define hal_enable_trx_interrupt() HAL_ENABLE_RADIO_INTERRUPT()
 

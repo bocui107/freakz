@@ -138,12 +138,14 @@ U8 hal_spi_write(U8 data)
 U8 hal_register_read(U8 address)
 {
 	U8 reg_val = 0;
+	U8 volatile saved_sreg;
 
 	/* Add the register read command to the register address. */
 	address &= HAL_TRX_CMD_RADDRM;
 	address |= HAL_TRX_CMD_RR;
 
-	AVR_ENTER_CRITICAL_REGION();
+	saved_sreg = SREG;
+        cli();
 
 	/* Start the SPI transaction by pulling the Slave Select low. */
 	HAL_SS_LOW();
@@ -155,7 +157,7 @@ U8 hal_register_read(U8 address)
 	/* End the transaction by pulling the Slave Select High. */
 	HAL_SS_HIGH();
 
-	AVR_LEAVE_CRITICAL_REGION();
+	SREG = saved_sreg;
 
 	return reg_val;
 }
@@ -172,11 +174,13 @@ U8 hal_register_read(U8 address)
 void hal_register_write(U8 address, U8 value)
 {
 	U8 dummy_read;
+	U8 volatile saved_sreg;
 
 	/* Add the Register Write command to the address. */
 	address = HAL_TRX_CMD_RW | (HAL_TRX_CMD_RADDRM & address);
 
-	AVR_ENTER_CRITICAL_REGION();
+	saved_sreg = SREG;
+        cli();
 
 	/* Start the SPI transaction by pulling the Slave Select low. */
 	HAL_SS_LOW();
@@ -188,7 +192,7 @@ void hal_register_write(U8 address, U8 value)
 	/* End the transaction by pulling the Slave Slect High. */
 	HAL_SS_HIGH();
 
-	AVR_LEAVE_CRITICAL_REGION();
+	SREG = saved_sreg;
 }
 
 /*
@@ -250,12 +254,15 @@ void hal_subregister_write(U8 address, U8 mask, U8 position, U8 value)
 void hal_frame_read(buffer_t *buf)
 {
 	U8 len, dummy, *rx_data=0;
+	U8 volatile saved_sreg;
 
 	/* check that we have either valid frame pointer or callback pointer */
 	if (!buf)
 		return;
 
-	AVR_ENTER_CRITICAL_REGION();
+        saved_sreg = SREG;
+        cli();
+
 
 	HAL_SS_LOW();
 
@@ -327,7 +334,7 @@ void hal_frame_read(buffer_t *buf)
 		buf->lqi = 0;
 	}
 
-	AVR_LEAVE_CRITICAL_REGION();
+	SREG = saved_sreg;
 }
 
 /*
@@ -340,9 +347,12 @@ void hal_frame_read(buffer_t *buf)
 void hal_frame_write(U8 *data, U8 len)
 {
 	U8 dummy;
+	U8 volatile saved_sreg;
+
 	len &= HAL_TRX_CMD_RADDRM; /* Truncate length to maximum frame length. */
 
-	AVR_ENTER_CRITICAL_REGION();
+	saved_sreg = SREG;
+        cli();
 
 	/* Initiate the SPI transaction */
 	HAL_SS_LOW();
@@ -364,7 +374,7 @@ void hal_frame_write(U8 *data, U8 len)
 
 	HAL_SS_HIGH(); /* Terminate SPI transaction. */
 
-	AVR_LEAVE_CRITICAL_REGION();
+	SREG = saved_sreg;
 }
 
 /*
@@ -379,8 +389,10 @@ void hal_frame_write(U8 *data, U8 len)
 void hal_sram_read(U8 address, U8 length, U8 *data)
 {
 	U8 dummy;
+	U8 volatile saved_sreg;
 
-	AVR_ENTER_CRITICAL_REGION();
+	saved_sreg = SREG;
+        cli();
 
 	/* Initiate the SPI transaction. */
 	HAL_SS_LOW();
@@ -400,7 +412,7 @@ void hal_sram_read(U8 address, U8 length, U8 *data)
 
 	HAL_SS_HIGH();
 
-	AVR_LEAVE_CRITICAL_REGION();
+	SREG = saved_sreg;
 }
 
 /*
@@ -415,8 +427,10 @@ void hal_sram_read(U8 address, U8 length, U8 *data)
 void hal_sram_write(U8 address, U8 length, U8 *data)
 {
 	U8 dummy;
+	U8 volatile saved_sreg;
 
-	AVR_ENTER_CRITICAL_REGION();
+	saved_sreg = SREG;
+        cli();
 
 	HAL_SS_LOW();
 
@@ -435,7 +449,7 @@ void hal_sram_write(U8 address, U8 length, U8 *data)
 
 	HAL_SS_HIGH();
 
-	AVR_LEAVE_CRITICAL_REGION();
+	SREG = saved_sreg;
 }
 
 /*
