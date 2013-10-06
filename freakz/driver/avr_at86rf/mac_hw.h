@@ -48,5 +48,10 @@ U8 mac_rx_enb(bool enb, bool auto_ack);
 void mac_set_short_addr(U16 addr);
 void mac_set_channel(U8 channel);
 void mac_set_pan_id(U16 pan_id);
-void mac_tx_handler(buffer_t *buf, address_t *addr, bool indir, bool ack_req, U8 dsn, U8 handle);
+void mac_tx_handler(buffer_t *buf,
+		    address_t *addr,
+		    bool indir,
+		    bool ack_req,
+		    U8 dsn,
+		    U8 handle);
 #endif

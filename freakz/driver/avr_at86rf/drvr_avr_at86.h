@@ -55,141 +55,126 @@
 #include "types.h"
 #include "buf.h"
 
-#define delay_us( us )   ( _delay_loop_2( ( F_CPU / 4000000UL ) * ( us ) ) )  ///< 1 usec delay
+/* 1 usec delay */
+#define delay_us(us)	(_delay_loop_2((F_CPU / 4000000UL) * (us)))
 
-// irq reg bits
-#define IRQ_MASK_PLL_LOCK   0           ///< IRQ reg bit - PLL Lock
-#define IRQ_MASK_PLL_UNLOCK 1           ///< IRQ reg bit - PLL Unlock
-#define IRQ_MASK_RX_START   2       ///< IRQ reg bit - RX Start
-#define IRQ_MASK_TRX_END    3       ///< IRQ reg bit - TRX End
+#define IRQ_MASK_PLL_LOCK	0	/* IRQ reg bit - PLL Lock */
+#define IRQ_MASK_PLL_UNLOCK	1	/* IRQ reg bit - PLL Unlock */
+#define IRQ_MASK_RX_START	2	/* IRQ reg bit - RX Start */
+#define IRQ_MASK_TRX_END	3	/* IRQ reg bit - TRX End */
 
-/**************************************************************************/
-/*!
-        AT86RF23x register address definitions
-*/
-/**************************************************************************/
+/* AT86RF23x register address definitions */
 typedef enum
 {
-    AT86_TRX_STATUS     = 0x01,
-    AT86_TRX_STATE      = 0x02,
-    AT86_TRX_CTRL_0     = 0x03,
-    AT86_TRX_CTRL_1     = 0x04,
-    AT86_PHY_TX_PWR     = 0x05,
-    AT86_PHY_RSSI       = 0x06,
-    AT86_PHY_ED_LEVEL   = 0x07,
-    AT86_PHY_CC_CCA     = 0x08,
-    AT86_CCA_THRES      = 0x09,
-    AT86_RX_CTRL        = 0x0a,
-    AT86_SFD_VAL        = 0x0b,
-    AT86_TRX_CTRL2      = 0x0c,
-    AT86_ANT_DIV        = 0x0d,
-    AT86_IRQ_MASK       = 0x0e,
-    AT86_IRQ_STATUS     = 0x0f,
-    AT86_VREG_CTRL      = 0x10,
-    AT86_BATMON         = 0x11,
-    AT86_XOSC_CTRL      = 0x12,
-    AT86_RX_SYN         = 0x15,
-    AT86_XAH_CTRL_1     = 0x17,
-    AT86_FTN_CTRL       = 0x18,
-    AT86_PLL_CF         = 0x1a,
-    AT86_PLL_DCU        = 0x1b,
-    AT86_PART_NUM       = 0x1c,
-    AT86_VERSION_NUM    = 0x1d,
-    AT86_MAN_ID_0       = 0x1e,
-    AT86_MAN_ID_1       = 0x1f,
-    AT86_SHORT_ADDR_0   = 0x20,
-    AT86_SHORT_ADDR_1   = 0x21,
-    AT86_PAN_ID_0       = 0x22,
-    AT86_PAN_ID_1       = 0x23,
-    AT86_IEEE_ADDR_0    = 0x24,
-    AT86_IEEE_ADDR_1    = 0x25,
-    AT86_IEEE_ADDR_2    = 0x26,
-    AT86_IEEE_ADDR_3    = 0x27,
-    AT86_IEEE_ADDR_4    = 0x28,
-    AT86_IEEE_ADDR_5    = 0x29,
-    AT86_IEEE_ADDR_6    = 0x2a,
-    AT86_IEEE_ADDR_7    = 0x2b,
-    AT86_XAH_CTRL_0     = 0x2c,
-    AT86_CSMA_SEED_0    = 0x2d,
-    AT86_CSMA_SEED_1    = 0x2e,
-    AT86_CSMA_BE        = 0x2f
+	AT86_TRX_STATUS     = 0x01,
+	AT86_TRX_STATE      = 0x02,
+	AT86_TRX_CTRL_0     = 0x03,
+	AT86_TRX_CTRL_1     = 0x04,
+	AT86_PHY_TX_PWR     = 0x05,
+	AT86_PHY_RSSI       = 0x06,
+	AT86_PHY_ED_LEVEL   = 0x07,
+	AT86_PHY_CC_CCA     = 0x08,
+	AT86_CCA_THRES      = 0x09,
+	AT86_RX_CTRL        = 0x0a,
+	AT86_SFD_VAL        = 0x0b,
+	AT86_TRX_CTRL2      = 0x0c,
+	AT86_ANT_DIV        = 0x0d,
+	AT86_IRQ_MASK       = 0x0e,
+	AT86_IRQ_STATUS     = 0x0f,
+	AT86_VREG_CTRL      = 0x10,
+	AT86_BATMON         = 0x11,
+	AT86_XOSC_CTRL      = 0x12,
+	AT86_RX_SYN         = 0x15,
+	AT86_XAH_CTRL_1     = 0x17,
+	AT86_FTN_CTRL       = 0x18,
+	AT86_PLL_CF         = 0x1a,
+	AT86_PLL_DCU        = 0x1b,
+	AT86_PART_NUM       = 0x1c,
+	AT86_VERSION_NUM    = 0x1d,
+	AT86_MAN_ID_0       = 0x1e,
+	AT86_MAN_ID_1       = 0x1f,
+	AT86_SHORT_ADDR_0   = 0x20,
+	AT86_SHORT_ADDR_1   = 0x21,
+	AT86_PAN_ID_0       = 0x22,
+	AT86_PAN_ID_1       = 0x23,
+	AT86_IEEE_ADDR_0    = 0x24,
+	AT86_IEEE_ADDR_1    = 0x25,
+	AT86_IEEE_ADDR_2    = 0x26,
+	AT86_IEEE_ADDR_3    = 0x27,
+	AT86_IEEE_ADDR_4    = 0x28,
+	AT86_IEEE_ADDR_5    = 0x29,
+	AT86_IEEE_ADDR_6    = 0x2a,
+	AT86_IEEE_ADDR_7    = 0x2b,
+	AT86_XAH_CTRL_0     = 0x2c,
+	AT86_CSMA_SEED_0    = 0x2d,
+	AT86_CSMA_SEED_1    = 0x2e,
+	AT86_CSMA_BE        = 0x2f
 } at86_reg_t;
 
-/** \brief  This enumeration defines the necessary timing information for the
- *          AT86RF230 radio transceiver. All times are in microseconds.
+/*
+ * This enumeration defines the necessary timing information for the
+ * AT86RF230 radio transceiver. All times are in microseconds.
  *
- *          These constants are extracted from the datasheet.
+ * These constants are extracted from the datasheet.
  */
 typedef enum{
-    TIME_TO_ENTER_P_ON               = 510,     /**<  Transition time from VCC is applied to P_ON. */
-    TIME_P_ON_TO_TRX_OFF             = 510,     /**<  Transition time from P_ON to TRX_OFF. */
-    TIME_SLEEP_TO_TRX_OFF            = 880,     /**<  Transition time from SLEEP to TRX_OFF. */
-    TIME_RESET                       = 6,       /**<  Time to hold the RST pin low during reset */
-    TIME_ED_MEASUREMENT              = 140,     /**<  Time it takes to do a ED measurement. */
-    TIME_CCA                         = 140,     /**<  Time it takes to do a CCA. */
-    TIME_PLL_LOCK                    = 150,     /**<  Maximum time it should take for the PLL to lock. */
-    TIME_FTN_TUNING                  = 25,      /**<  Maximum time it should take to do the filter tuning. */
-    TIME_NOCLK_TO_WAKE               = 6,       /**<  Transition time from *_NOCLK to being awake. */
-    TIME_CMD_FORCE_TRX_OFF           = 1,       /**<  Time it takes to execute the FORCE_TRX_OFF command. */
-    TIME_TRX_OFF_TO_PLL_ACTIVE       = 180,     /**<  Transition time from TRX_OFF to: RX_ON, PLL_ON, TX_ARET_ON and RX_AACK_ON. */
-    TIME_STATE_TRANSITION_PLL_ACTIVE = 1,       /**<  Transition time from PLL active state to another. */
+	TIME_TO_ENTER_P_ON     = 510, /* Transition time from VCC is applied to P_ON. */
+	TIME_P_ON_TO_TRX_OFF   = 510, /* Transition time from P_ON to TRX_OFF. */
+	TIME_SLEEP_TO_TRX_OFF  = 880, /* Transition time from SLEEP to TRX_OFF. */
+	TIME_RESET             = 6,   /* Time to hold the RST pin low during reset */
+	TIME_ED_MEASUREMENT    = 140, /* Time it takes to do a ED measurement. */
+	TIME_CCA               = 140, /* Time it takes to do a CCA. */
+	TIME_PLL_LOCK          = 150, /* Maximum time it should take for the PLL to lock. */
+	TIME_FTN_TUNING        = 25,  /* Maximum time it should take to do the filter tuning. */
+	TIME_NOCLK_TO_WAKE     = 6,   /* Transition time from *_NOCLK to being awake. */
+	TIME_CMD_FORCE_TRX_OFF = 1,   /* Time it takes to execute the FORCE_TRX_OFF command. */
+	TIME_TRX_OFF_TO_PLL_ACTIVE  = 180, /* Transition time from TRX_OFF to: RX_ON, PLL_ON, TX_ARET_ON and RX_AACK_ON. */
+	TIME_STATE_TRANSITION_PLL_ACTIVE = 1, /* Transition time from PLL active state to another. */
 } at86_radio_timing_t;
 
-/**************************************************************************/
-/*!
-        Radio status enumerations. These are the status values that can be
-        returned by the radio.
-*/
-/**************************************************************************/
+/*
+ * Radio status enumerations. These are the status values that can be
+ * returned by the radio.
+ */
 typedef enum{
-    RADIO_SUCCESS = 0x40,                       /**< The requested service was performed successfully. */
-    RADIO_UNSUPPORTED_DEVICE,                   /**< The connected device is not an Atmel AT86RF230. */
-    RADIO_INVALID_ARGUMENT,                     /**< One or more of the supplied function arguments are invalid. */
-    RADIO_TIMED_OUT,                            /**< The requested service timed out. */
-    RADIO_WRONG_STATE,                          /**< The end-user tried to do an invalid state transition. */
-    RADIO_BUSY_STATE,                           /**< The radio transceiver is busy receiving or transmitting. */
-    RADIO_STATE_TRANSITION_FAILED,              /**< The requested state transition could not be completed. */
-    RADIO_CCA_IDLE,                             /**< Channel is clear, available to transmit a new frame. */
-    RADIO_CCA_BUSY,                             /**< Channel busy. */
-    RADIO_TRX_BUSY,                             /**< Transceiver is busy receiving or transmitting data. */
-    RADIO_BAT_LOW,                              /**< Measured battery voltage is lower than voltage threshold. */
-    RADIO_BAT_OK,                               /**< Measured battery voltage is above the voltage threshold. */
-    RADIO_CRC_FAILED,                           /**< The CRC failed for the actual frame. */
-    RADIO_CHANNEL_ACCESS_FAILURE,               /**< The channel access failed during the auto mode. */
-    RADIO_NO_ACK,                               /**< No acknowledge frame was received. */
+	RADIO_SUCCESS = 0x40,          /* The requested service was performed successfully. */
+	RADIO_UNSUPPORTED_DEVICE,      /* The connected device is not an Atmel AT86RF230. */
+	RADIO_INVALID_ARGUMENT,        /* One or more of the supplied function arguments are invalid. */
+	RADIO_TIMED_OUT,               /* The requested service timed out. */
+	RADIO_WRONG_STATE,             /* The end-user tried to do an invalid state transition. */
+	RADIO_BUSY_STATE,              /* The radio transceiver is busy receiving or transmitting. */
+	RADIO_STATE_TRANSITION_FAILED, /* The requested state transition could not be completed. */
+	RADIO_CCA_IDLE,                /* Channel is clear, available to transmit a new frame. */
+	RADIO_CCA_BUSY,                /* Channel busy. */
+	RADIO_TRX_BUSY,                /* Transceiver is busy receiving or transmitting data. */
+	RADIO_BAT_LOW,                 /* Measured battery voltage is lower than voltage threshold. */
+	RADIO_BAT_OK,                  /* Measured battery voltage is above the voltage threshold. */
+	RADIO_CRC_FAILED,              /* The CRC failed for the actual frame. */
+	RADIO_CHANNEL_ACCESS_FAILURE,  /* The channel access failed during the auto mode. */
+	RADIO_NO_ACK,                  /* No acknowledge frame was received. */
 }at86_radio_status_t;
 
-/**************************************************************************/
-/*!
-        Clear channel assessment enumerations
-*/
-/**************************************************************************/
+/* Clear channel assessment enumerations */
 typedef enum{
-    CCA_ED                    = 0,    /**< Use energy detection above threshold mode. */
-    CCA_CARRIER_SENSE         = 1,    /**< Use carrier sense mode. */
-    CCA_CARRIER_SENSE_WITH_ED = 2     /**< Use a combination of both energy detection and carrier sense. */
+	CCA_ED                    = 0, /* Use energy detection above threshold mode. */
+	CCA_CARRIER_SENSE         = 1, /* Use carrier sense mode. */
+	CCA_CARRIER_SENSE_WITH_ED = 2  /* Use a combination of both energy detection and carrier sense. */
 }at86_radio_cca_mode_t;
 
-/**************************************************************************/
-/*!
-        Driver Control Block
-        This structure contains flags and information that is used to control
-        the behavior of the driver and allow it to respond to rx and tx events.
-*/
-/**************************************************************************/
+/*
+ * Driver Control Block
+ * This structure contains flags and information that is used to control
+ * the behavior of the driver and allow it to respond to rx and tx events.
+ */
 typedef struct
 {
-    U8 handle;                  ///< Frame handle used to identify the frame and assoc it with a status.
-    U8 status;                  ///< Transmit status after a transmission attempt.
-    bool status_avail;  ///< Status available flag. Used to signal the driver that a new status is avail.
-    bool data_rx;       ///< Data rx flag. Used to signal the driver that data has been received.
+	U8 handle;         /* Frame handle used to identify the frame and assoc it with a status. */
+	U8 status;         /* Transmit status after a transmission attempt */
+	bool status_avail; /* Status available flag. Used to signal the driver that a new status is avail */
+	bool data_rx;      /* Data rx flag. Used to signal the driver that data has been received */
 } at86_dcb_t;
 
-// prototypes
-
-/*********************************************************/
-PROCESS_NAME(drvr_process);             ///< Main AT86 driver process
-/*********************************************************/
+PROCESS_NAME(drvr_process); /* Main AT86 driver process */
 
 void drvr_init();
 void drvr_at86_reset();
