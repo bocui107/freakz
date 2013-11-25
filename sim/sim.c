@@ -47,6 +47,7 @@
 #include <sys/wait.h>
 #include <sys/errno.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include "type.h"
 #include "sim.h"
 #include "node_list.h"
@@ -355,6 +356,10 @@ int main (int argc, char *argv[])
 	 */
 	signal(SIGCHLD, sigchld_handler);
 
+	/*
+	 * The directory's permission is 775
+	 */
+	mkdir("./log", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 	sprintf(msg, "./log/sim.txt");
 	/*
 	 * reallocal the file point or redirect the point.
@@ -362,6 +367,7 @@ int main (int argc, char *argv[])
 	freopen(msg, "w", stderr);
 
 	/* create the  public pipe and open it for reading */
+	mkdir("./fifo", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 	strcpy(pp.name, "./fifo/PUBLIC");
 
 	/*
