@@ -52,7 +52,7 @@
 #include "sim.h"
 #include "node_list.h"
 
-static pipe_t pp;
+static struct pipe_t pp;
 extern int errno;
 
 static U8 conn_map[MAXNODES][MAXNODES] = {
@@ -67,12 +67,12 @@ static U8 conn_map[MAXNODES][MAXNODES] = {
 
 void *sim_data_out_thread(void *node)
 {
-	sim_node_t nd;
-	sim_node_t *sibling;
+	struct sim_node_t nd;
+	struct sim_node_t *sibling;
 	U8 i;
 
 	/* copy the node data into the node structure. */
-	memcpy(&nd, node, sizeof(sim_node_t));
+	memcpy(&nd, node, sizeof(struct sim_node_t));
 
 	while (1)
 	{
@@ -106,13 +106,13 @@ void *sim_data_out_thread(void *node)
 void *sim_cmd_out_thread(void *node)
 {
 	int status;
-	sim_node_t nd;
-	sim_node_t *sibling;
+	struct sim_node_t nd;
+	struct sim_node_t *sibling;
 	U8 len;
 	struct cli_buf_t *cli_buf = cli_buf_get();
 
 	/* copy the node data into the node structure. */
-	memcpy(&nd, node, sizeof(sim_node_t));
+	memcpy(&nd, node, sizeof(struct sim_node_t));
 
 	while (1)
 	{
@@ -178,7 +178,7 @@ void *sim_cmd_out_thread(void *node)
 
 void sim_send_data(char *msg, pid_t sender)
 {
-	sim_node_t *nd;
+	struct sim_node_t *nd;
 
 	for (nd = node_list_get_head(); nd != NULL; nd = nd->next)
 	{
@@ -190,7 +190,7 @@ void sim_send_data(char *msg, pid_t sender)
 
 void sim_send_cmd(char *msg, U8 index)
 {
-	sim_node_t *nd;
+	struct sim_node_t *nd;
 
 	for (nd = node_list_get_head(); nd != NULL; nd = nd->next)
 	{
@@ -207,17 +207,17 @@ void sim_add_node(U8 index)
 {
 	pid_t pid, w;
 	int status;
-	sim_node_t *nd, *child;
+	struct sim_node_t *nd, *child;
 	char msg[ARGVMAX];
 
 	/* alloc the node descriptor */
-	nd = (sim_node_t *)malloc(sizeof(sim_node_t));
+	nd = (struct sim_node_t *)malloc(sizeof(struct sim_node_t));
 	if (!nd) {
 		printf("Malloc failed.\n");
 		return;
 	}
 
-	memset(nd, 0, sizeof(sim_node_t));
+	memset(nd, 0, sizeof(struct sim_node_t));
 
 	/* fork the process */
 	pid = fork();
@@ -282,7 +282,7 @@ void sim_add_node(U8 index)
 void sim_kill_nodes()
 {
 	char msg[30];
-	sim_node_t *nd;
+	struct sim_node_t *nd;
 
 	if (errno == EEXIST)
 		return;
@@ -311,7 +311,7 @@ void sim_kill_nodes()
 
 void sigchld_handler()
 {
-	sim_node_t *nd;
+	struct sim_node_t *nd;
 	pid_t pid;
 	int status;
 

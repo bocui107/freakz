@@ -36,10 +36,10 @@
 
 PROCESS(sim_process, "Simulation Process");
 
-static sim_node_t self_node;
+static struct sim_node_t self_node;
 extern process_event_t event_cmd_rcvd;
 
-sim_node_t *sim_get_self()
+struct sim_node_t *sim_get_self()
 {
 	return &self_node;
 }

@@ -54,30 +54,30 @@ void node_list_init()
     list_init(node_list);
 }
 
-sim_node_t *node_list_get_head()
+struct sim_node_t *node_list_get_head()
 {
     return list_head(node_list);
 }
 
-void node_list_add(sim_node_t *entry)
+void node_list_add(struct sim_node_t *entry)
 {
     list_add(node_list, entry);
 }
 
-void node_list_remove(sim_node_t *entry)
+void node_list_remove(struct sim_node_t *entry)
 {
     list_remove(node_list, entry);
     free(entry);
 }
 
-sim_node_t *node_list_pop()
+struct sim_node_t *node_list_pop()
 {
-    return (sim_node_t *)list_pop(node_list);
+    return (struct sim_node_t *)list_pop(node_list);
 }
 
 void node_list_print()
 {
-	sim_node_t *node;
+	struct sim_node_t *node;
 
 	printf("Current node PIDs are:\n");
 	for (node = list_head(node_list); node != NULL; node = node->next)

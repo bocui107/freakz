@@ -48,26 +48,26 @@
 #define ARGVMAX		128
 #define MAXNODES	7
 
-typedef struct
+struct pipe_t
 {
 	int pipe;
 	char name[30];
 	pthread_t thread;
-} pipe_t;
+};
 
-typedef struct _sim_node_t
+struct sim_node_t
 {
-	struct _sim_node_t *next;
+	struct sim_node_t *next;
 	int	pid;
 	int	index;
 	U16	addr;
-	pipe_t	data_in;
-	pipe_t	data_out;
-	pipe_t	cmd_in;
-	pipe_t	cmd_out;
+	struct pipe_t	data_in;
+	struct pipe_t	data_out;
+	struct pipe_t	cmd_in;
+	struct pipe_t	cmd_out;
 	U8	buf[ARGVMAX];
 	U8	cmdbuf[ARGVMAX];
-} sim_node_t;
+};
 
 enum {
 	READPIPE,

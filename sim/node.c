@@ -33,9 +33,9 @@
 #include "sim.h"
 #include "type.h"
 
-static sim_node_t self_node;
+static struct sim_node_t self_node;
 
-sim_node_t *get_self()
+struct sim_node_t *get_self()
 {
 	return &self_node;
 }

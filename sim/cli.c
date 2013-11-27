@@ -152,7 +152,7 @@ void cli()
 {
 	char msg[MSGBUFSIZE];
 	char *msg_ptr = NULL;
-	sim_node_t *nd;
+	struct sim_node_t *nd;
 
 	while (1)
 	{
@@ -209,7 +209,7 @@ void send_cmd(char *str)
 void add_node(char *str)
 {
 	U8 index;
-	sim_node_t *nd;
+	struct sim_node_t *nd;
 	char *tmp;
 
 	tmp = strtok(str, " ");
@@ -234,7 +234,7 @@ void add_node(char *str)
 void kill_node(char *str)
 {
 	U8 index;
-	sim_node_t *nd;
+	struct sim_node_t *nd;
 	char *tmp;
 
 	tmp = strtok(str, " ");

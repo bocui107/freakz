@@ -60,7 +60,7 @@ extern process_event_t event_data_in;
 extern process_event_t event_cmd_rcvd;
 extern int errno;
 static sim_node_t node;             // node struct that holds info related to node communications
-static pipe_t pp;                   // public pipe used to initially communicate with sim shell
+static struct pipe_t pp;                   // public pipe used to initially communicate with sim shell
 static char cmd[BUFSIZE];
 FILE *fp;
 FILE *fout;

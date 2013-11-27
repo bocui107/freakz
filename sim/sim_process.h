@@ -27,5 +27,5 @@
 #include "contiki.h"
 #include "sim.h"
 
-sim_node_t *sim_get_self();
+struct sim_node_t *sim_get_self();
 PROCESS_NAME(sim_process);

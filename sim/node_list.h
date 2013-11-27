@@ -40,8 +40,8 @@
 *******************************************************************/
 
 void node_list_init();
-sim_node_t *node_list_get_head();
-void node_list_add(sim_node_t *entry);
-sim_node_t *node_list_pop();
+struct sim_node_t *node_list_get_head();
+void node_list_add(struct sim_node_t *entry);
+struct sim_node_t *node_list_pop();
 void node_list_print();
-void node_list_remove(sim_node_t *entry);
+void node_list_remove(struct sim_node_t *entry);

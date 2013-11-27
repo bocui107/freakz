@@ -50,12 +50,12 @@
 #define BUFSIZE 128
 #define NAMESIZE 50
 
-typedef struct
+struct pipe_t
 {
 	int pipe;
 	char name[NAMESIZE];
 	pthread_t thread;
-} pipe_t;
+};
 
 typedef struct _sim_node_t
 {
@@ -63,10 +63,10 @@ typedef struct _sim_node_t
 	int		pid;
 	int		index;
 	U16		addr;
-	pipe_t		data_in;
-	pipe_t		data_out;
-	pipe_t		cmd_in;
-	pipe_t		cmd_out;
+	struct pipe_t	data_in;
+	struct pipe_t	data_out;
+	struct pipe_t	cmd_in;
+	struct pipe_t	cmd_out;
 	U8		buf[BUFSIZE];
 } sim_node_t;
 
