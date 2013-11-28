@@ -47,32 +47,32 @@
 #include "sim.h"
 #include "list.h"
 
-LIST(node_list);
+static LIST_HEAD(node_list);
 
 void node_list_init()
 {
-    list_init(node_list);
+    INIT_LIST_HEAD(&node_list);
 }
 
 struct sim_node_t *node_list_get_head()
 {
-    return list_head(node_list);
+    return node_list;
 }
 
 void node_list_add(struct sim_node_t *entry)
 {
-    list_add(node_list, entry);
+    list_add(&node_list, entry);
 }
 
 void node_list_remove(struct sim_node_t *entry)
 {
-    list_remove(node_list, entry);
+    list_remove(&node_list, entry);
     free(entry);
 }
 
 struct sim_node_t *node_list_pop()
 {
-    return (struct sim_node_t *)list_pop(node_list);
+    return (struct sim_node_t *)list_pop(&node_list);
 }
 
 void node_list_print()
@@ -80,7 +80,7 @@ void node_list_print()
 	struct sim_node_t *node;
 
 	printf("Current node PIDs are:\n");
-	for (node = list_head(node_list); node != NULL; node = node->next)
+	list_for_each_entry(node, &node_list, list)
 		printf("Node Index = %d, PID = %d.\n", node->index, node->pid);
 
 	printf("\n");

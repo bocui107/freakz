@@ -47,12 +47,6 @@
  */
 #include "list.h"
 
-#define NULL 0
-
-struct list {
-	struct list *next;
-};
-
 /**
  * Initialize a list.
  *
@@ -61,9 +55,9 @@ struct list {
  *
  * \param list The list to be initialized.
  */
-void list_init(list_t list)
+void list_init(struct list_head *list)
 {
-	*list = NULL;
+	list->next = NULL;
 }
 
 /**
@@ -77,9 +71,9 @@ void list_init(list_t list)
  *
  * \sa list_tail()
  */
-void * list_head(list_t list)
+struct list_head *list_head(struct list_head *list)
 {
-	return *list;
+	return list->next;
 }
 
 /**
@@ -94,9 +88,9 @@ void * list_head(list_t list)
  * \param dest The destination list.
  * \param src The source list.
  */
-void list_copy(list_t dest, list_t src)
+void list_copy(struct list_head *dest, struct list_head *src)
 {
-	*dest = *src;
+	dest->next = src->next;
 }
 
 /**
@@ -110,14 +104,11 @@ void list_copy(list_t dest, list_t src)
  *
  * \sa list_head()
  */
-void * list_tail(list_t list)
+struct list_head *list_tail(struct list_head *list)
 {
-	struct list *l;
+	struct list_head *l = list;
 
-	if(*list == NULL)
-		return NULL;
-
-	for(l = *list; l->next != NULL; l = l->next);
+	for(; l->next != NULL; l = l->next);
 
 	return l;
 }
@@ -133,27 +124,22 @@ void * list_tail(list_t list)
  * \sa list_push()
  *
  */
-void list_add(list_t list, void *item)
+void list_add(struct list_head *list, struct list_head *item)
 {
-	struct list *l;
+	struct list_head *l;
 
-	((struct list *)item)->next = NULL;
-
+	item->next = NULL;
 	l = list_tail(list);
-
-	if(l == NULL)
-		*list = item;
-	else
-		l->next = item;
+	l->next = item;
 }
 
 /*
  * Add an item to the start of the list.
  */
-void list_push(list_t list, void *item)
+void list_push(struct list_head *list, struct list_head *item)
 {
-	((struct list *)item)->next = *list;
-	*list = item;
+	item->next = list;
+	list->next = item;
 }
 
 /*
@@ -165,20 +151,20 @@ void list_push(list_t list, void *item)
  * \return The removed object
  *
  */
-void * list_chop(list_t list)
+struct list_head *list_chop(struct list_head *list)
 {
-	struct list *l, *r;
+	struct list_head *l, *r;
 
-	if(*list == NULL)
+	if(list->next == NULL)
 		return NULL;
 
-	if(((struct list *)*list)->next == NULL) {
-		l = *list;
-		*list = NULL;
+	if(list->next->next == NULL) {
+		l = list;
+		list = NULL;
 		return l;
 	}
 
-	for(l = *list; l->next->next != NULL; l = l->next);
+	for(l = list->next; l->next->next != NULL; l = l->next);
 
 	r = l->next;
 	l->next = NULL;
@@ -195,12 +181,12 @@ void * list_chop(list_t list)
  * \param list The list.
  * \return The new head of the list.
  */
-void * list_pop(list_t list)
+struct list_head *list_pop(struct list_head *list)
 {
-	if(*list != NULL)
-		*list = ((struct list *)*list)->next;
+	if(list->next != NULL)
+		list = list->next;
 
-	return *list;
+	return list;
 }
 
 /**
@@ -212,23 +198,19 @@ void * list_pop(list_t list)
  * \param item The item that is to be removed from the list.
  *
  */
-void list_remove(list_t list, void *item)
+void list_remove(struct list_head *list,
+		 struct list_head *item)
 {
-	struct list *l, *r;
+	struct list_head *l, *r;
 
-	if(*list == NULL)
+	if(list->next == NULL)
 		return;
 
-	r = NULL;
-	for(l = *list; l != NULL; l = l->next) {
+	r = list;
+	for(l = list->next; l != NULL; l = l->next) {
 		if(l == item) {
-			if(r == NULL)
-				/* First on list */
-				*list = l->next;
-			else
-				/* Not first on list */
-				r->next = l->next;
-
+			/* Not first on list */
+			r->next = l->next;
 			l->next = NULL;
 			return;
 		}
@@ -244,12 +226,12 @@ void list_remove(list_t list, void *item)
  * \param list The list.
  * \return The length of the list.
  */
-int list_length(list_t list)
+int list_length(struct list_head *list)
 {
-	struct list *l;
+	struct list_head *l;
 	int n = 0;
 
-	for(l = *list; l != NULL; l = l->next) {
+	for(l = list->next; l != NULL; l = l->next) {
 		++n;
 	}
 
@@ -271,12 +253,14 @@ int list_length(list_t list)
  *             start of the list.
  *
  */
-void list_insert(list_t list, void *previtem, void *newitem)
+void list_insert(struct list_head *list,
+		 struct list_head *previtem,
+		 struct list_head *newitem)
 {
 	if(previtem == NULL) {
 		list_push(list, newitem);
 	} else {
-		((struct list *)newitem)->next = ((struct list *)previtem)->next;
-		((struct list *)previtem)->next = newitem;
+		newitem->next = previtem->next;
+		previtem->next = newitem;
 	}
 }

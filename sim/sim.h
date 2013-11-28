@@ -43,6 +43,7 @@
 
 #include "type.h"
 #include "cli.h"
+#include "list.h"
 
 #define MSGBUFSIZE	512
 #define ARGVMAX		128
@@ -57,7 +58,7 @@ struct pipe_t
 
 struct sim_node_t
 {
-	struct sim_node_t *next;
+	struct list_head *list;
 	int	pid;
 	int	index;
 	U16	addr;

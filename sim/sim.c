@@ -89,7 +89,7 @@ void *sim_data_out_thread(void *node)
 		printf("\n");
 
 		/* this is where the magic happen */
-		for (sibling = node_list_get_head(); sibling != NULL; sibling = sibling->next)
+		list_for_each_entry(sibling, &node_list, list)
 		{
 			/*
 			 * if the indices are less than maxnodes, then process them
@@ -180,7 +180,7 @@ void sim_send_data(char *msg, pid_t sender)
 {
 	struct sim_node_t *nd;
 
-	for (nd = node_list_get_head(); nd != NULL; nd = nd->next)
+	list_for_each_entry(nd, &node_list, list)
 	{
 		/* the length of the transfer is in the 1st byte of the frame */
 		if ((write(nd->data_in.pipe, msg, strlen(msg) + 1)) == -1)
@@ -192,7 +192,7 @@ void sim_send_cmd(char *msg, U8 index)
 {
 	struct sim_node_t *nd;
 
-	for (nd = node_list_get_head(); nd != NULL; nd = nd->next)
+	list_for_each_entry(nd, &node_list, list)
 	{
 		if (nd->index == index)
 		{
@@ -317,7 +317,7 @@ void sigchld_handler()
 
 	pid = waitpid(-1, &status, WNOHANG);
 
-	for (nd = node_list_get_head(); nd != NULL; nd = nd->next)
+	list_for_each_entry(nd, &node_list, list)
 	{
 		if (nd->pid == pid)
 			break;

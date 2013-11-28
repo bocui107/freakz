@@ -220,7 +220,7 @@ void add_node(char *str)
 	}
 
 	index = strtol(tmp, NULL, 10);
-	for (nd = node_list_get_head(); nd != NULL; nd = nd->next)
+	list_for_each_entry(nd, &node_list, list)
 	{
 		if (nd->index == index)
 		{
@@ -246,7 +246,7 @@ void kill_node(char *str)
 
 	index = strtol(tmp, NULL, 10);
 
-	for (nd = node_list_get_head(); nd != NULL; nd = nd->next)
+	list_for_each_entry(nd, &node_list, list)
 	{
 		if (nd->index == index)
 		{
