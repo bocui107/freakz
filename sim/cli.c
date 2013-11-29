@@ -54,7 +54,6 @@
 
 #include "type.h"
 #include "sim.h"
-#include "node_list.h"
 #include "cli.h"
 
 /* main file pointer to the current script */
@@ -220,21 +219,12 @@ void add_node(char *str)
 	}
 
 	index = strtol(tmp, NULL, 10);
-	list_for_each_entry(nd, &node_list, list)
-	{
-		if (nd->index == index)
-		{
-			printf("ADD_NODE: Duplicate index. Cannot add.\n");
-			return;
-		}
-	}
 	sim_add_node(index);
 }
 
 void kill_node(char *str)
 {
 	U8 index;
-	struct sim_node_t *nd;
 	char *tmp;
 
 	tmp = strtok(str, " ");
@@ -245,35 +235,12 @@ void kill_node(char *str)
 	}
 
 	index = strtol(tmp, NULL, 10);
-
-	list_for_each_entry(nd, &node_list, list)
-	{
-		if (nd->index == index)
-		{
-			if (pthread_kill(nd->data_out.thread, 0))
-				perror("pthread_kill");
-
-			if (pthread_kill(nd->cmd_out.thread, 0))
-				perror("pthread_kill");
-
-			close(nd->data_out.pipe);
-			close(nd->data_in.pipe);
-			close(nd->cmd_in.pipe);
-
-			unlink(nd->data_in.name);
-			unlink(nd->data_out.name);
-			unlink(nd->cmd_in.name);
-
-			kill(nd->pid, SIGTERM);
-			node_list_remove(nd);
-			printf("Node %d was terminated.\n", nd->index);
-		}
-	}
+	sim_kill_nodes(index);
 }
 
 void list_nodes(char *str)
 {
-	node_list_print();
+	sim_list_print();
 }
 
 void process_script(char *str)

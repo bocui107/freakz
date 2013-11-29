@@ -58,7 +58,7 @@ struct pipe_t
 
 struct sim_node_t
 {
-	struct list_head *list;
+	struct list_head list;
 	int	pid;
 	int	index;
 	U16	addr;
@@ -77,6 +77,8 @@ enum {
 
 void cli();
 void sim_add_node(U8 index);
+void sim_kill_nodes(U8 index);
 void sim_send_data(char *msg, pid_t sender);
 void sim_send_cmd(char *msg, U8 index);
+void sim_list_print(void);
 #endif

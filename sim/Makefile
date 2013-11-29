@@ -1,7 +1,7 @@
 
 CC = gcc
 CFLAGS = -c
-SOURCES = sim.c cli.c list.c node_list.c
+SOURCES = sim.c cli.c list.c
 OBJECTS = $(SOURCES:.c=.o)
 EXE = sim
 

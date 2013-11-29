@@ -50,10 +50,10 @@
 #include <sys/types.h>
 #include "type.h"
 #include "sim.h"
-#include "node_list.h"
 
 static struct pipe_t pp;
 extern int errno;
+static LIST_HEAD(node_list);
 
 static U8 conn_map[MAXNODES][MAXNODES] = {
 	{0, 1, 1, 0, 0, 0, 0,},   // node 1
@@ -203,12 +203,31 @@ void sim_send_cmd(char *msg, U8 index)
 	}
 }
 
+void sim_list_print(void) {
+	struct sim_node_t *node;
+
+	printf("Current node PIDs are:\n");
+	list_for_each_entry(node, &node_list, list)
+		printf("Node Index = %d, PID = %d.\n", node->index, node->pid);
+
+	printf("\n");
+}
+
 void sim_add_node(U8 index)
 {
 	pid_t pid, w;
 	int status;
 	struct sim_node_t *nd, *child;
 	char msg[ARGVMAX];
+
+	list_for_each_entry(nd, &node_list, list)
+	{
+		if (nd->index == index)
+		{
+			printf("ADD_NODE: Duplicate index. Cannot add.\n");
+			return;
+		}
+	}
 
 	/* alloc the node descriptor */
 	nd = (struct sim_node_t *)malloc(sizeof(struct sim_node_t));
@@ -274,12 +293,43 @@ void sim_add_node(U8 index)
 		if (pthread_create(&nd->cmd_out.thread, NULL, sim_cmd_out_thread, nd) > 0)
 			perror("pthread_create");
 
-		node_list_add(nd);
+		list_add(&node_list, &nd->list);
 		break;
 	}
 }
 
-void sim_kill_nodes()
+void sim_kill_nodes(U8 index)
+{
+	struct sim_node_t *nd;
+
+	list_for_each_entry(nd, &node_list, list)
+	{
+		if (nd->index == index)
+		{
+			if (pthread_kill(nd->data_out.thread, 0))
+				perror("pthread_kill");
+
+			if (pthread_kill(nd->cmd_out.thread, 0))
+				perror("pthread_kill");
+
+			close(nd->data_out.pipe);
+			close(nd->data_in.pipe);
+			close(nd->cmd_in.pipe);
+
+			unlink(nd->data_in.name);
+			unlink(nd->data_out.name);
+			unlink(nd->cmd_in.name);
+
+			kill(nd->pid, SIGTERM);
+			list_remove(&node_list, &nd->list);
+			free(nd);
+
+			printf("Node %d was terminated.\n", nd->index);
+		}
+	}
+}
+
+static void sim_kill_all_nodes()
 {
 	char msg[30];
 	struct sim_node_t *nd;
@@ -289,21 +339,10 @@ void sim_kill_nodes()
 
 	if (errno == EINTR)
 	{
-		while ((nd = node_list_get_head()) != NULL)
+		list_for_each_entry(nd, &node_list, list)
 		{
 			close(pp.pipe);
-			close(nd->data_out.pipe);
-			close(nd->data_in.pipe);
-			close(nd->cmd_in.pipe);
-
-			if (pthread_kill(nd->data_out.thread, 0) != 0)
-				perror("pthread_kill");
-
-			kill(nd->pid, SIGTERM);
-			unlink(nd->data_in.name);
-			unlink(nd->data_out.name);
-			unlink(nd->cmd_in.name);
-			node_list_pop();
+			sim_kill_nodes(nd->index);
 		}
 		exit(EXIT_SUCCESS);
 	}
@@ -337,18 +376,18 @@ int main (int argc, char *argv[])
 {
 	char msg[50];
 
-	node_list_init();
+	INIT_LIST_HEAD(&node_list);
 
 	/*
 	 * register the abort function
 	 */
-	atexit(sim_kill_nodes);
+	atexit(sim_kill_all_nodes);
 
 	/*
 	 * When the program is abort(interrupt) signal, the user input
 	 * INTR character(Ctrl + c) to notify the font process group.
 	 */
-	signal(SIGINT, sim_kill_nodes);
+	signal(SIGINT, sim_kill_all_nodes);
 
 	/*
 	 * When a thread is stop or abort, the thread will send
