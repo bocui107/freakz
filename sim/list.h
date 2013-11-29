@@ -25,15 +25,7 @@
 #ifndef __LIST_H__
 #define __LIST_H__
 
-#undef NULL
-#define NULL ((void *)0)
-
-#undef offsetof
-#ifdef __compiler_offsetof
-#define offsetof(TYPE,MEMBER) __compiler_offsetof(TYPE,MEMBER)
-#else
-#define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
-#endif
+#include "stddef.h"
 
 /**
  * container_of - cast a member of a structure out to the containing structure
