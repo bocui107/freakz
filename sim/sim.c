@@ -298,6 +298,29 @@ void sim_add_node(U8 index)
 	}
 }
 
+void static kill_a_node(struct sim_node_t *nd)
+{
+	kill(nd->pid, SIGTERM);
+	pthread_cancel(nd->cmd_out.thread);
+	pthread_cancel(nd->data_out.thread);
+	pthread_join(nd->cmd_out.thread, NULL);
+	pthread_join(nd->data_out.thread, NULL);
+
+	close(nd->data_out.pipe);
+	close(nd->data_in.pipe);
+	close(nd->cmd_in.pipe);
+
+	unlink(nd->data_in.name);
+	unlink(nd->data_out.name);
+	unlink(nd->cmd_in.name);
+	sleep(1);
+	list_remove(&node_list, &nd->list);
+	free(nd);
+
+	printf("Node %d was terminated.\n", nd->index);
+}
+
+
 void sim_kill_nodes(U8 index)
 {
 	struct sim_node_t *nd;
@@ -305,27 +328,7 @@ void sim_kill_nodes(U8 index)
 	list_for_each_entry(nd, &node_list, list)
 	{
 		if (nd->index == index)
-		{
-			if (pthread_kill(nd->data_out.thread, 0))
-				perror("pthread_kill");
-
-			if (pthread_kill(nd->cmd_out.thread, 0))
-				perror("pthread_kill");
-
-			close(nd->data_out.pipe);
-			close(nd->data_in.pipe);
-			close(nd->cmd_in.pipe);
-
-			unlink(nd->data_in.name);
-			unlink(nd->data_out.name);
-			unlink(nd->cmd_in.name);
-
-			kill(nd->pid, SIGTERM);
-			list_remove(&node_list, &nd->list);
-			free(nd);
-
-			printf("Node %d was terminated.\n", nd->index);
-		}
+			kill_a_node(nd);
 	}
 }
 
@@ -339,10 +342,11 @@ static void sim_kill_all_nodes()
 
 	if (errno == EINTR)
 	{
+		close(pp.pipe);
+		unlink(pp.name);
 		list_for_each_entry(nd, &node_list, list)
 		{
-			close(pp.pipe);
-			sim_kill_nodes(nd->index);
+			kill_a_node(nd);
 		}
 		exit(EXIT_SUCCESS);
 	}
@@ -362,6 +366,10 @@ void sigchld_handler()
 			break;
 	}
 
+	/*
+	 * WIFSIGNALED: 如果子进程是因为信号而结束则此宏值为真
+	 * WTERMSIG(status)取得子进程因信号而中止的信号代码，一般会先用WIFSIGNALED 来判断后才使用此宏
+	 */
 	if(WIFSIGNALED(status) && (WTERMSIG(status) == SIGSEGV))
 	{
 		if(nd == NULL)

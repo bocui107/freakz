@@ -131,13 +131,14 @@ static void sigint_handler()
 		perror("node eexist");
 		break;
 	case EINTR:
+		pthread_cancel(node.data_in.thread);
+		pthread_cancel(node.cmd_in.thread);
+		pthread_join(node.cmd_in.thread, NULL);
+		pthread_join(node.data_in.thread, NULL);
 		close(node.data_in.pipe);
 		close(node.data_out.pipe);
 		close(node.cmd_in.pipe);
-		pthread_cancel(node.data_in.thread);
-		pthread_cancel(node.data_out.thread);
-		pthread_cancel(node.cmd_in.thread);
-		pthread_cancel(node.cmd_out.thread);
+		close(node.cmd_out.pipe);
 		fclose(fp);
 		exit(EXIT_SUCCESS);
 		break;
@@ -155,13 +156,15 @@ sim_node_t *node_get()
 
 static void sigkill_handler()
 {
+	pthread_cancel(node.data_in.thread);
+	pthread_cancel(node.cmd_in.thread);
+	pthread_join(node.cmd_in.thread, NULL);
+	pthread_join(node.data_in.thread, NULL);
 	close(node.data_in.pipe);
 	close(node.data_out.pipe);
 	close(node.cmd_in.pipe);
-	pthread_cancel(node.data_in.thread);
-	pthread_cancel(node.data_out.thread);
-	pthread_cancel(node.cmd_in.thread);
-	pthread_cancel(node.cmd_out.thread);
+	close(node.cmd_out.pipe);
+	close(pp.pipe);
 	fclose(fp);
 	exit(EXIT_SUCCESS);
 }
@@ -229,6 +232,7 @@ int main(int argc, char *argv[])
 	/* register the signal handler */
 	signal(SIGINT, sigint_handler);
 	signal(SIGKILL, sigkill_handler);
+	signal(SIGTERM, sigkill_handler);
 
 	/* set up node parameters */
 	node.pid = getpid();
