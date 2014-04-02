@@ -118,10 +118,4 @@ typedef unsigned short u16_t;
 typedef unsigned long u32_t;
 typedef unsigned short uip_stats_t;
 typedef unsigned long off_t;
-
-void clock_delay(unsigned int us2);
-void clock_wait(int ms10);
-void clock_set_seconds(unsigned long s);
-unsigned long clock_seconds(void);
-
 #endif /* __CONTIKI_CONF_H__ */

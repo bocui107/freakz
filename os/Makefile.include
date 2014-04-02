@@ -37,8 +37,8 @@ endif
 
 include $(CONTIKI)/../freakz/Makefile.freakz
 
-SYSTEM  = process.c procinit.c autostart.c profile.c profile-aggregates.c
-LIBS    = memb.c timer.c list.c etimer.c energest.c rtimer.c ctimer.c mmem.c
+SYSTEM  = process.c procinit.c autostart.c
+LIBS    = memb.c timer.c list.c etimer.c rtimer.c ctimer.c mmem.c
 
 CONTIKIFILES = $(SYSTEM) $(LIBS)
 

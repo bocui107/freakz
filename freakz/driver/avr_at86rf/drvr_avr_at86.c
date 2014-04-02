@@ -48,7 +48,6 @@
 #include <stdio.h>
 #include "freakz.h"
 #include "hal.h"
-#include "rand.h"
 #include "drvr_avr_at86.h"
 #include "at86rf230_registermap.h"
 
