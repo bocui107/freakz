@@ -30,7 +30,6 @@
  *
  * Author: Adam Dunkels <adam@sics.se>
  *
- * $Id: pt.h,v 1.2 2006/09/26 20:57:58 adamdunkels Exp $
  */
 
 /**
@@ -46,8 +45,8 @@
  *
  */
 
-#ifndef __PT_H__
-#define __PT_H__
+#ifndef PT_H_
+#define PT_H_
 
 #include "sys/lc.h"
 
@@ -112,7 +111,7 @@ struct pt {
  *
  * \hideinitializer
  */
-#define PT_BEGIN(pt) { char PT_YIELD_FLAG = 1; LC_RESUME((pt)->lc)
+#define PT_BEGIN(pt) { char PT_YIELD_FLAG = 1; if (PT_YIELD_FLAG) {;} LC_RESUME((pt)->lc)
 
 /**
  * Declare the end of a protothread.
@@ -259,7 +258,7 @@ struct pt {
 /**
  * Schedule a protothread.
  *
- * This function shedules a protothread. The return value of the
+ * This function schedules a protothread. The return value of the
  * function is non-zero if the protothread is running or zero if the
  * protothread has exited.
  *
@@ -318,6 +317,6 @@ struct pt {
 
 /** @} */
 
-#endif /* __PT_H__ */
+#endif /* PT_H_ */
 
 /** @} */

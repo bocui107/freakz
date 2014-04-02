@@ -1,8 +1,11 @@
+/** \addtogroup sys
+ * @{ */
+
 /**
  * \defgroup rt Real-time task scheduling
  *
  * The real-time module handles the scheduling and execution of
- * real-time tasks (with predictible execution times).
+ * real-time tasks (with predictable execution times).
  *
  * @{
  */
@@ -45,13 +48,18 @@
  *
  * This file is part of the Contiki operating system.
  *
- * @(#)$Id: rtimer.h,v 1.6 2007/10/23 20:33:19 adamdunkels Exp $
  */
-#ifndef __RTIMER_H__
-#define __RTIMER_H__
+#ifndef RTIMER_H_
+#define RTIMER_H_
 
+#include "contiki-conf.h"
+
+#ifndef RTIMER_CLOCK_LT
 typedef unsigned short rtimer_clock_t;
 #define RTIMER_CLOCK_LT(a,b)     ((signed short)((a)-(b)) < 0)
+#endif /* RTIMER_CLOCK_LT */
+
+#include "rtimer-arch.h"
 
 /**
  * \brief      Initialize the real-time scheduler.
@@ -66,7 +74,7 @@ struct rtimer;
 typedef void (* rtimer_callback_t)(struct rtimer *t, void *ptr);
 
 /**
- * \brief      Repressentation of a real-time task
+ * \brief      Representation of a real-time task
  *
  *             This structure represents a real-time task and is used
  *             by the real-time module and the architecture specific
@@ -89,14 +97,17 @@ enum {
  * \brief      Post a real-time task.
  * \param task A pointer to the task variable previously declared with RTIMER_TASK().
  * \param time The time when the task is to be executed.
+ * \param duration Unused argument.
+ * \param func A function to be called when the task is executed.
+ * \param ptr An opaque pointer that will be supplied as an argument to the callback function.
  * \return     Non-zero (true) if the task could be scheduled, zero
  *             (false) if the task could not be scheduled.
  *
- *             This function schedules a real-time task a specified
+ *             This function schedules a real-time task at a specified
  *             time in the future.
  *
  */
-int rtimer_set(struct rtimer *t, rtimer_clock_t time,
+int rtimer_set(struct rtimer *task, rtimer_clock_t time,
 	       rtimer_clock_t duration, rtimer_callback_t func, void *ptr);
 
 /**
@@ -139,8 +150,7 @@ void rtimer_arch_schedule(rtimer_clock_t t);
 
 #define RTIMER_SECOND RTIMER_ARCH_SECOND
 
-#include "rtimer-arch.h"
+#endif /* RTIMER_H_ */
 
-#endif /* __RTIMER_H__ */
-
+/** @} */
 /** @} */

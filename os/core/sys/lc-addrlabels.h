@@ -30,7 +30,6 @@
  *
  * Author: Adam Dunkels <adam@sics.se>
  *
- * $Id: lc-addrlabels.h,v 1.1 2006/06/17 22:41:20 adamdunkels Exp $
  */
 
 /**
@@ -57,8 +56,8 @@
  * implementation.
  */
 
-#ifndef __LC_ADDRLABELS_H__
-#define __LC_ADDRLABELS_H__
+#ifndef LC_ADDRLABELS_H_
+#define LC_ADDRLABELS_H_
 
 /** \hideinitializer */
 typedef void * lc_t;
@@ -78,5 +77,5 @@ typedef void * lc_t;
 
 #define LC_END(s)
 
-#endif /* __LC_ADDRLABELS_H__ */
+#endif /* LC_ADDRLABELS_H_ */
 /** @} */

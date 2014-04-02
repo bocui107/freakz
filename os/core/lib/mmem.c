@@ -28,7 +28,6 @@
  *
  * This file is part of the Contiki operating system.
  *
- * @(#)$Id: mmem.c,v 1.2 2006/12/22 17:14:06 barner Exp $
  */
 
 /**
@@ -41,7 +40,7 @@
  *         Implementation of the managed memory allocator
  * \author
  *         Adam Dunkels <adam@sics.se>
- *
+ * 
  */
 
 
@@ -50,12 +49,17 @@
 #include "contiki-conf.h"
 #include <string.h>
 
-#define MMEM_SIZE 2048
+#ifdef MMEM_CONF_SIZE
+#define MMEM_SIZE MMEM_CONF_SIZE
+#else
+#define MMEM_SIZE 4096
+#endif
 
 LIST(mmemlist);
 unsigned int avail_memory;
 static char memory[MMEM_SIZE];
 
+/*---------------------------------------------------------------------------*/
 /**
  * \brief      Allocate a managed memory block
  * \param m    A pointer to a struct mmem.
@@ -75,37 +79,33 @@ static char memory[MMEM_SIZE];
  *             allocated memory.
  *
  */
-int mmem_alloc(struct mmem *m, unsigned int size)
+int
+mmem_alloc(struct mmem *m, unsigned int size)
 {
-	/* Check if we have enough memory left for this allocation. */
-	if(avail_memory < size)
-		return 0;
+  /* Check if we have enough memory left for this allocation. */
+  if(avail_memory < size) {
+    return 0;
+  }
 
-	/*
-	 * We had enough memory so we add this memory block to the end of
-	 * the list of allocated memory blocks.
-	 */
-	list_add(mmemlist, m);
+  /* We had enough memory so we add this memory block to the end of
+     the list of allocated memory blocks. */
+  list_add(mmemlist, m);
 
-	/*
-	 * Set up the pointer so that it points to the first available byte
-	 * in the memory block.
-	 */
-	m->ptr = &memory[MMEM_SIZE - avail_memory];
+  /* Set up the pointer so that it points to the first available byte
+     in the memory block. */
+  m->ptr = &memory[MMEM_SIZE - avail_memory];
 
-	/* Remember the size of this memory block. */
-	m->size = size;
+  /* Remember the size of this memory block. */
+  m->size = size;
 
-	/* Decrease the amount of available memory. */
-	avail_memory -= size;
+  /* Decrease the amount of available memory. */
+  avail_memory -= size;
 
-	/*
-	 * Return non-zero to indicate that we were able to allocate
-	 * memory.
-	 */
-	return 1;
+  /* Return non-zero to indicate that we were able to allocate
+     memory. */
+  return 1;
 }
-
+/*---------------------------------------------------------------------------*/
 /**
  * \brief      Deallocate a managed memory block
  * \param m    A pointer to the managed memory block
@@ -115,39 +115,30 @@ int mmem_alloc(struct mmem *m, unsigned int size)
  *             previously has been allocated with mmem_alloc().
  *
  */
-void mmem_free(struct mmem *m)
+void
+mmem_free(struct mmem *m)
 {
-	struct mmem *n;
+  struct mmem *n;
 
-	if(m->next != NULL) {
-		/*
-		 * Compact the memory after the allocation that is to be removed
-		 * by moving it downwards.
-		 *
-		 * memmove(void *dest, const void *src,size_t n) 
-		 * Copy n size from src to dest. And memmove will deal with
-		 * the overlap region.
-		 */
-		memmove(m->ptr,
-			m->next->ptr,
-			&memory[MMEM_SIZE - avail_memory] - (char *)m->next->ptr
-			);
+  if(m->next != NULL) {
+    /* Compact the memory after the allocation that is to be removed
+       by moving it downwards. */
+    memmove(m->ptr, m->next->ptr,
+	    &memory[MMEM_SIZE - avail_memory] - (char *)m->next->ptr);
+    
+    /* Update all the memory pointers that points to memory that is
+       after the allocation that is to be removed. */
+    for(n = m->next; n != NULL; n = n->next) {
+      n->ptr = (void *)((char *)n->ptr - m->size);
+    }
+  }
 
-		/*
-		 * Update all the memory pointers that points to memory that is
-		 * after the allocation that is to be removed.
-		 */
-		for(n = m->next; n != NULL; n = n->next) {
-			n->ptr = (void *)((char *)n->ptr - m->size);
-		}
-	}
+  avail_memory += m->size;
 
-	avail_memory += m->size;
-
-	/* Remove the memory block from the list. */
-	list_remove(mmemlist, m);
+  /* Remove the memory block from the list. */
+  list_remove(mmemlist, m);
 }
-
+/*---------------------------------------------------------------------------*/
 /**
  * \brief      Initialize the managed memory module
  * \author     Adam Dunkels
@@ -157,8 +148,12 @@ void mmem_free(struct mmem *m)
  *             module.
  *
  */
-void mmem_init(void)
+void
+mmem_init(void)
 {
-	list_init(mmemlist);
-	avail_memory = MMEM_SIZE;
+  list_init(mmemlist);
+  avail_memory = MMEM_SIZE;
 }
+/*---------------------------------------------------------------------------*/
+
+/** @} */

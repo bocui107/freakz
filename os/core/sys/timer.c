@@ -42,16 +42,11 @@
  *
  * Author: Adam Dunkels <adam@sics.se>
  *
- * $Id: timer.c,v 1.2 2007/05/27 11:11:28 oliverschmidt Exp $
  */
-
-// suppress all lint messages for this file
-//lint --e{*}
 
 #include "contiki-conf.h"
 #include "sys/clock.h"
 #include "sys/timer.h"
-#include <stdio.h>
 
 /*---------------------------------------------------------------------------*/
 /**
@@ -125,23 +120,28 @@ timer_restart(struct timer *t)
 int
 timer_expired(struct timer *t)
 {
-  return (clock_time_t)(clock_time() - t->start) >= (clock_time_t)t->interval;
-}
+  /* Note: Can not return diff >= t->interval so we add 1 to diff and return
+     t->interval < diff - required to avoid an internal error in mspgcc. */
+  clock_time_t diff = (clock_time() - t->start) + 1;
+  return t->interval < diff;
 
-//int
-//timer_expired(struct timer *t)
-//{
-//    if ((clock_time_t)clock_time() >= (clock_time_t)t->start)
-//    {
-//        // normal case
-//        return ((clock_time_t)(clock_time() - t->start) >= (clock_time_t)t->interval);
-//    }
-//    else
-//    {
-//        // rollover case
-//        return ((clock_time_t)(CLOCK_TIME_MAX - t->start - clock_time()) >= (clock_time_t)t->interval);
-//    }
-//}
+}
+/*---------------------------------------------------------------------------*/
+/**
+ * The time until the timer expires
+ *
+ * This function returns the time until the timer expires.
+ *
+ * \param t A pointer to the timer
+ *
+ * \return The time until the timer expires
+ *
+ */
+clock_time_t
+timer_remaining(struct timer *t)
+{
+  return t->start + t->interval - clock_time();
+}
 /*---------------------------------------------------------------------------*/
 
 /** @} */

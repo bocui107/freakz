@@ -28,66 +28,18 @@
  *
  * This file is part of the Contiki operating system.
  *
- * $Id: energest.h,v 1.7 2007/11/17 21:24:50 oliverschmidt Exp $
  */
 
 /**
  * \file
- *         Header file for the energy estimation mechanism
+ *         Convenience function for printing system statistics
  * \author
  *         Adam Dunkels <adam@sics.se>
  */
 
-#ifndef __ENERGEST_H__
-#define __ENERGEST_H__
+#ifndef PRINT_STATS_H_
+#define PRINT_STATS_H_
 
-#include "sys/rtimer.h"
+void print_stats(void);
 
-typedef struct {
-  /*  unsigned long cummulative[2];*/
-  unsigned long current;
-} energest_t;
-
-enum energest_type {
-  ENERGEST_TYPE_CPU,
-  ENERGEST_TYPE_LPM,
-  ENERGEST_TYPE_IRQ,
-  ENERGEST_TYPE_LED_GREEN,
-  ENERGEST_TYPE_LED_YELLOW,
-  ENERGEST_TYPE_LED_RED,
-  ENERGEST_TYPE_TRANSMIT,
-  ENERGEST_TYPE_LISTEN,
-
-  ENERGEST_TYPE_SENSORS,
-
-  ENERGEST_TYPE_SERIAL,
-
-  ENERGEST_TYPE_MAX
-};
-
-void energest_init(void);
-unsigned long energest_type_time(int type);
-void energest_type_set(int type, unsigned long value);
-
-#if ENERGEST_CONF_ON
-/*extern int energest_total_count;*/
-extern energest_t energest_total_time[ENERGEST_TYPE_MAX];
-extern unsigned short energest_current_time[ENERGEST_TYPE_MAX];
-
-#define ENERGEST_ON(type)  do { \
-                           /*++energest_total_count;*/ \
-                           energest_current_time[type] = RTIMER_NOW(); \
-                           } while(0)
-#define ENERGEST_OFF(type) do { \
-                           energest_total_time[type].current += (unsigned long)((signed short)RTIMER_NOW() - \
-                           (signed short)energest_current_time[type]); \
-                           } while(0)
-#else /* ENERGEST_CONF_ON */
-#define ENERGEST_ON(type) do { } while(0)
-#define ENERGEST_OFF(type) do { } while(0)
-#endif /* ENERGEST_CONF_ON */
-
-unsigned long energest_arch_current_estimate(void);
-unsigned short energest_arch_now(void);
-
-#endif /* __ENERGEST_H__ */
+#endif /* PRINT_STATS_H_ */

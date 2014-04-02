@@ -33,7 +33,6 @@
  *
  * This file is part of the Contiki operating system.
  *
- * $Id: ctimer.c,v 1.5 2007/11/13 15:13:03 nifi Exp $
  */
 
 /**
@@ -43,7 +42,7 @@
  *         Adam Dunkels <adam@sics.se>
  */
 
-#include "ctimer.h"
+#include "sys/ctimer.h"
 #include "contiki.h"
 #include "lib/list.h"
 
@@ -59,80 +58,114 @@ static char initialized;
 #define PRINTF(...)
 #endif
 
-PROCESS(ctimer_process, "ctimer process");
+/*---------------------------------------------------------------------------*/
+PROCESS(ctimer_process, "Ctimer process");
 PROCESS_THREAD(ctimer_process, ev, data)
 {
-	struct ctimer *c;
+  struct ctimer *c;
+  PROCESS_BEGIN();
 
-	PROCESS_BEGIN();
+  for(c = list_head(ctimer_list); c != NULL; c = c->next) {
+    etimer_set(&c->etimer, c->etimer.timer.interval);
+  }
+  initialized = 1;
 
-	for(c = list_head(ctimer_list); c != NULL; c = c->next) {
-		etimer_set(&c->etimer, c->etimer.timer.interval);
+  while(1) {
+    PROCESS_YIELD_UNTIL(ev == PROCESS_EVENT_TIMER);
+    for(c = list_head(ctimer_list); c != NULL; c = c->next) {
+      if(&c->etimer == data) {
+	list_remove(ctimer_list, c);
+	PROCESS_CONTEXT_BEGIN(c->p);
+	if(c->f != NULL) {
+	  c->f(c->ptr);
 	}
-	initialized = 1;
-
-	while(1) {
-		PROCESS_YIELD_UNTIL(ev == PROCESS_EVENT_TIMER);
-		for(c = list_head(ctimer_list); c != NULL; c = c->next) {
-			if(&c->etimer == data) {
-				list_remove(ctimer_list, c);
-				PROCESS_CONTEXT_BEGIN(c->p);
-				if(c->f != NULL) {
-					c->f(c->ptr);
-				}
-				PROCESS_CONTEXT_END(c->p);
-				break;
-			}
-		}
-	}
-	PROCESS_END();
+	PROCESS_CONTEXT_END(c->p);
+	break;
+      }
+    }
+  }
+  PROCESS_END();
 }
-
-void ctimer_init(void)
+/*---------------------------------------------------------------------------*/
+void
+ctimer_init(void)
 {
-	initialized = 0;
-	list_init(ctimer_list);
-	process_start(&ctimer_process, NULL);
+  initialized = 0;
+  list_init(ctimer_list);
+  process_start(&ctimer_process, NULL);
 }
-
-void ctimer_set(struct ctimer *c, clock_time_t t,
+/*---------------------------------------------------------------------------*/
+void
+ctimer_set(struct ctimer *c, clock_time_t t,
 	   void (*f)(void *), void *ptr)
 {
-	PRINTF("ctimer_set %p %d\n", c, t);
-	c->p = PROCESS_CURRENT();
-	c->f = f;
-	c->ptr = ptr;
-	if(initialized) {
-		PROCESS_CONTEXT_BEGIN(&ctimer_process);
-		etimer_set(&c->etimer, t);
-		PROCESS_CONTEXT_END(&ctimer_process);
-	} else {
-		c->etimer.timer.interval = t;
-	}
+  PRINTF("ctimer_set %p %u\n", c, (unsigned)t);
+  c->p = PROCESS_CURRENT();
+  c->f = f;
+  c->ptr = ptr;
+  if(initialized) {
+    PROCESS_CONTEXT_BEGIN(&ctimer_process);
+    etimer_set(&c->etimer, t);
+    PROCESS_CONTEXT_END(&ctimer_process);
+  } else {
+    c->etimer.timer.interval = t;
+  }
 
-	list_remove(ctimer_list, c);
-	list_add(ctimer_list, c);
+  list_remove(ctimer_list, c);
+  list_add(ctimer_list, c);
 }
-
-void ctimer_reset(struct ctimer *c)
+/*---------------------------------------------------------------------------*/
+void
+ctimer_reset(struct ctimer *c)
 {
-	if(initialized) {
-		PROCESS_CONTEXT_BEGIN(&ctimer_process);
-		etimer_reset(&c->etimer);
-		PROCESS_CONTEXT_END(&ctimer_process);
-	}
+  if(initialized) {
+    PROCESS_CONTEXT_BEGIN(&ctimer_process);
+    etimer_reset(&c->etimer);
+    PROCESS_CONTEXT_END(&ctimer_process);
+  }
 
-	list_remove(ctimer_list, c);
-	list_add(ctimer_list, c);
+  list_remove(ctimer_list, c);
+  list_add(ctimer_list, c);
 }
-
-void ctimer_stop(struct ctimer *c)
+/*---------------------------------------------------------------------------*/
+void
+ctimer_restart(struct ctimer *c)
 {
-	if(initialized) {
-		etimer_stop(&c->etimer);
-	} else {
-		c->etimer.next = NULL;
-		c->etimer.p = PROCESS_NONE;
-	}
-	list_remove(ctimer_list, c);
+  if(initialized) {
+    PROCESS_CONTEXT_BEGIN(&ctimer_process);
+    etimer_restart(&c->etimer);
+    PROCESS_CONTEXT_END(&ctimer_process);
+  }
+
+  list_remove(ctimer_list, c);
+  list_add(ctimer_list, c);
 }
+/*---------------------------------------------------------------------------*/
+void
+ctimer_stop(struct ctimer *c)
+{
+  if(initialized) {
+    etimer_stop(&c->etimer);
+  } else {
+    c->etimer.next = NULL;
+    c->etimer.p = PROCESS_NONE;
+  }
+  list_remove(ctimer_list, c);
+}
+/*---------------------------------------------------------------------------*/
+int
+ctimer_expired(struct ctimer *c)
+{
+  struct ctimer *t;
+  if(initialized) {
+    return etimer_expired(&c->etimer);
+  }
+  for(t = list_head(ctimer_list); t != NULL; t = t->next) {
+    if(t == c) {
+      return 0;
+    }
+  }
+  return 1;
+}
+/*---------------------------------------------------------------------------*/
+/** @} */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005, Swedish Institute of Computer Science
+ * Copyright (c) 2006, Swedish Institute of Computer Science.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,34 +26,26 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * This file is part of the Contiki operating system.
  *
- * @(#)$Id: rand.h,v 1.4 2007/09/04 08:48:54 bg- Exp $
- */
-/* -*- C -*- */
-/* @(#)$Id: rand.h,v 1.4 2007/09/04 08:48:54 bg- Exp $ */
-
-#ifndef RAND_H
-#define RAND_H
-
-#undef RAND_MAX
-#define RAND_MAX 0x7fff
-
-/*
- * Minimal standard random number generator.
+ * -----------------------------------------------------------------
  *
- * Simple crappy ANSI C compatible random number generator that is
- * good enough for us!
- *
- * Park, S.K. and K.W. Miller, 1988;
- * Random Number Generators: Good Ones are Hard to Find,
- * Comm. of the ACM, V. 31. No. 10, pp 1192-1201
+ * Author  : Adam Dunkels, Joakim Eriksson, Niclas Finne
+ * Created : 2006-10-02
+ * Updated : $Date: 2006/10/05 09:23:41 $
+ *           $Revision: 1.1 $
  */
 
-extern int32_t rand_state;
+#ifndef GCR_H_
+#define GCR_H_
 
-int rand(void);
+void gcr_init();
+unsigned char gcr_finished();
 
-void srand(unsigned int);
+void gcr_encode(unsigned char raw_data);
 
-#endif /* RAND_H */
+void gcr_decode(unsigned char gcr_data);
+unsigned char gcr_get_encoded(unsigned char *raw_data);
+unsigned char gcr_get_decoded(unsigned char *raw_data);
+unsigned char gcr_valid();
+
+#endif /* GCR_H_ */

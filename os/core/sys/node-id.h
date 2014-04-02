@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Swedish Institute of Computer Science.
+ * Copyright (c) 2006, Swedish Institute of Computer Science.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,52 +28,16 @@
  *
  * This file is part of the Contiki operating system.
  *
- * $Id: energest.c,v 1.5 2007/11/12 22:27:21 adamdunkels Exp $
+ * Author: Adam Dunkels <adam@sics.se>
+ *
  */
 
-/**
- * \file
- *         Implementation of the energy estimation module
- * \author
- *         Adam Dunkels <adam@sics.se>
- */
+#ifndef NODE_ID_H_
+#define NODE_ID_H_
 
-// suppress all lint messages for this file
-//lint --e{*}
+void node_id_restore(void);
+void node_id_burn(unsigned short node_id);
 
-#include "lib/energest.h"
-#include "contiki-conf.h"
+extern unsigned short node_id;
 
-#if ENERGEST_CONF_ON
-
-int energest_total_count;
-energest_t energest_total_time[ENERGEST_TYPE_MAX];
-unsigned short energest_current_time[ENERGEST_TYPE_MAX];
-
-/*---------------------------------------------------------------------------*/
-void
-energest_init(void)
-{
-  int i;
-  for(i = 0; i < ENERGEST_TYPE_MAX; ++i) {
-    energest_total_time[i].current = energest_current_time[i] = 0;
-  }
-}
-/*---------------------------------------------------------------------------*/
-unsigned long
-energest_type_time(int type)
-{
-  return energest_total_time[type].current;
-}
-/*---------------------------------------------------------------------------*/
-void
-energest_type_set(int type, unsigned long val)
-{
-  energest_total_time[type].current = val;
-}
-/*---------------------------------------------------------------------------*/
-#else /* ENERGEST_CONF_ON */
-void energest_type_set(int type, unsigned long val) {}
-void energest_init(void) {}
-unsigned long energest_type_time(int type) { return 0; }
-#endif /* ENERGEST_CONF_ON */
+#endif /* NODE_ID_H_ */

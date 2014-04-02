@@ -28,7 +28,6 @@
  *
  * This file is part of the Contiki operating system.
  *
- * @(#)$Id: mmem.h,v 1.1 2006/06/17 22:41:18 adamdunkels Exp $
  */
 /**
  * \addtogroup mem
@@ -54,17 +53,18 @@
  *         Header file for the managed memory allocator
  * \author
  *         Adam Dunkels <adam@sics.se>
- *
+ * 
  */
 
-#ifndef __MMEM_H__
-#define __MMEM_H__
+#ifndef MMEM_H_
+#define MMEM_H_
 
+/*---------------------------------------------------------------------------*/
 /**
  * \brief      Get a pointer to the managed memory
- * \param m    A pointer to the struct mmem
+ * \param m    A pointer to the struct mmem 
  * \return     A pointer to the memory block, or NULL if memory could
- *             not be allcated.
+ *             not be allocated. 
  * \author     Adam Dunkels
  *
  *             This macro is used to get a pointer to a memory block
@@ -73,18 +73,21 @@
  * \hideinitializer
  */
 #define MMEM_PTR(m) (struct mmem *)(m)->ptr
+
 struct mmem {
-	struct mmem *next;
-	unsigned int size;
-	void *ptr;
+  struct mmem *next;
+  unsigned int size;
+  void *ptr;
 };
 
 /* XXX: tagga minne med "interrupt usage", vilke gör att man är
- * speciellt varsam under free().
- */
+   speciellt varsam under free(). */
 
 int  mmem_alloc(struct mmem *m, unsigned int size);
 void mmem_free(struct mmem *);
 void mmem_init(void);
 
-#endif /* __MMEM_H__ */
+#endif /* MMEM_H_ */
+
+/** @} */
+/** @} */

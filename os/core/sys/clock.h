@@ -6,17 +6,28 @@
  * \defgroup clock Clock library
  *
  * The clock library is the interface between Contiki and the platform
- * specific clock functionality. The clock library performs a single
- * function: measuring time. Additionally, the clock library provides
- * a macro, CLOCK_SECOND, which corresponds to one second of system
- * time.
+ * specific clock functionality. The clock library defines a macro,
+ * CLOCK_SECOND, to convert seconds into the tick resolution of the platform.
+ * Typically this is 1-10 milliseconds, e.g. 4*CLOCK_SECOND could be 512.
+ * A 16 bit counter would thus overflow every 1-10 minutes.
+ * Platforms use the tick interrupt to maintain a long term count
+ * of seconds since startup.
+ *
+ * Platforms may also implement rtimers for greater time resolution
+ * and for real-time interrupts, These use a corresponding RTIMER_SECOND.
+ *
+ * \note These timers do not necessarily have a common divisor or are phase locked.
+ * One may be crystal controlled and the other may not. Low power operation
+ * or sleep will often use one for wake and disable the other, then give
+ * it a tick correction after wakeup.
  *
  * \note The clock library need in many cases not be used
- * directly. Rather, the \ref timer "timer library" or the \ref etimer
- * "event timers" should be used.
+ * directly. Rather, the \ref timer "timer library", \ref etimer
+ * "event timers", or \ref trimer "rtimer library" should be used.
  *
  * \sa \ref timer "Timer library"
  * \sa \ref etimer "Event timers"
+ * \sa \ref rtimer "Realtime library"
  *
  * @{
  */
@@ -53,14 +64,22 @@
  *
  * Author: Adam Dunkels <adam@sics.se>
  *
- * $Id: clock.h,v 1.3 2007/09/07 10:20:30 fros4943 Exp $
  */
-#ifndef __CLOCK_H__
-#define __CLOCK_H__
+#ifndef CLOCK_H_
+#define CLOCK_H_
 
 #include "contiki-conf.h"
 
-#define CLOCK_LT(a,b)     ((signed short)((a)-(b)) < 0)
+/**
+ * A second, measured in system clock time.
+ *
+ * \hideinitializer
+ */
+#ifdef CLOCK_CONF_SECOND
+#define CLOCK_SECOND CLOCK_CONF_SECOND
+#else
+#define CLOCK_SECOND (clock_time_t)32
+#endif
 
 /**
  * Initialize the clock library.
@@ -78,26 +97,49 @@ void clock_init(void);
  *
  * \return The current clock time, measured in system ticks.
  */
-clock_time_t clock_time(void);
-
-void clock_delay(unsigned int);
+CCIF clock_time_t clock_time(void);
 
 /**
- * A second, measured in system clock time.
+ * Get the current value of the platform seconds.
  *
- * \hideinitializer
+ * This could be the number of seconds since startup, or
+ * since a standard epoch.
+ *
+ * \return The value.
  */
-#ifdef CLOCK_CONF_SECOND
-#define CLOCK_SECOND CLOCK_CONF_SECOND
-#else
-#define CLOCK_SECOND (clock_time_t)32
-#endif
+CCIF unsigned long clock_seconds(void);
 
+/**
+ * Set the value of the platform seconds.
+ * \param sec   The value to set.
+ *
+ */
+void clock_set_seconds(unsigned long sec);
+
+/**
+ * Wait for a given number of ticks.
+ * \param t   How many ticks.
+ *
+ */
+void clock_wait(clock_time_t t);
+
+/**
+ * Delay a given number of microseconds.
+ * \param dt   How many microseconds to delay.
+ *
+ * \note Interrupts could increase the delay by a variable amount.
+ */
+void clock_delay_usec(uint16_t dt);
+
+/**
+ * Deprecated platform-specific routines.
+ *
+ */
 int clock_fine_max(void);
 unsigned short clock_fine(void);
+void clock_delay(unsigned int delay);
 
-
-#endif /* __CLOCK_H__ */
+#endif /* CLOCK_H_ */
 
 /** @} */
 /** @} */

@@ -58,10 +58,9 @@
  *
  * Author: Adam Dunkels <adam@sics.se>
  *
- * $Id: etimer.h,v 1.2 2006/08/26 23:59:39 oliverschmidt Exp $
  */
-#ifndef __ETIMER_H__
-#define __ETIMER_H__
+#ifndef ETIMER_H_
+#define ETIMER_H_
 
 #include "sys/timer.h"
 #include "sys/process.h"
@@ -113,7 +112,7 @@ CCIF void etimer_set(struct etimer *et, clock_time_t interval);
  *
  * \sa etimer_restart()
  */
-void etimer_reset(struct etimer *et);
+CCIF void etimer_reset(struct etimer *et);
 
 /**
  * \brief      Restart an event timer from the current point in time
@@ -237,6 +236,6 @@ clock_time_t etimer_next_expiration_time(void);
 /** @} */
 
 PROCESS_NAME(etimer_process);
-#endif /* __ETIMER_H__ */
+#endif /* ETIMER_H_ */
 /** @} */
 /** @} */

@@ -30,7 +30,6 @@
  *
  * Author: Adam Dunkels <adam@sics.se>
  *
- * $Id: memb.c,v 1.3 2007/03/16 16:53:33 adamdunkels Exp $
  */
 
 /**
@@ -43,10 +42,6 @@
  * Memory block allocation routines.
  * \author Adam Dunkels <adam@sics.se>
  */
-
-// suppress all lint messages for this file
-//lint --e{*}
-
 #include <string.h>
 
 #include "contiki.h"
@@ -54,14 +49,14 @@
 
 /*---------------------------------------------------------------------------*/
 void
-memb_init(struct memb_blocks *m)
+memb_init(struct memb *m)
 {
   memset(m->count, 0, m->num);
   memset(m->mem, 0, m->size * m->num);
 }
 /*---------------------------------------------------------------------------*/
 void *
-memb_alloc(struct memb_blocks *m)
+memb_alloc(struct memb *m)
 {
   int i;
 
@@ -81,7 +76,7 @@ memb_alloc(struct memb_blocks *m)
 }
 /*---------------------------------------------------------------------------*/
 char
-memb_free(struct memb_blocks *m, void *ptr)
+memb_free(struct memb *m, void *ptr)
 {
   int i;
   char *ptr2;
@@ -90,7 +85,7 @@ memb_free(struct memb_blocks *m, void *ptr)
      which the pointer "ptr" points to. */
   ptr2 = (char *)m->mem;
   for(i = 0; i < m->num; ++i) {
-
+    
     if(ptr2 == (char *)ptr) {
       /* We've found to block to which "ptr" points so we decrease the
 	 reference count and return the new value of it. */
@@ -106,7 +101,7 @@ memb_free(struct memb_blocks *m, void *ptr)
 }
 /*---------------------------------------------------------------------------*/
 int
-memb_inmemb(struct memb_blocks *m, void *ptr)
+memb_inmemb(struct memb *m, void *ptr)
 {
   return (char *)ptr >= (char *)m->mem &&
     (char *)ptr < (char *)m->mem + (m->num * m->size);

@@ -42,11 +42,7 @@
  *
  * Author: Adam Dunkels <adam@sics.se>
  *
- * $Id: etimer.c,v 1.3 2007/10/07 19:59:27 joxe Exp $
  */
-
-// suppress all lint messages for this file
-//lint --e{*}
 
 #include "contiki-conf.h"
 
@@ -84,11 +80,11 @@ update_time(void)
 PROCESS_THREAD(etimer_process, ev, data)
 {
   struct etimer *t, *u;
-
+	
   PROCESS_BEGIN();
 
   timerlist = NULL;
-
+  
   while(1) {
     PROCESS_YIELD();
 
@@ -114,13 +110,13 @@ PROCESS_THREAD(etimer_process, ev, data)
     }
 
   again:
-
+    
     u = NULL;
-
+    
     for(t = timerlist; t != NULL; t = t->next) {
       if(timer_expired(&t->timer)) {
 	if(process_post(t->p, PROCESS_EVENT_TIMER, t) == PROCESS_ERR_OK) {
-
+	  
 	  /* Reset the process ID of the event timer, to signal that the
 	     etimer has expired. This is later checked in the
 	     etimer_expired() function. */
@@ -139,9 +135,9 @@ PROCESS_THREAD(etimer_process, ev, data)
       }
       u = t;
     }
-
+    
   }
-
+  
   PROCESS_END();
 }
 /*---------------------------------------------------------------------------*/
@@ -159,17 +155,17 @@ add_timer(struct etimer *timer)
   etimer_request_poll();
 
   if(timer->p != PROCESS_NONE) {
-    /* Timer not on list. */
-
     for(t = timerlist; t != NULL; t = t->next) {
       if(t == timer) {
 	/* Timer already on list, bail out. */
+        timer->p = PROCESS_CURRENT();
 	update_time();
 	return;
       }
     }
   }
 
+  /* Timer not on list. */
   timer->p = PROCESS_CURRENT();
   timer->next = timerlist;
   timerlist = timer;
