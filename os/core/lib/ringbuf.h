@@ -67,7 +67,7 @@
 struct ringbuf {
   uint8_t *data;
   uint8_t mask;
-  
+
   /* XXX these must be 8-bit quantities to avoid race conditions. */
   uint8_t put_ptr, get_ptr;
 };

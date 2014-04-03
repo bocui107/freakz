@@ -53,7 +53,7 @@
  *         Header file for the managed memory allocator
  * \author
  *         Adam Dunkels <adam@sics.se>
- * 
+ *
  */
 
 #ifndef MMEM_H_
@@ -62,9 +62,9 @@
 /*---------------------------------------------------------------------------*/
 /**
  * \brief      Get a pointer to the managed memory
- * \param m    A pointer to the struct mmem 
+ * \param m    A pointer to the struct mmem
  * \return     A pointer to the memory block, or NULL if memory could
- *             not be allocated. 
+ *             not be allocated.
  * \author     Adam Dunkels
  *
  *             This macro is used to get a pointer to a memory block

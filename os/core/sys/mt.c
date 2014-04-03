@@ -98,7 +98,7 @@ mt_yield(void)
      program instead. For us, the switch function will not return
      until the next time we are scheduled to run. */
   mtarch_yield();
-  
+
 }
 /*--------------------------------------------------------------------------*/
 void
