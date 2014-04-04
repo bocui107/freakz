@@ -118,6 +118,18 @@ typedef unsigned char process_num_events_t;
  * \hideinitializer
  */
 #define PROCESS_BEGIN()             PT_BEGIN(process_pt)
+/*
+#define PT_BEGIN(pt)
+	{
+		char PT_YIELD_FLAG = 1;
+
+		if (PT_YIELD_FLAG)
+			{;}
+
+		switch((pt)->lc) {
+
+			case 0:
+*/
 
 /**
  * Define the end of a process.
@@ -129,6 +141,17 @@ typedef unsigned char process_num_events_t;
  * \hideinitializer
  */
 #define PROCESS_END()               PT_END(process_pt)
+/*
+#define PT_END(pt)
+		}
+
+		PT_YIELD_FLAG = 0;
+
+		(pt)->lc = 0;
+
+		return PT_ENDED;
+	}
+*/
 
 /**
  * Wait for an event to be posted to the process.
@@ -162,7 +185,19 @@ typedef unsigned char process_num_events_t;
  * \hideinitializer
  */
 #define PROCESS_YIELD()             PT_YIELD(process_pt)
-
+/*
+#define PT_YIELD(pt)					\
+	do {						\
+		PT_YIELD_FLAG = 0;			\
+							\
+		(pt)->lc = __LINE__;			\
+							\
+		case __LINE__:				\
+			if(PT_YIELD_FLAG == 0) {	\
+				return PT_YIELDED;	\
+			}				\
+	} while(0)
+*/
 /**
  * Yield the currently running process until a condition occurs.
  *
@@ -177,6 +212,20 @@ typedef unsigned char process_num_events_t;
  */
 #define PROCESS_YIELD_UNTIL(c)      PT_YIELD_UNTIL(process_pt, c)
 
+/*
+#define PT_YIELD_UNTIL(pt, cond)				\
+	do {							\
+		PT_YIELD_FLAG = 0;				\
+								\
+		(pt)->lc = __LINE__;				\
+								\
+		case __LINE__:					\
+			if((PT_YIELD_FLAG == 0) || !(cond)) {	\
+				return PT_YIELDED;		\
+			}					\
+	} while(0)
+*/
+
 /**
  * Wait for a condition to occur.
  *
@@ -190,7 +239,32 @@ typedef unsigned char process_num_events_t;
  * \hideinitializer
  */
 #define PROCESS_WAIT_UNTIL(c)       PT_WAIT_UNTIL(process_pt, c)
+
+/*
+#define PT_WAIT_UNTIL(pt, condition)
+	do {
+		(pt)->lc = __LINE__;
+
+		case __LINE__:
+			if(!(condition)) {
+				return PT_WAITING;
+			}
+	} while(0)
+*/
+
 #define PROCESS_WAIT_WHILE(c)       PT_WAIT_WHILE(process_pt, c)
+
+/*
+#define PT_WAIT_WHILE(pt, condition)
+	do {
+		(pt)->lc = __LINE__;
+
+		case __LINE__:
+			if(condition) {
+				return PT_WAITING;
+			}
+	} while(0)
+*/
 
 /**
  * Exit the currently running process.
@@ -198,6 +272,14 @@ typedef unsigned char process_num_events_t;
  * \hideinitializer
  */
 #define PROCESS_EXIT()              PT_EXIT(process_pt)
+
+/*
+#define PT_EXIT(pt)			\
+	do {				\
+		(pt)->lc = 0;		\
+		return PT_EXITED;	\
+	} while(0)
+*/
 
 /**
  * Spawn a protothread from the process.
@@ -209,6 +291,20 @@ typedef unsigned char process_num_events_t;
  * \hideinitializer
  */
 #define PROCESS_PT_SPAWN(pt, thread)   PT_SPAWN(process_pt, pt, thread)
+
+/*
+#define PT_SPAWN(pt, child, thread)				\
+	do {							\
+		(child)->lc = 0;				\
+
+		(pt)->lc = __LINE__;
+
+		case __LINE__:
+			if((thread) < PT_EXITED) {
+				return PT_WAITING;
+			}
+	} while(0)
+*/
 
 /**
  * Yield the process for a short while.
@@ -274,6 +370,14 @@ typedef unsigned char process_num_events_t;
 static PT_THREAD(process_thread_##name(struct pt *process_pt,	\
 				       process_event_t ev,	\
 				       process_data_t data))
+/*
+#define PT_THREAD(name_args) char name_args
+
+#define PROCESS_THREAD(name, ev, data)				\
+static char process_thread_##name(struct pt *process_pt,	\
+				process_event_t ev,		\
+				process_data_t data)
+*/
 
 /**
  * Declare the name of a process.
@@ -309,6 +413,14 @@ static PT_THREAD(process_thread_##name(struct pt *process_pt,	\
   struct process name = { NULL, strname,		\
                           process_thread_##name }
 #endif
+
+/*
+#define PROCESS(name, strname)					\
+static char process_thread_##name(struct pt *process_pt,	\
+				process_event_t ev,		\
+				process_data_t data);		\
+struct process name = { NULL, strname, process_thread_##name }
+*/
 
 /** @} */
 

@@ -51,13 +51,21 @@
 #include "sys/lc.h"
 
 struct pt {
-  lc_t lc;
+	lc_t lc;
 };
 
 #define PT_WAITING 0
 #define PT_YIELDED 1
 #define PT_EXITED  2
 #define PT_ENDED   3
+
+/**
+ * typedef unsigned short lc_t;
+ * #define LC_INIT(s) s = 0;
+ * #define LC_RESUME(s) switch(s) { case 0:
+ * #define LC_SET(s) s = __LINE__; case __LINE__:
+ * #define LC_END(s) }
+ */
 
 /**
  * \name Initialization
@@ -111,7 +119,27 @@ struct pt {
  *
  * \hideinitializer
  */
-#define PT_BEGIN(pt) { char PT_YIELD_FLAG = 1; if (PT_YIELD_FLAG) {;} LC_RESUME((pt)->lc)
+#define PT_BEGIN(pt)	\
+	{		\
+		char PT_YIELD_FLAG = 1;	\
+					\
+		if (PT_YIELD_FLAG)	\
+			{;}		\
+					\
+		LC_RESUME((pt)->lc)	\
+
+/*
+#define PT_BEGIN(pt)
+	{
+		char PT_YIELD_FLAG = 1;
+
+		if (PT_YIELD_FLAG)
+			{;}
+
+		switch((pt)->lc) {
+
+			case 0:
+*/
 
 /**
  * Declare the end of a protothread.
@@ -123,8 +151,24 @@ struct pt {
  *
  * \hideinitializer
  */
-#define PT_END(pt) LC_END((pt)->lc); PT_YIELD_FLAG = 0; \
-                   PT_INIT(pt); return PT_ENDED; }
+#define PT_END(pt)			\
+		LC_END((pt)->lc);	\
+		PT_YIELD_FLAG = 0;	\
+	        PT_INIT(pt);		\
+		return PT_ENDED;	\
+	}
+
+/*
+#define PT_END(pt)
+		}
+
+		PT_YIELD_FLAG = 0;
+
+		(pt)->lc = 0;
+
+		return PT_ENDED;
+	}
+*/
 
 /** @} */
 
@@ -151,6 +195,18 @@ struct pt {
       return PT_WAITING;			\
     }						\
   } while(0)
+
+/*
+#define PT_WAIT_UNTIL(pt, condition)
+	do {
+			(pt)->lc = __LINE__;
+
+		case __LINE__:
+			if(!(condition)) {
+				return PT_WAITING;
+			}
+	} while(0)
+*/
 
 /**
  * Block and wait while condition is true.
@@ -189,7 +245,11 @@ struct pt {
  * \hideinitializer
  */
 #define PT_WAIT_THREAD(pt, thread) PT_WAIT_WHILE((pt), PT_SCHEDULE(thread))
-
+/** PT_SCHEDULE仅仅是比较当前PT的状态, 大于0 */
+/*
+#define PT_WAIT_THREAD(pt, thread) \
+		PT_WAIT_WHILE((pt), (thread) < PT_EXITED)
+*/
 /**
  * Spawn a child protothread and wait until it exits.
  *
@@ -207,6 +267,20 @@ struct pt {
     PT_INIT((child));				\
     PT_WAIT_THREAD((pt), (thread));		\
   } while(0)
+
+/*
+#define PT_SPAWN(pt, child, thread)
+	do {
+		(child)->lc = 0;
+
+		(pt)->lc = __LINE__;
+
+		case __LINE__:
+			if((thread) < PT_EXITED) {
+				return PT_WAITING;
+			}
+	} while(0)
+*/
 
 /** @} */
 
@@ -231,6 +305,13 @@ struct pt {
     return PT_WAITING;			\
   } while(0)
 
+/*
+#define PT_RESTART(pt)			\
+	do {				\
+		(pt)->lc = 0;		\
+		return PT_WAITING;	\
+	} while(0)
+*/
 /**
  * Exit the protothread.
  *
@@ -247,6 +328,14 @@ struct pt {
     PT_INIT(pt);				\
     return PT_EXITED;			\
   } while(0)
+
+/*
+#define PT_EXIT(pt)			\
+	do {				\
+		(pt)->lc = 0;		\
+		return PT_EXITED;	\
+	} while(0)
+*/
 
 /** @} */
 
@@ -295,6 +384,25 @@ struct pt {
     }						\
   } while(0)
 
+/*
+#define PT_YIELD(pt)					\
+	do {						\
+		PT_YIELD_FLAG = 0;			\
+							\
+		(pt)->lc = __LINE__;			\
+							\
+		case __LINE__:				\
+			if(PT_YIELD_FLAG == 0) {	\
+				return PT_YIELDED;	\
+			}				\
+	} while(0)
+*/
+
+/** NOTE: 第一次设置PT_YIELD_FLAG时, PT_YIELD_FLAG为0, 所以让出protothread,
+ * 那么何时设置PT_YIELD_FLAG为1, 在PT_BEGIN()的宏定义中有PT_YIELD_FLAG = 1
+ * 因此在每次执行该protothread时, 都是需要经过PT_BEGIN的 */
+
+
 /**
  * \brief      Yield from the protothread until a condition occurs.
  * \param pt   A pointer to the protothread control structure.
@@ -314,6 +422,20 @@ struct pt {
       return PT_YIELDED;			\
     }						\
   } while(0)
+
+/*
+#define PT_YIELD_UNTIL(pt, cond)				\
+	do {							\
+		PT_YIELD_FLAG = 0;				\
+								\
+		(pt)->lc = __LINE__;				\
+								\
+		case __LINE__:					\
+			if((PT_YIELD_FLAG == 0) || !(cond)) {	\
+				return PT_YIELDED;		\
+			}					\
+	} while(0)
+*/
 
 /** @} */
 

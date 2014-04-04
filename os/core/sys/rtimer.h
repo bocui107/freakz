@@ -55,8 +55,8 @@
 #include "contiki-conf.h"
 
 #ifndef RTIMER_CLOCK_LT
-typedef unsigned short rtimer_clock_t;
-#define RTIMER_CLOCK_LT(a,b)     ((signed short)((a)-(b)) < 0)
+typedef unsigned short		rtimer_clock_t;
+#define RTIMER_CLOCK_LT(a,b)	((signed short)((a)-(b)) < 0)
 #endif /* RTIMER_CLOCK_LT */
 
 #include "rtimer-arch.h"
@@ -81,16 +81,16 @@ typedef void (* rtimer_callback_t)(struct rtimer *t, void *ptr);
  *             support module for the real-time module.
  */
 struct rtimer {
-  rtimer_clock_t time;
-  rtimer_callback_t func;
-  void *ptr;
+	rtimer_clock_t time;
+	rtimer_callback_t func;
+	void *ptr;
 };
 
 enum {
-  RTIMER_OK,
-  RTIMER_ERR_FULL,
-  RTIMER_ERR_TIME,
-  RTIMER_ERR_ALREADY_SCHEDULED,
+	RTIMER_OK,
+	RTIMER_ERR_FULL,
+	RTIMER_ERR_TIME,
+	RTIMER_ERR_ALREADY_SCHEDULED,
 };
 
 /**

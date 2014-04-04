@@ -138,7 +138,7 @@ exit_process(struct process *p, struct process *fromprocess)
   if(process_is_running(p)) {
     /* Process was running */
     p->state = PROCESS_STATE_NONE;
-
+    /* 这种情况说明该线程还正在运行中 */
     /*
      * Post a synchronous event to all processes to inform them that
      * this process is about to exit. This will allow services to
@@ -149,12 +149,15 @@ exit_process(struct process *p, struct process *fromprocess)
 	call_process(q, PROCESS_EVENT_EXITED, (process_data_t)p);
       }
     }
+   /* 通知所有其他线程,该线程准备退出 */
 
     if(p->thread != NULL && p != fromprocess) {
       /* Post the exit event to the process that is about to exit. */
       process_current = p;
       p->thread(&p->pt, PROCESS_EVENT_EXIT, NULL);
     }
+   /* 如果该线程有调用体, 并且不是从自己退出, 而是别人要求自己退出, 则需要
+    * 通知自己的调用体PROCESS_EVENT_EXIT事件 */
   }
 
   if(p == process_list) {
@@ -167,7 +170,7 @@ exit_process(struct process *p, struct process *fromprocess)
       }
     }
   }
-
+  /* 删除链表中的线程q*/
   process_current = old_current;
 }
 /*---------------------------------------------------------------------------*/
