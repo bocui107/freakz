@@ -48,7 +48,6 @@
 #include "sys/clock.h"
 #include "sys/timer.h"
 
-/*---------------------------------------------------------------------------*/
 /**
  * Set a timer.
  *
@@ -60,13 +59,12 @@
  * \param interval The interval before the timer expires.
  *
  */
-void
-timer_set(struct timer *t, clock_time_t interval)
+void timer_set(struct timer *t, clock_time_t interval)
 {
-  t->interval = interval;
-  t->start = clock_time();
+	t->interval = interval;
+	t->start = clock_time();
 }
-/*---------------------------------------------------------------------------*/
+
 /**
  * Reset the timer with the same interval.
  *
@@ -80,12 +78,11 @@ timer_set(struct timer *t, clock_time_t interval)
  *
  * \sa timer_restart()
  */
-void
-timer_reset(struct timer *t)
+void timer_reset(struct timer *t)
 {
-  t->start += t->interval;
+	t->start += t->interval;
 }
-/*---------------------------------------------------------------------------*/
+
 /**
  * Restart the timer from the current point in time
  *
@@ -100,12 +97,11 @@ timer_reset(struct timer *t)
  *
  * \sa timer_reset()
  */
-void
-timer_restart(struct timer *t)
+void timer_restart(struct timer *t)
 {
-  t->start = clock_time();
+	t->start = clock_time();
 }
-/*---------------------------------------------------------------------------*/
+
 /**
  * Check if a timer has expired.
  *
@@ -117,16 +113,18 @@ timer_restart(struct timer *t)
  * \return Non-zero if the timer has expired, zero otherwise.
  *
  */
-int
-timer_expired(struct timer *t)
+int timer_expired(struct timer *t)
 {
-  /* Note: Can not return diff >= t->interval so we add 1 to diff and return
-     t->interval < diff - required to avoid an internal error in mspgcc. */
-  clock_time_t diff = (clock_time() - t->start) + 1;
-  return t->interval < diff;
+	/*
+	 * Note: Can not return diff >= t->interval so
+	 * we add 1 to diff and return t->interval < diff - required
+	 * to avoid an internal error in mspgcc.
+	 */
+	clock_time_t diff = (clock_time() - t->start) + 1;
 
+	return t->interval < diff;
 }
-/*---------------------------------------------------------------------------*/
+
 /**
  * The time until the timer expires
  *
@@ -137,11 +135,8 @@ timer_expired(struct timer *t)
  * \return The time until the timer expires
  *
  */
-clock_time_t
-timer_remaining(struct timer *t)
+clock_time_t timer_remaining(struct timer *t)
 {
-  return t->start + t->interval - clock_time();
+	return t->start + t->interval - clock_time();
 }
-/*---------------------------------------------------------------------------*/
-
 /** @} */

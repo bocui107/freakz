@@ -269,14 +269,14 @@ static void do_event(void)
 		order of their priority. */
 		if(receiver == PROCESS_BROADCAST) {
 			for(p = process_list; p != NULL; p = p->next) {
-			/*
-			 * If we have been requested to poll a process,
-			 * we do this in between processing the broadcast event.
-			 */
-			if(poll_requested)
-				do_poll();
+				/*
+				 * If we have been requested to poll a process,
+				 * we do this in between processing the broadcast event.
+				 */
+				if(poll_requested)
+					do_poll();
 
-			call_process(p, ev, data);
+				call_process(p, ev, data);
 			}
 		} else {
 			/*

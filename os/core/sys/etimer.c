@@ -53,9 +53,8 @@ static struct etimer *timerlist;
 static clock_time_t next_expiration;
 
 PROCESS(etimer_process, "Event timer");
-/*---------------------------------------------------------------------------*/
-static void
-update_time(void)
+
+static void update_time(void)
 {
 	clock_time_t tdist;
 	clock_time_t now;
@@ -79,11 +78,12 @@ update_time(void)
 			}
 		/* 计算所有的时钟事件的间隔, 并且选择最小的时间间隔的时钟事件 */
 		}
+
 		next_expiration = now + tdist;
 		/* now + tdist = t->timer.start + t->timer.interval也就是下一个到期的时钟事件 */
 	}
 }
-/*---------------------------------------------------------------------------*/
+
 PROCESS_THREAD(etimer_process, ev, data)
 {
 	struct etimer *t, *u;
@@ -161,15 +161,13 @@ again:
 
 	PROCESS_END();
 }
-/*---------------------------------------------------------------------------*/
-void
-etimer_request_poll(void)
+
+void etimer_request_poll(void)
 {
 	process_poll(&etimer_process);
 }
-/*---------------------------------------------------------------------------*/
-static void
-add_timer(struct etimer *timer)
+
+static void add_timer(struct etimer *timer)
 {
 	struct etimer *t;
 
@@ -193,67 +191,57 @@ add_timer(struct etimer *timer)
 
 	update_time();
 }
-/*---------------------------------------------------------------------------*/
-void
-etimer_set(struct etimer *et, clock_time_t interval)
+
+void etimer_set(struct etimer *et, clock_time_t interval)
 {
 	timer_set(&et->timer, interval);
 	add_timer(et);
 }
-/*---------------------------------------------------------------------------*/
-void
-etimer_reset(struct etimer *et)
+
+void etimer_reset(struct etimer *et)
 {
 	timer_reset(&et->timer);
 	add_timer(et);
 }
-/*---------------------------------------------------------------------------*/
-void
-etimer_restart(struct etimer *et)
+
+void etimer_restart(struct etimer *et)
 {
 	timer_restart(&et->timer);
 	add_timer(et);
 }
-/*---------------------------------------------------------------------------*/
-void
-etimer_adjust(struct etimer *et, int timediff)
+
+void etimer_adjust(struct etimer *et, int timediff)
 {
 	et->timer.start += timediff;
 	update_time();
 }
-/*---------------------------------------------------------------------------*/
-int
-etimer_expired(struct etimer *et)
+
+int etimer_expired(struct etimer *et)
 {
 	return et->p == PROCESS_NONE;
 }
-/*---------------------------------------------------------------------------*/
-clock_time_t
-etimer_expiration_time(struct etimer *et)
+
+clock_time_t etimer_expiration_time(struct etimer *et)
 {
 	return et->timer.start + et->timer.interval;
 }
-/*---------------------------------------------------------------------------*/
-clock_time_t
-etimer_start_time(struct etimer *et)
+
+clock_time_t etimer_start_time(struct etimer *et)
 {
 	return et->timer.start;
 }
-/*---------------------------------------------------------------------------*/
-int
-etimer_pending(void)
+
+int etimer_pending(void)
 {
 	return timerlist != NULL;
 }
-/*---------------------------------------------------------------------------*/
-clock_time_t
-etimer_next_expiration_time(void)
+
+clock_time_t etimer_next_expiration_time(void)
 {
 	return etimer_pending() ? next_expiration : 0;
 }
-/*---------------------------------------------------------------------------*/
-void
-etimer_stop(struct etimer *et)
+
+void etimer_stop(struct etimer *et)
 {
 	struct etimer *t;
 
@@ -281,5 +269,5 @@ etimer_stop(struct etimer *et)
 	/* Set the timer as expired */
 	et->p = PROCESS_NONE;
 }
-/*---------------------------------------------------------------------------*/
+
 /** @} */
