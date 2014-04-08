@@ -51,7 +51,6 @@
 #define SCLOCK_GEQ(a, b)	((unsigned long)((a) - (b)) < \
 				((unsigned long)(~((unsigned long)0)) >> 1))
 
-/*---------------------------------------------------------------------------*/
 /**
  * Set a timer.
  *
@@ -63,13 +62,12 @@
  * \param interval The interval before the timer expires.
  *
  */
-void
-stimer_set(struct stimer *t, unsigned long interval)
+void stimer_set(struct stimer *t, unsigned long interval)
 {
-  t->interval = interval;
-  t->start = clock_seconds();
+	t->interval = interval;
+	t->start = clock_seconds();
 }
-/*---------------------------------------------------------------------------*/
+
 /**
  * Reset the timer with the same interval.
  *
@@ -83,12 +81,11 @@ stimer_set(struct stimer *t, unsigned long interval)
  *
  * \sa stimer_restart()
  */
-void
-stimer_reset(struct stimer *t)
+void stimer_reset(struct stimer *t)
 {
-  t->start += t->interval;
+	t->start += t->interval;
 }
-/*---------------------------------------------------------------------------*/
+
 /**
  * Restart the timer from the current point in time
  *
@@ -103,12 +100,11 @@ stimer_reset(struct stimer *t)
  *
  * \sa stimer_reset()
  */
-void
-stimer_restart(struct stimer *t)
+void stimer_restart(struct stimer *t)
 {
-  t->start = clock_seconds();
+	t->start = clock_seconds();
 }
-/*---------------------------------------------------------------------------*/
+
 /**
  * Check if a timer has expired.
  *
@@ -120,12 +116,11 @@ stimer_restart(struct stimer *t)
  * \return Non-zero if the timer has expired, zero otherwise.
  *
  */
-int
-stimer_expired(struct stimer *t)
+int stimer_expired(struct stimer *t)
 {
-  return SCLOCK_GEQ(clock_seconds(), t->start + t->interval);
+	return SCLOCK_GEQ(clock_seconds(), t->start + t->interval);
 }
-/*---------------------------------------------------------------------------*/
+
 /**
  * The time until the timer expires
  *
@@ -136,12 +131,11 @@ stimer_expired(struct stimer *t)
  * \return The time until the timer expires
  *
  */
-unsigned long
-stimer_remaining(struct stimer *t)
+unsigned long stimer_remaining(struct stimer *t)
 {
-  return t->start + t->interval - clock_seconds();
+	return t->start + t->interval - clock_seconds();
 }
-/*---------------------------------------------------------------------------*/
+
 /**
  * The time elapsed since the timer started
  *
@@ -152,12 +146,9 @@ stimer_remaining(struct stimer *t)
  * \return The time elapsed since the last start of the timer
  *
  */
-unsigned long
-stimer_elapsed(struct stimer *t)
+unsigned long stimer_elapsed(struct stimer *t)
 {
-  return clock_seconds() - t->start;
+	return clock_seconds() - t->start;
 }
-
-/*---------------------------------------------------------------------------*/
 
 /** @} */
