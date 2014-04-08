@@ -71,6 +71,18 @@ int contiki_main(void)
 		 * select() wait the change of the file.
 		 * n: the max file describe + 1
 		 * readfds, writefds and exceptfds is the set of the file,
+		 *
+		 * struct timeval *timeout是select的超时时间, 这个参数至关重要,
+		 * 它可以使select处于三种状态:
+		 * 第一. 若将NULL以形参传入, 即不传入时间结构, 就是将select置于阻塞状态,
+		 * 一定等到监视文件描述符集合中某个文件描述符发生变化为止;
+		 *
+		 * 第二. 若将时间值设为0秒0毫秒, 就变成一个纯粹的非阻塞函数,
+		 * 不管文件描述符是否有变化, 都立刻返回继续执行, 文件无变化返回0,
+		 * 有变化返回一个正值;
+		 *
+		 * 第三. timeout的值大于0, 这就是等待的超时时间, 即select在timeout时间内阻塞,
+		 * 超时时间之内有事件到来就返回了, 否则在超时后不管怎样一定返回, 返回值同上述
 		 */
 		select(0, NULL, NULL, NULL, &tv);
 		etimer_request_poll();
