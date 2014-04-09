@@ -35,14 +35,11 @@
 
 extern const struct process *procinit[];
 
-/*---------------------------------------------------------------------------*/
-void
-procinit_init(void)
+void procinit_init(void)
 {
-  int i;
+	int i;
 
-  for(i = 0; procinit[i] != NULL; ++i) {
-    process_start((struct process *)procinit[i], NULL);
-  }
+	for(i = 0; procinit[i] != NULL; ++i) {
+		process_start((struct process *)procinit[i], NULL);
+	}
 }
-/*---------------------------------------------------------------------------*/

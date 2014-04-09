@@ -199,7 +199,7 @@ struct pt {
 /*
 #define PT_WAIT_UNTIL(pt, condition)
 	do {
-			(pt)->lc = __LINE__;
+		(pt)->lc = __LINE__;
 
 		case __LINE__:
 			if(!(condition)) {
