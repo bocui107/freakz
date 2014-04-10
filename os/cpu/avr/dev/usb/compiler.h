@@ -12,7 +12,7 @@
  *      Atmel Corporation: http://www.atmel.com \n
  *      Support email: avr@atmel.com
  *
- * $Name: contiki-2-2-2 $
+ * $Name:  $
  * $Revision: 1.1 $
  * $RCSfile: compiler.h,v $
  * $Date: 2008/10/14 20:16:36 $  \n
@@ -47,25 +47,17 @@
 #ifndef _COMPILER_H_
 #define _COMPILER_H_
 
-/*_____ I N C L U D E S ____________________________________________________*/
-
-
-/*_____ D E C L A R A T I O N S ____________________________________________*/
 #define LITTLE_ENDIAN
 
 #ifndef ASM_INCLUDE // define ASM_INCLUDE in your a51 source code before include of .h file
 typedef float               Float16;
 
-#ifndef DATA_TYPES
-#define DATA_TYPES
 typedef unsigned char       U8 ;
 typedef unsigned short      U16;
 typedef unsigned long       U32;
 typedef signed char         S8 ;
 typedef signed short        S16;
 typedef long                S32;
-#endif
-
 #if (defined __C51__)
 typedef bit                 Bool;    // Shall be used with _MEM_TYPE_BIT_ to optimize the memory.
 #else
@@ -76,8 +68,6 @@ typedef U8                  Status;
 typedef Bool                Status_bool;
 #define PASS 0
 #define FAIL 1
-
-
 
 #if (defined __C51__)
 #  define _MEM_TYPE_BIT_              bdata  // Used for bit accesses
@@ -95,7 +85,6 @@ typedef Bool                Status_bool;
 
 typedef unsigned char       Uchar;
 
-
 typedef unsigned char       Uint8;
 typedef unsigned int        Uint16;
 typedef unsigned long int   Uint32;
@@ -110,9 +99,9 @@ typedef unsigned long int   DWord;
 
 typedef union
 {
-  Uint32 dw; // l changed in dw (double word) because l is used for signed long...
-  Uint16 w[2];
-  Uint8  b[4];
+	Uint32 dw; // l changed in dw (double word) because l is used for signed long...
+	Uint16 w[2];
+	Uint8  b[4];
 } Union32;
 
 typedef union
@@ -178,26 +167,16 @@ typedef char      r_uart_ptchar;
 #define SFR_W_EXT(a,b) SFR_W_R(b,a)
 #endif
 
-
-/* General purpose defines */
-/*#define _ConstType_	__farflash
-#define _MemType_
-#define _GenericType_ __generic
-#define code __farflash
-#define xdata
-#define idata
-#define data*/
-
-
-
-
-/*_____ M A C R O S ________________________________________________________*/
 /* little-big endian management */
 #define INTEL_ALIGNMENT     LITTLE_ENDIAN
 #define MOTOROLA_ALIGNMENT  BIG_ENDIAN
 
-// U16/U32 endian handlers
-#ifdef LITTLE_ENDIAN     // => 16bit: (LSB,MSB), 32bit: (LSW,MSW) or (LSB0,LSB1,LSB2,LSB3) or (MSB3,MSB2,MSB1,MSB0)
+/*
+ * U16/U32 endian handlers
+ * 16bit: (LSB,MSB),
+ * 32bit: (LSW,MSW) or (LSB0,LSB1,LSB2,LSB3) or (MSB3,MSB2,MSB1,MSB0)
+ */
+#ifdef LITTLE_ENDIAN
 #  define MSB(u16)        (((U8* )&u16)[1])
 #  define LSB(u16)        (((U8* )&u16)[0])
 #  define MSW(u32)        (((U16*)&u32)[1])
@@ -210,7 +189,12 @@ typedef char      r_uart_ptchar;
 #  define LSB1(u32)       MSB2(u32)
 #  define LSB2(u32)       MSB1(u32)
 #  define LSB3(u32)       MSB0(u32)
-#else // BIG_ENDIAN         => 16bit: (MSB,LSB), 32bit: (MSW,LSW) or (LSB3,LSB2,LSB1,LSB0) or (MSB0,MSB1,MSB2,MSB3)
+#else
+/*
+ * BIG_ENDIAN
+ * 16bit: (MSB,LSB)
+ * 32bit: (MSW,LSW) or (LSB3,LSB2,LSB1,LSB0) or (MSB0,MSB1,MSB2,MSB3)
+ */
 #  define MSB(u16)        (((U8* )&u16)[0])
 #  define LSB(u16)        (((U8* )&u16)[1])
 #  define MSW(u32)        (((U16*)&u32)[0])
@@ -236,24 +220,6 @@ typedef char      r_uart_ptchar;
    |  (     ((U32)(b) &   0xFF0000) >>  8)  \
    |  (     ((U32)(b) & 0xFF000000) >> 24)  \
    )
-
-// host to network conversion: used for Intel HEX format, TCP/IP, ...
-// Convert a 16-bit value from host-byte order to network-byte order
-// Standard Unix, POSIX 1003.1g (draft)
-
-/*
-#ifdef LITTLE_ENDIAN
-#  define htons(a)    Le16(a)
-#define ntohs(a)    htons(a)
-#  define htonl(a)    Le32(a)
-#define ntohl(a)    htonl(a)
-#else
-#define htons(a)    (a)
-#define ntohs(a)    (a)
-#define htonl(a)    (a)
-#define ntohl(a)    (a)
-#endif
-*/
 
 // Constants
 #define ENABLE   1
@@ -284,8 +250,8 @@ typedef char      r_uart_ptchar;
 #define OUT_X(addrx,value)      (*addrx = value)
 #define IN_X(addrx)             (*addrx)
 
-#  define Max(a, b)            ( (a)>(b) ? (a) : (b) )       // Take the max between a and b
-#  define Min(a, b)            ( (a)<(b) ? (a) : (b) )       // Take the min between a and b
+#define Max(a, b)            ( (a)>(b) ? (a) : (b) )       // Take the max between a and b
+#define Min(a, b)            ( (a)<(b) ? (a) : (b) )       // Take the min between a and b
 
 // Align on the upper value <val> on a <n> boundary
 // i.e. Upper(0, 4)= 4
@@ -324,19 +290,22 @@ typedef char      r_uart_ptchar;
               bit of sfr register
     bit_val : CLR / SET
 ************************************************************/
-#define SET_SFR_BIT(sfr_reg, bit_pos, bit_val) { sfr_reg &= ~(1<<(bit_pos)); sfr_reg |= ((bit_val)<<(bit_pos));}
+#define SET_SFR_BIT(sfr_reg, bit_pos, bit_val) {	\
+	sfr_reg &= ~(1<<(bit_pos));	\
+	sfr_reg |= ((bit_val) << (bit_pos));	\
+	}
 
 #define TID_GUARD(proc) ((__TID__ & 0x7FF0) != ((90 << 8) | ((proc) << 4)))
 
 /******************************************************************************/
 /* GCC COMPILER                                                               */
 /******************************************************************************/
-   #ifdef AVRGCC
+#ifdef AVRGCC
 #define _CONST_TYPE_
 #define _ConstType_	__flash
 #define _MemType_
 #define _GenericType_ __generic
-#define FLASH PROGMEM
+#define FLASH const PROGMEM
 #define XDATA
 #define IDATA
 #define DATA
@@ -344,12 +313,10 @@ typedef char      r_uart_ptchar;
 #define PDATA
 #define BDATA
 #define bit	U8
-   //#include <avr/sfr_defs.h>
-   #include <avr/interrupt.h>
-   #include <avr/pgmspace.h>
-   #define Enable_interrupt() sei()
-   #define Disable_interrupt() cli()
+#include <avr/interrupt.h>
+#include <avr/pgmspace.h>
+#define Enable_interrupt() sei()
+#define Disable_interrupt() cli()
+#endif
 
-   #endif
 #endif /* _COMPILER_H_ */
-

@@ -43,91 +43,86 @@
 #ifndef _CONF_USB_H_
 #define _CONF_USB_H_
 
-
-
 /**
    \ingroup usbstick
    \defgroup usbconf USB Configuration
    @{
 */
 
+/* _________________ USB MODE CONFIGURATION ____________________________
+ * @ingroup usbconf
+ * @defgroup USB_op_mode USB operating modes configuration
+ * defines to enable device or host usb operating modes
+ * supported by the application
+ * @{
+ *
+ * @brief ENABLE to activate the host software library support
+ *
+ * Possible values ENABLE or DISABLE
+ */
+#define USB_HOST_FEATURE            DISABLED
 
-   // _________________ USB MODE CONFIGURATION ____________________________
-   //! @ingroup usbconf
-   //! @defgroup USB_op_mode USB operating modes configuration
-   //! defines to enable device or host usb operating modes
-   //! supported by the application
-   //! @{
+/* @brief ENABLE to activate the device software library support
+ *
+ * Possible values ENABLE or DISABLE
+ */
+#define USB_DEVICE_FEATURE          ENABLED
 
-      //! @brief ENABLE to activate the host software library support
-      //!
-      //! Possible values ENABLE or DISABLE
-      #define USB_HOST_FEATURE            DISABLED
+// _________________ USB REGULATOR CONFIGURATION _______________________
+//! @ingroup usbconf
+//! @defgroup USB_reg_mode USB regulator configuration
+//! @{
 
-      //! @brief ENABLE to activate the device software library support
-      //!
-      //! Possible values ENABLE or DISABLE
-      #define USB_DEVICE_FEATURE          ENABLED
-
-   //! @}
-
-   // _________________ USB REGULATOR CONFIGURATION _______________________
-   //! @ingroup usbconf
-   //! @defgroup USB_reg_mode USB regulator configuration
-   //! @{
-
-   //! @brief Enable the internal regulator for USB pads
-   //!
-   //! When the application voltage is lower than 3.5V, to optimize power consumption
-   //! the internal USB pads regulatr can be disabled.
+//! @brief Enable the internal regulator for USB pads
+//!
+//! When the application voltage is lower than 3.5V, to optimize power consumption
+//! the internal USB pads regulatr can be disabled.
 #ifndef USE_USB_PADS_REGULATOR
-   #define USE_USB_PADS_REGULATOR   ENABLE      // Possible values ENABLE or DISABLE
+#define USE_USB_PADS_REGULATOR   ENABLE      // Possible values ENABLE or DISABLE
 #endif
-   //! @}
+//! @}
 
 // _________________ DEVICE MODE CONFIGURATION __________________________
 
-   //! @ingroup usbconf
-   //! @defgroup USB_device_mode_cfg USB device operating mode configuration
-   //!
-   //! @{
+//! @ingroup usbconf
+//! @defgroup USB_device_mode_cfg USB device operating mode configuration
+//!
+//! @{
 
 /** USB RNDIS / Virtual com port setup **/
 
-#define NB_ENDPOINTS        7  //!  number of endpoints in the application including control endpoint
-#define VCP_RX_EP			0x06
-#define VCP_TX_EP			0x05
-#define VCP_INT_EP			0x04
-#define TX_EP				0x02
-#define RX_EP				0x03
-#define INT_EP              0x01
+#ifndef CDC_ECM_USES_INTERRUPT_ENDPOINT
+#define CDC_ECM_USES_INTERRUPT_ENDPOINT	0
+#endif
+
+#ifndef USB_ETH_EMULATE_WIFI
+#define USB_ETH_EMULATE_WIFI	0
+#endif
+
+#define NB_ENDPOINTS	7  //!  number of endpoints in the application including control endpoint
+#define VCP_RX_EP	0x06
+#define VCP_TX_EP	0x05
+#define VCP_INT_EP	0x04
+#define TX_EP		0x01
+#define RX_EP		0x02
+#define INT_EP		0x03
 
 /** USB Mass Storage Setup **/
-
 #define NB_ENDPOINTS_MS     3 //!  number of endpoints in the application including control endpoint
 #define MS_IN_EP            0x01
 #define MS_OUT_EP           0x02
 
 #define USB_LOW_SPEED_DEVICE DISABLE
 
+#define Usb_unicode(a)		((U16)(a))
 
-#define Usb_unicode(a)			((U16)(a))
-
-   //! @ingroup usbconf
-   //! @defgroup device_cst_actions USB device custom actions
-   //!
-   //! @{
-   // write here the action to associate to each USB event
-   // be carefull not to waste time in order not disturbing the functions
-#define Usb_sof_action()         /* sof_action(); */
-#define Usb_wake_up_action()
-#define Usb_resume_action()
+//! @ingroup usbconf
+//! @defgroup device_cst_actions USB device custom actions
+//!
+//! @{
+// write here the action to associate to each USB event
+// be carefull not to waste time in order not disturbing the functions
 #define Usb_suspend_action()     suspend_action();
-#define Usb_reset_action()
-#define Usb_vbus_on_action()
-#define Usb_vbus_off_action()
-#define Usb_set_configuration_action()
-
 
 // write here the action to associate to each SCSI event
 // be carefull not to waste time in order not disturbing the functions
@@ -136,13 +131,7 @@
 #define Scsi_start_write_action()   Led2_on()
 #define Scsi_stop_write_action()    Led2_off()
 
-   //! @}
-
 extern void sof_action(void);
 extern void suspend_action(void);
-   //! @}
-
-
 /** @}  */
-
 #endif // _CONF_USB_H_

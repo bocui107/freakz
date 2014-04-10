@@ -15,11 +15,10 @@
  *      Atmel Corporation: http://www.atmel.com \n
  *      Support email: avr@atmel.com
  *
- * $Name: contiki-2-2-2 $
+ * $Name:  $
  * $Revision: 1.1 $
  * $RCSfile: config.h,v $
  * $Date: 2008/10/14 20:16:36 $  \n
- * $Id: config.h,v 1.1 2008/10/14 20:16:36 c_oflynn Exp $
  ******************************************************************************/
 /* Copyright (c) 2008  ATMEL Corporation
    All rights reserved.
@@ -58,21 +57,15 @@
    @{
 */
 
-//_____ I N C L U D E S ____________________________________________________
-
-
 #include "compiler.h" //!< Compiler definitions
-
 #include "contiki-raven.h"
 
 #ifdef AVRGCC
-   #define __AVR_AT90USBxxx__
-   #include <avr/io.h>
+#define __AVR_AT90USBxxx__
+#include <avr/io.h>
 #else
-   #include "lib_mcu/mcu.h" //!< Register declaration
+#include "lib_mcu/mcu.h" //!< Register declaration
 #endif
-
-//#include "conf_scheduler.h" //!< Scheduler tasks declaration
 
 //! Enable or not the ADC usage
 #undef  USE_ADC
