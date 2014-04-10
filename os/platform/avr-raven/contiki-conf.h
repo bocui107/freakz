@@ -55,7 +55,7 @@ typedef int32_t s32_t;
 #define RAVEN_LCD_INTERFACE
 
 /* Clock ticks per second */
-#define CLOCK_CONF_SECOND 125
+#define CLOCK_CONF_SECOND 1000
 
 /* COM port to be used for SLIP connection */
 #define SLIP_PORT RS232_PORT_0

@@ -60,6 +60,12 @@ void clock_setup()
 	 * Set timer control register:
 	 *  - prescale: 256
 	 *  - counter reset via comparison register (WGM01)
+	 *
+	 * AVR_CONF_TMR0_PRESCALE == 1		===> #define AVR_TCCR0B_CONF _BV(CS00)
+	 * AVR_CONF_TMR0_PRESCALE == 8		===> #define AVR_TCCR0B_CONF _BV(CS01)
+	 * AVR_CONF_TMR0_PRESCALE == 64		===> #define AVR_TCCR0B_CONF _BV(CS01) | _BV(CS00)
+	 * AVR_CONF_TMR0_PRESCALE == 256	===> #define AVR_TCCR0B_CONF _BV(CS02)
+	 * AVR_CONF_TMR0_PRESCALE == 1024	===> #define AVR_TCCR0B_CONF _BV(CS02) | _BV(CS00)
 	 */
 	TCCR0A = _BV(WGM01);
 	TCCR0B = _BV(CS02);
