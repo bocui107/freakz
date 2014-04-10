@@ -39,114 +39,73 @@
     are instantiated in the protocol control block and these functions
     are used to control those buffers in a circular fashion.
 */
-/*******************************************************************/
 #include "freakusb.h"
 #include <stdio.h>
 
-/**************************************************************************/
-/*!
-    Initialize the specified buffer.
-*/
-/**************************************************************************/
+/* Initialize the specified buffer. */
 void usb_buf_init(U8 ep_num, U8 ep_dir)
 {
-    usb_pcb_t *pcb = usb_pcb_get();
+	usb_pcb_t *pcb = usb_pcb_get();
 
-    pcb->fifo[ep_num].ep_dir    = ep_dir;
-    pcb->fifo[ep_num].len       = 0;
+	pcb->fifo[ep_num].ep_dir    = ep_dir;
+	pcb->fifo[ep_num].len       = 0;
 }
 
-/**************************************************************************/
-/*!
-    Return the used buf space
-*/
-/**************************************************************************/
-//static U8 usb_buf_get_used(U8 ep_num)
-//{
-//    usb_pcb_t *pcb = usb_pcb_get();
-//
-//    if (pcb->fifo[ep_num].wr_ptr > pcb->fifo[ep_num].rd_ptr)
-//    {
-//        return pcb->fifo[ep_num].wr_ptr - pcb->fifo[ep_num].rd_ptr;
-//    }
-//    else if (pcb->fifo[ep_num].wr_ptr == pcb->fifo[ep_num].rd_ptr)
-//    {
-//        return 0;
-//    }
-//    else
-//    {
-//        return MAX_BUF_SZ - (pcb->fifo[ep_num].rd_ptr - pcb->fifo[ep_num].wr_ptr);
-//    }
-//}
-
-/**************************************************************************/
-/*!
-    Read one byte out of the specified buffer. This function will return the byte
-    located at the array index of the read pointer, and then increment the read pointer index.
-    If the read pointer exceeds the maximum buffer size, it will roll over to zero.
-*/
-/**************************************************************************/
+/*
+ * Read one byte out of the specified buffer. This function will return the byte
+ * located at the array index of the read pointer, and then increment the read pointer index.
+ * If the read pointer exceeds the maximum buffer size, it will roll over to zero.
+ */
 U8 usb_buf_read(U8 ep_num)
 {
-    usb_pcb_t *pcb = usb_pcb_get();
-    U8 data;
+	usb_pcb_t *pcb = usb_pcb_get();
+	U8 data;
 
-    data    = pcb->fifo[ep_num].buf[pcb->fifo[ep_num].rd_ptr];
-    pcb->fifo[ep_num].rd_ptr = (pcb->fifo[ep_num].rd_ptr + 1) % MAX_BUF_SZ;
-    pcb->fifo[ep_num].len--;
-    return data;
+	data    = pcb->fifo[ep_num].buf[pcb->fifo[ep_num].rd_ptr];
+	pcb->fifo[ep_num].rd_ptr = (pcb->fifo[ep_num].rd_ptr + 1) % MAX_BUF_SZ;
+	pcb->fifo[ep_num].len--;
+	return data;
 }
 
-/**************************************************************************/
-/*!
-    Write one byte into the specified buffer. This function will write one
-    byte into the array index specified by the write pointer and increment
-    the write index. If the write index exceeds the max buffer size, then it
-    will roll over to zero.
-*/
-/**************************************************************************/
+/*
+ * Write one byte into the specified buffer. This function will write one
+ * byte into the array index specified by the write pointer and increment
+ * the write index. If the write index exceeds the max buffer size, then it
+ * will roll over to zero.
+ */
 void usb_buf_write(U8 ep_num, U8 data)
 {
-    usb_pcb_t *pcb = usb_pcb_get();
+	usb_pcb_t *pcb = usb_pcb_get();
 
-    pcb->fifo[ep_num].buf[pcb->fifo[ep_num].wr_ptr] = data;
-    pcb->fifo[ep_num].wr_ptr = (pcb->fifo[ep_num].wr_ptr + 1) % MAX_BUF_SZ;
-    pcb->fifo[ep_num].len++;
+	pcb->fifo[ep_num].buf[pcb->fifo[ep_num].wr_ptr] = data;
+	pcb->fifo[ep_num].wr_ptr = (pcb->fifo[ep_num].wr_ptr + 1) % MAX_BUF_SZ;
+	pcb->fifo[ep_num].len++;
 }
 
-/**************************************************************************/
-/*!
-    Clear the fifo read and write pointers and set the length to zero.
-*/
-/**************************************************************************/
+/* Clear the fifo read and write pointers and set the length to zero. */
 void usb_buf_clear_fifo(U8 ep_num)
 {
-    usb_pcb_t *pcb = usb_pcb_get();
+	usb_pcb_t *pcb = usb_pcb_get();
 
-    pcb->fifo[ep_num].rd_ptr = 0;
-    pcb->fifo[ep_num].wr_ptr = 0;
-    pcb->fifo[ep_num].len = 0;
+	pcb->fifo[ep_num].rd_ptr = 0;
+	pcb->fifo[ep_num].wr_ptr = 0;
+	pcb->fifo[ep_num].len = 0;
 }
 
-/**************************************************************************/
-/*!
-    Return the number of the first fifo that has the specified direction
-    and also has pending data to be processed or transmitted. If no data is
-    pending, it will return a value of 0xFF.
-*/
-/**************************************************************************/
+/*
+ * Return the number of the first fifo that has the specified direction
+ * and also has pending data to be processed or transmitted. If no data is
+ * pending, it will return a value of 0xFF.
+ */
 U8 usb_buf_data_pending(U8 ep_dir)
 {
-    U8 i;
-    usb_pcb_t *pcb = usb_pcb_get();
+	U8 i;
+	usb_pcb_t *pcb = usb_pcb_get();
 
-    // start from ep 1 since we aren't checking the ctrl ep
-    for (i=1; i<(NUM_EPS+1); i++)
-    {
-        if ((pcb->fifo[i].ep_dir == ep_dir) && (pcb->fifo[i].len != 0))
-        {
-            return i;
-        }
-    }
-    return 0xFF;
+	/* start from ep 1 since we aren't checking the ctrl ep */
+	for (i = 1; i < (NUM_EPS + 1); i++) {
+		if ((pcb->fifo[i].ep_dir == ep_dir) && (pcb->fifo[i].len != 0))
+			return i;
+	}
+	return 0xFF;
 }

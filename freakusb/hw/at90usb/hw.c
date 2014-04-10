@@ -59,7 +59,7 @@ void hw_init()
 	SET_DEVICE_MODE();
 
 	/* config PLL and turn it on */
-	PLLCSR  = (1 << PLLP1) | (1 << PLLP0);
+	PLLCSR  = (0 << PLLP2) | (1 << PLLP1) | (1 << PLLP0);
 	PLLCSR |= (1 << PLLE);
 	while (!PLL_LOCKED);
 

@@ -42,8 +42,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-// Standard data types
-// Standard data types
 typedef uint8_t             U8;     ///< Generic 8 bit unsigned data type
 typedef uint16_t            U16;    ///< Generic 16 bit unsigned data type
 typedef uint32_t            U32;    ///< Generic 32 bit unsigned data type
@@ -51,13 +49,4 @@ typedef uint32_t            U32;    ///< Generic 32 bit unsigned data type
 typedef int8_t              S8;     ///< Generic 8 bit signed data type
 typedef int16_t             S16;    ///< Generic 16 bit signed data type
 typedef int32_t             S32;    ///< Generic 32 bit signed data type
-/*!
-    Boolean type definition. It uses a full byte to hold a boolean value.
-    Slightly inefficient.
-*/
-//typedef enum
-//{
-//    false   = 0,
-//    true    = 1
-//} bool;
 #endif

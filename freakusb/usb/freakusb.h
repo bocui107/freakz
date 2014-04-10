@@ -43,21 +43,21 @@
 #include <stdio.h>
 #include "types.h"
 
-// class specific
+/* class specific */
 #include "cdc.h"
 
-// hw specific
+/* hw specific */
 #include "hw.h"
 
-// config
-#define FLASHMEM            PROGMEM     ///< AVR Specific for storing data in flash
+/* config */
+#define FLASHMEM            PROGMEM     /* AVR Specific for storing data in flash */
 #define MAX_RX_ENTRIES      5
-#define MAX_EPS             7           ///< AVR Specific for AT90USB USB controller
+#define MAX_EPS             7           /* AVR Specific for AT90USB USB controller */
 #define POWER_SRC           BUS_POWERED
 #define MAX_REQUEST_SIZE    32
 #define CTRL_IN_REQ_SZ      8
 
-// eps
+/* eps */
 #define EP_CTRL         0
 #define EP_1            1
 #define EP_2            2
@@ -67,7 +67,7 @@
 #define EP_6            6
 #define EP_7            7
 
-// packet sizes
+/* packet sizes */
 #define PKTSZ_8         0
 #define PKTSZ_16        1
 #define PKTSZ_32        2
@@ -77,17 +77,17 @@
 #define PKTSZ_512       6
 #define PKTSZ_1024      7
 
-// xfer type
+/* xfer type */
 #define CONTROL         0
 #define ISOCHRONOUS     1
 #define BULK            2
 #define INTP            3
 
-// dir
+/* direction */
 #define DIR_OUT         0
 #define DIR_IN          1
 
-// token types
+/* token types */
 #define PKTTYP_SETUP    0
 #define PKTTYP_IN       1
 #define PKTTYP_OUT      2
@@ -151,40 +151,40 @@
 #define SELF_POWERED        1
 #define BUS_POWERED         0
 
-// get desc request
+/* get desc request */
 typedef struct req_t
 {
-    U8 type;
-    U8 req;
-    U16 val;
-    U16 idx;
-    U16 len;
-    U8 data[];
+	U8 type;
+	U8 req;
+	U16 val;
+	U16 idx;
+	U16 len;
+	U8 data[];
 } req_t;
 
-// buffer used for circular fifo
+/* buffer used for circular fifo */
 typedef struct _usb_buffer_t
 {
-    U8 ep_dir;
-    volatile U8 len;    // this may change in an interrupt and the value would be required
-    volatile U8 wr_ptr;
-    volatile U8 rd_ptr;
-    U8 buf[MAX_BUF_SZ];
+	U8 ep_dir;
+	volatile U8 len;    // this may change in an interrupt and the value would be required
+	volatile U8 wr_ptr;
+	volatile U8 rd_ptr;
+	U8 buf[MAX_BUF_SZ];
 } usb_buffer_t;
 
-// protocol control block
+/* protocol control block */
 typedef struct _usb_pcb_t
 {
-    bool connected;
-    volatile U8 flags;
-    U8 intp_flags;
-    U8 cfg_num;
-    U8 ep_stall;
-    U8 test;
-    usb_buffer_t fifo[NUM_EPS];
-    void (*class_init)();
-    void (*class_req_handler)(req_t *req);
-    void (*class_rx_handler)();
+	bool connected;
+	volatile U8 flags;
+	U8 intp_flags;
+	U8 cfg_num;
+	U8 ep_stall;
+	U8 test;
+	usb_buffer_t fifo[NUM_EPS];
+	void (*class_init)();
+	void (*class_req_handler)(req_t *req);
+	void (*class_rx_handler)();
 } usb_pcb_t;
 
 // prototypes
@@ -232,14 +232,5 @@ U8 usb_buf_read(U8 ep_num);
 void usb_buf_write(U8 ep_num, U8 data);
 void usb_buf_clear_fifo(U8 ep_num);
 U8 usb_buf_data_pending(U8 ep_dir);
-
-// misc.c
-//void dbg_led_init();
-//void dbg_led_enb(U8 led_num);
-//void dbg_led_dis(U8 led_num);
-//void dbg_joystick_init();
-//U8 dbg_joystick_get_status();
-//void dbg_hwb_init();
-//bool dbg_hwb_get_status();
 #endif
 

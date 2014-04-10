@@ -42,6 +42,37 @@
 #include "contiki.h"
 
 FILE file_str = FDEV_SETUP_STREAM(freakusb_putchar, NULL, _FDEV_SETUP_WRITE);
+#if 0
+struct __file {
+        char    *buf;           /* buffer pointer */
+        unsigned char unget;    /* ungetc() buffer */
+        uint8_t flags;          /* flags, see below */
+#define __SRD   0x0001          /* OK to read */
+#define __SWR   0x0002          /* OK to write */
+#define __SSTR  0x0004          /* this is an sprintf/snprintf string */
+#define __SPGM  0x0008          /* fmt string is in progmem */
+#define __SERR  0x0010          /* found error */
+#define __SEOF  0x0020          /* found EOF */
+#define __SUNGET 0x040          /* ungetc() happened */
+#define __SMALLOC 0x80          /* handle is malloc()ed */
+        int     size;           /* size of buffer */
+        int     len;            /* characters read or written so far */
+        int     (*put)(char, struct __file *);  /* function to write one char to device */
+        int     (*get)(struct __file *);        /* function to read one char from device */
+        void    *udata;         /* User defined and accessible data. */
+};
+
+
+#define FILE    struct __file
+
+#define FDEV_SETUP_STREAM(p, g, f) \
+        { \
+                .put = p, \
+                .get = g, \
+                .flags = f, \
+                .udata = 0, \
+        }
+#endif
 
 PROCESS(freakusb_process, "FreakUSB Process");
 
@@ -85,13 +116,13 @@ PROCESS_THREAD(freakusb_process, ev, data_proc)
 	hw_init();
 	cdc_init();
 
-	// TODO: Implement this when we decide to accept commands over the USB
+	/* TODO: Implement this when we decide to accept commands over the USB */
 	cdc_reg_rx_handler(test_avr_usb_rx_handler);
 
-	// hook the putchar function to the printf and use it for stdout
+	/* hook the putchar function to the printf and use it for stdout */
 	stdout = &file_str;
 
-	// kick off the polling function
+	/* kick off the polling function */
 	process_poll(&freakusb_process);
 
 	while (1) {

@@ -34,44 +34,38 @@
  */
 
 #include <stdio.h>
-
 #include <avr/interrupt.h>
-
 #include "contiki.h"
-
 #include "dev/slip.h"
 
-static int
-slip_putchar(char c, FILE *stream)
+static int slip_putchar(char c, FILE *stream)
 {
+	static char debug_frame = 0;
+
 #define SLIP_END 0300
-  static char debug_frame = 0;
+	if (!debug_frame) { /* Start of debug output */
+		slip_arch_writeb(SLIP_END);
+		slip_arch_writeb('\r'); /* Type debug line == '\r' */
+		debug_frame = 1;
+	}
 
-  if (!debug_frame) {		/* Start of debug output */
-    slip_arch_writeb(SLIP_END);
-    slip_arch_writeb('\r'); /* Type debug line == '\r' */
-    debug_frame = 1;
-  }
+	slip_arch_writeb((unsigned char)c);
 
-  slip_arch_writeb((unsigned char)c);
+	/*
+	 * Line buffered output, a newline marks the end of debug output and
+	 * implicitly flushes debug output.
+	 */
+	if (c == '\n') {
+		slip_arch_writeb(SLIP_END);
+		debug_frame = 0;
+	}
 
-  /*
-   * Line buffered output, a newline marks the end of debug output and
-   * implicitly flushes debug output.
-   */
-  if (c == '\n') {
-    slip_arch_writeb(SLIP_END);
-    debug_frame = 0;
-  }
-
-  return c;
+	return c;
 }
 
-static FILE slip_stdout =
-FDEV_SETUP_STREAM(slip_putchar, NULL, _FDEV_SETUP_WRITE);
+static FILE slip_stdout = FDEV_SETUP_STREAM(slip_putchar, NULL, _FDEV_SETUP_WRITE);
 
-void
-slip_arch_init(unsigned long ubr)
+void slip_arch_init(unsigned long ubr)
 {
   u8_t dummy;
   spl_t s = splhigh();
