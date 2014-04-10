@@ -54,7 +54,7 @@ void clock_setup()
 	 * F_CPU = AVR_CONF_TMR0_PRESCALE * CLOCK_CONF_SECOND * OCR2A, less 1 for CTC mode
 	 * OCR0A = F_CPU / AVR_CONF_TMR0_PRESCALE / CLOCK_CONF_SECOND - 1;
 	 */
-	OCR0A = 32;
+	OCR0A = 31;
 
 	/*
 	 * Set timer control register:
