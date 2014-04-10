@@ -43,8 +43,8 @@
 #include "sys/rtimer.h"
 
 typedef struct {
-  /*  unsigned long cumulative[2];*/
-  unsigned long current;
+	/*  unsigned long cumulative[2];*/
+	unsigned long current;
 } energest_t;
 
 enum energest_type {

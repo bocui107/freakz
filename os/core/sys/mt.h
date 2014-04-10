@@ -179,10 +179,10 @@ void mtarch_pstop(void);
 #include "mtarch.h"
 
 struct mt_thread {
-  int state;
-  process_event_t *evptr;
-  process_data_t *dataptr;
-  struct mtarch_thread thread;
+	int state;
+	process_event_t *evptr;
+	process_data_t *dataptr;
+	struct mtarch_thread thread;
 };
 
 /**

@@ -57,11 +57,11 @@
 #include "sys/etimer.h"
 
 struct ctimer {
-  struct ctimer *next;
-  struct etimer etimer;
-  struct process *p;
-  void (*f)(void *);
-  void *ptr;
+	struct ctimer *next;
+	struct etimer etimer;
+	struct process *p;
+	void (*f)(void *);
+	void *ptr;
 };
 
 /**
