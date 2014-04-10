@@ -36,10 +36,9 @@
 
 #include "contiki.h"
 
-void
-init_lowlevel(void)
+void init_lowlevel(void)
 {
-    Leds_init();
-    Leds_off();
-    return;
+	Leds_init();
+	Leds_off();
+	return;
 }

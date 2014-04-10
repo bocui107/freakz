@@ -58,44 +58,38 @@
 
 PROCINIT(&etimer_process);
 
-int
-main(void)
+int main(void)
 {
-  /*
-   * GCC depends on register r1 set to 0.
-   */
-  asm volatile ("clr r1");
+	/*
+	 * GCC depends on register r1 set to 0.
+	 */
+	asm volatile ("clr r1");
 
-  /* Initialize hardware */
-  init_lowlevel();
+	/* Initialize hardware */
+	init_lowlevel();
 
-  /* Clock */
-  clock_init();
+	/* Clock */
+	clock_init();
 
-  /* Process subsystem */
-  process_init();
+	/* Process subsystem */
+	process_init();
 
-  /* Register initial processes */
-  procinit_init();
+	/* Register initial processes */
+	procinit_init();
 
-  /* Setup USB */
-  process_start(&freakusb_process, NULL);
+	/* Setup USB */
+	process_start(&freakusb_process, NULL);
 
-  // init the freakz stack
-  freakz_init();
+	/* init the freakz stack */
+	freakz_init();
 
-  // init the test code
-  test_avr_init();
+	/* init the test code */
+	test_avr_init();
 
-   /* Main scheduler loop */
-  while(1) {
-    process_run();
-  }
+	 /* Main scheduler loop */
+	while(1) {
+		process_run();
+	}
 
-  return 0;
+	return 0;
 }
-
-
-
-
-
