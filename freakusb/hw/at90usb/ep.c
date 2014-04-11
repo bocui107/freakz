@@ -142,7 +142,7 @@ void ep_write(U8 ep_num)
 		while (!RWAL_INT);
 	}
 
-	for (i=0; i<len; i++)
+	for (i = 0; i < len; i++)
 	{
 		/* check if we've reached the max packet size for the endpoint */
 		if (i == ep_size)
@@ -172,9 +172,7 @@ void ep_read(U8 ep_num)
 	len = FIFO_BYTE_CNT;
 
 	for (i=0; i<len; i++)
-	{
 		usb_buf_write(ep_num,  UEDATX);
-	}
 
 	if (len > 0) {
 		pcb->flags |= (ep_num == 0) ?
@@ -216,14 +214,14 @@ void ep_clear_stall(U8 ep_num)
 
 	pcb->ep_stall &= ~(1 << ep_num);
 	ep_select(ep_num);
-	UECONX |= (1<<STALLRQC);
+	UECONX |= (1 << STALLRQC);
 }
 
 /* Reset the data toggle on the specified endpoint */
 void ep_reset_toggle(U8 ep_num)
 {
 	ep_select(ep_num);
-	UECONX |= (1<<RSTDT);
+	UECONX |= (1 << RSTDT);
 }
 
 /* Clear all endpoints and initialize ep0 for control transfers */
@@ -232,7 +230,7 @@ void ep_init()
 	U8 i;
 
 	/* disable and clear all endpoints */
-	for (i=0; i<MAX_EPS; i++)
+	for (i = 0; i < MAX_EPS; i++)
 	{
 		ep_select(i);
 		ep_disable(i);
@@ -279,9 +277,9 @@ U8 ep_intp_get_num()
 {
 	U8 i;
 
-	for (i=0; i<MAX_EPS; i++)
+	for (i = 0; i < MAX_EPS; i++)
 	{
-		if (UEINT & (1<<i))
+		if (UEINT & (1 << i))
 			return i;
 	}
 	return 0xFF;
@@ -296,9 +294,9 @@ U8 ep_intp_get_src()
 	U8 i;
 
 	// get the intp src
-	for (i=0; i<8; i++)
+	for (i = 0; i < 8; i++)
 	{
-		if ((UEINTX & (1<<i)) && (UEIENX & (1<<i)))
+		if ((UEINTX & (1 << i)) && (UEIENX & (1 << i)))
 			return i;
 	}
 	return 0xFF;

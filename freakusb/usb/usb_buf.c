@@ -61,7 +61,7 @@ U8 usb_buf_read(U8 ep_num)
 	usb_pcb_t *pcb = usb_pcb_get();
 	U8 data;
 
-	data    = pcb->fifo[ep_num].buf[pcb->fifo[ep_num].rd_ptr];
+	data = pcb->fifo[ep_num].buf[pcb->fifo[ep_num].rd_ptr];
 	pcb->fifo[ep_num].rd_ptr = (pcb->fifo[ep_num].rd_ptr + 1) % MAX_BUF_SZ;
 	pcb->fifo[ep_num].len--;
 	return data;

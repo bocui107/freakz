@@ -83,14 +83,14 @@ void usb_poll()
 		 * a fifo. it makes the operations easier because we can just
 		 * do a pointer overlay on the buffer.
 		 */
-		if (pcb.flags & (1<<SETUP_DATA_AVAIL))
+		if (pcb.flags & (1 << SETUP_DATA_AVAIL))
 		{
 			/*
 			 * clear the setup flag at the very beginning.
 			 * later on, we can wait on this flag if there
 			 * are data stages to the setup transaction.
 			 */
-			pcb.flags &= ~(1<<SETUP_DATA_AVAIL);
+			pcb.flags &= ~(1 << SETUP_DATA_AVAIL);
 
 			/* handle the request */
 			ctrl_handler();
@@ -102,10 +102,10 @@ void usb_poll()
 		 * than the control endpoint unless the USB is properly
 		 * enumerated.
 		 */
-		if (pcb.flags & (1<<ENUMERATED))
+		if (pcb.flags & (1 << ENUMERATED))
 		{
 			/* if any rx data is pending, send it to the rx handler */
-			if (pcb.flags & (1<<RX_DATA_AVAIL))
+			if (pcb.flags & (1 << RX_DATA_AVAIL))
 			{
 				if (pcb.class_rx_handler)
 					pcb.class_rx_handler();
@@ -121,7 +121,7 @@ void usb_poll()
 			 * if any tx data is pending, send it to
 			 * the endpoint fifo
 			 */
-			if (pcb.flags & (1<<TX_DATA_AVAIL))
+			if (pcb.flags & (1 << TX_DATA_AVAIL))
 			{
 				/* get the ep number of any fifo with pending tx data */
 				if ((ep_num = usb_buf_data_pending(DIR_IN)) != 0xFF)
