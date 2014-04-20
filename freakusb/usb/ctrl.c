@@ -177,7 +177,7 @@ void ctrl_set_config(req_t *req)
 	pcb->class_init();
 
 	/* signal that the device is enumerated */
-	pcb->flags |= (1<<ENUMERATED);
+	pcb->flags |= (1 << ENUMERATED);
 }
 
 /*

@@ -176,7 +176,7 @@ void ep_read(U8 ep_num)
 
 	if (len > 0) {
 		pcb->flags |= (ep_num == 0) ?
-			      (1<<SETUP_DATA_AVAIL) : (1<<RX_DATA_AVAIL);
+			      (1 << SETUP_DATA_AVAIL) : (1 << RX_DATA_AVAIL);
 	}
 }
 

@@ -48,7 +48,7 @@ void intp_clear_all()
 	USBINT = 0;
 	UDINT  = 0;
 
-	for (i=0; i<MAX_EPS; i++)
+	for (i = 0; i < MAX_EPS; i++)
 	{
 		ep_select(i);
 		UEINTX = 0;
@@ -73,7 +73,7 @@ void intp_vbus_change()
 		UDCON  &= ~(1 << DETACH);
 	} else {
 		/* if we're connected, but VBUS is gone, then detach */
-		if (!(USBSTA & (1<<VBUS)))
+		if (!(USBSTA & (1 << VBUS)))
 		{
 			/* detach from the bus */
 			UDCON  |= (1 << DETACH);
