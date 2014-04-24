@@ -56,7 +56,7 @@
 #include "buf.h"
 
 /* 1 usec delay */
-#define delay_us(us)	(_delay_loop_2((F_CPU / 4000000UL) * (us)))
+#define delay_us(us)	(_delay_loop_2(1 + ((unsigned long long)us * F_CPU) / 4000000UL))
 
 #define IRQ_MASK_PLL_LOCK	0	/* IRQ reg bit - PLL Lock */
 #define IRQ_MASK_PLL_UNLOCK	1	/* IRQ reg bit - PLL Unlock */
