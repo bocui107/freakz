@@ -488,33 +488,30 @@ U8 drvr_set_trx_state(U8 state)
 	 * we need to handle some special cases before we transition
 	 * to the new state
 	 */
-	switch (state) {
-	case TRX_OFF:
-		/* Go to TRX_OFF from any state. */
+
+	/*
+	 * The radio transceiver can be in one of the following states:
+	 * TRX_OFF, RX_ON, PLL_ON, RX_AACK_ON, TX_ARET_ON
+	 */
+	if(state == TRX_OFF){
 		drvr_reset_fsm();
-		break;
-	case TX_ARET_ON:
-		if (curr_state == RX_AACK_ON)
-		{
+	} else {
+		/*
+		 * It is not allowed to go from RX_AACK_ON or TX_AACK_ON and directly
+		 * to TX_AACK_ON or RX_AACK_ON respectively. Need to go via PLL_ON.
+		 * (Old datasheets allowed other transitions, but this code complies
+		 * with the current specification for RF230, RF231 and 128RFA1.)
+		 */
+		if (((state == TX_ARET_ON) && (current_state == RX_AACK_ON)) ||
+		    ((state == RX_AACK_ON) && (current_state == TX_ARET_ON))) {
 			/*
-			 * First do intermediate state transition
-			 * to PLL_ON, then to TX_ARET_ON.
+			 * First do intermediate state transition to PLL_ON.
+			 * The final state transition is handled after the
+			 * if-else if.
 			 */
 			hal_subregister_write(SR_TRX_CMD, PLL_ON);
 			delay_us(TIME_STATE_TRANSITION_PLL_ACTIVE);
 		}
-		break;
-	case RX_AACK_ON:
-		if (curr_state == TX_ARET_ON)
-		{
-			/*
-			 * First do intermediate state transition
-			 * to RX_ON, then to RX_AACK_ON.
-			 */
-			hal_subregister_write(SR_TRX_CMD, RX_ON);
-			delay_us(TIME_STATE_TRANSITION_PLL_ACTIVE);
-		}
-		break;
 	}
 
 	/* Now we're okay to transition to any new state. */
