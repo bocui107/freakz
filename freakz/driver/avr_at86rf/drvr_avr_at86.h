@@ -63,6 +63,15 @@
 #define IRQ_MASK_RX_START	2	/* IRQ reg bit - RX Start */
 #define IRQ_MASK_TRX_END	3	/* IRQ reg bit - TRX End */
 
+#define RF230_MIN_CHANNEL                       ( 11 )
+#define RF230_MAX_CHANNEL                       ( 26 )
+#define RF230_MIN_ED_THRESHOLD                  ( 0 )
+#define RF230_MAX_ED_THRESHOLD                  ( 15 )
+#define RF230_MAX_TX_FRAME_LENGTH               ( 127 ) /**< 127 Byte PSDU. */
+
+#define TX_PWR_3DBM                             ( 0 )
+#define TX_PWR_17_2DBM                          ( 15 )
+
 /* AT86RF23x register address definitions */
 typedef enum
 {

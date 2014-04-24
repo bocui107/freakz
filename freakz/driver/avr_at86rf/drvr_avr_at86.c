@@ -64,9 +64,27 @@ extern process_event_t event_drvr_conf;
 /* Driver control block instantiation */
 static at86_dcb_t dcb;
 
+/* This function checks if the radio transceiver is sleeping.
+ *
+ * true    The radio transceiver is in SLEEP or one of the *_NOCLK
+ *             states.
+ * false   The radio transceiver is not sleeping.
+ */
+bool at86_is_sleeping(void)
+{
+	/*
+	 * The radio transceiver will be at SLEEP or one of the
+	 * *_NOCLK states only if the SLP_TR pin is high.
+	 */
+	if (hal_get_slptr())
+		return true;
+	else
+		return false;
+}
+
 /*
- * This is the reset sequence for the AT86 part. It follows the reset sequence
- * outlined in the AT86RF23x datasheet.
+ * This function will reset all the registers and the state machine of
+ * the radio transceiver.
  */
 void drvr_at86_reset()
 {
@@ -77,13 +95,21 @@ void drvr_at86_reset()
 }
 
 /*
- * Reset the finite state machine inside the AT86RF23x device. The timing
- * is required as mentioned in the datasheet.
+ * This function will reset the state machine (to TRX_OFF) from any of
+ * its states, except for the SLEEP state.
  */
 void drvr_reset_fsm()
 {
-	hal_set_slptr_low();
-	delay_us(TIME_NOCLK_TO_WAKE);
+
+	/* The data sheet is not clear on what happens when slptr is raised in RX on
+	 * states, it "remains in the new state and returns to the preceding state
+	 * when slptr is lowered". Possibly that is why there is an undocumented
+	 * TIME_NOCLK_TO_WAKE delay here?
+	 */
+	if (at86_is_sleeping()) {
+		hal_set_slptr_low();
+		delay_us(TIME_NOCLK_TO_WAKE);
+	}
 	hal_subregister_write(SR_TRX_CMD, CMD_FORCE_TRX_OFF);
 	delay_us(TIME_CMD_FORCE_TRX_OFF);
 }
@@ -140,7 +166,7 @@ void drvr_toggle_leds()
  * be used later when the confirmation gets sent up the stack to identify
  * the frame that the confirmation pertains to.
  */
-void drvr_set_handle(U8 handle)
+void drvr_set_handle(uint8_t handle)
 {
 	dcb.handle = handle;
 }
@@ -151,7 +177,7 @@ void drvr_set_handle(U8 handle)
  * included in the confirmation and will signal the higher layers whether the
  * transmission was successful or not.
  */
-void drvr_set_status(U8 status)
+void drvr_set_status(uint8_t status)
 {
 	dcb.status = status;
 	dcb.status_avail = true;
@@ -171,13 +197,20 @@ void drvr_set_data_rx_flag(bool flag)
 }
 
 /*
- * Set the AUTO CRC function in the registers. If this is set, then the hardware
- * will automatically generate the two byte frame checksum tacked on to the
- * end of the frame.
+ * This function will enable or disable automatic CRC during frame
+ * transmission.
+ *
+ * auto_crc_on If this parameter equals true auto CRC will be used for
+ * all frames to be transmitted. If this is set, then the hardware will
+ * automatically generate the two byte frame checksum tacked on to the
+ * end of the frame. If the parameter equals false, the automatic
+ * CRC will be disabled.
  */
-void drvr_set_auto_crc(bool auto_crc_on)
-{
-	hal_subregister_write(SR_TX_AUTO_CRC_ON, auto_crc_on);
+void drvr_set_auto_crc(bool auto_crc_on) {
+	if (auto_crc_on)
+		hal_subregister_write(SR_TX_AUTO_CRC_ON, 1);
+	else
+		hal_subregister_write(SR_TX_AUTO_CRC_ON, 0);
 }
 
 /*
@@ -195,26 +228,81 @@ void drvr_set_rand_seed()
  * Get a random number. This function returns a random 16-bit number
  * to the function that calls it.
  */
-U16 drvr_get_rand()
+uint16_t drvr_get_rand()
 {
-	return (U16)rand();
+	return (uint16_t)rand();
 }
 
 /*
  * Get the Tx/Rx state. It will read the hardware registers and return
  * the current state of the hardware's TX/RX FSM.
  */
-U8 drvr_get_trx_state()
+
+/* This function return the Radio Transceivers current state.
+ *
+ * P_ON               When the external supply voltage (VDD) is
+ *                    first supplied to the transceiver IC, the
+ *                    system is in the P_ON (Poweron) mode.
+ * BUSY_RX            The radio transceiver is busy receiving a
+ *                    frame.
+ * BUSY_TX            The radio transceiver is busy transmitting a
+ *                    frame.
+ * RX_ON              The RX_ON mode enables the analog and digital
+ *                    receiver blocks and the PLL frequency
+ *                    synthesizer.
+ * TRX_OFF            In this mode, the SPI module and crystal
+ *                    oscillator are active.
+ * PLL_ON             Entering the PLL_ON mode from TRX_OFF will
+ *                    first enable the analog voltage regulator. The
+ *                    transceiver is ready to transmit a frame.
+ * BUSY_RX_AACK       The radio was in RX_AACK_ON mode and received
+ *                    the Start of Frame Delimiter (SFD). State
+ *                    transition to BUSY_RX_AACK is done if the SFD
+ *                    is valid.
+ * BUSY_TX_ARET       The radio transceiver is busy handling the
+ *                    auto retry mechanism.
+ * RX_AACK_ON         The auto acknowledge mode of the radio is
+ *                    enabled and it is waiting for an incomming
+ *                    frame.
+ * TX_ARET_ON         The auto retry mechanism is enabled and the
+ *                    radio transceiver is waiting for the user to
+ *                    send the TX_START command.
+ * RX_ON_NOCLK        The radio transceiver is listening for
+ *                    incomming frames, but the CLKM is disabled so
+ *                    that the controller could be sleeping.
+ *                    However, this is only true if the controller
+ *                    is run from the clock output of the radio.
+ * RX_AACK_ON_NOCLK   Same as the RX_ON_NOCLK state, but with the
+ *                    auto acknowledge module turned on.
+ * BUSY_RX_AACK_NOCLK Same as BUSY_RX_AACK, but the controller
+ *                    could be sleeping since the CLKM pin is
+ *                    disabled.
+ * STATE_TRANSITION   The radio transceiver's state machine is in
+ *                    transition between two states.
+ */
+uint8_t drvr_get_trx_state()
 {
 	return hal_subregister_read(SR_TRX_STATUS);
 }
 
-/* Returns the channel that the hardware is currently set to */
-U8 drvr_get_channel()
+/*
+ * Returns the channel that the hardware is currently set to
+ * Current channel, 11 to 26.
+ */
+uint8_t drvr_get_channel()
 {
 	return hal_subregister_read(SR_CHANNEL);
 }
 
+/* This function will change the operating channel.
+ *
+ * channel New channel to operate on. Must be between 11 and 26.
+ *
+ * RADIO_SUCCESS New channel set.
+ * RADIO_WRONG_STATE Transceiver is in a state where the channel cannot be changed (SLEEP).
+ * RADIO_INVALID_ARGUMENT Channel argument is out of bounds.
+ * RADIO_TIMED_OUT The PLL did not lock within the specified time.
+ */
 /*
  * Sets the channel in the hardware. Changing a channel requires a certain
  * amount of delay as the hardware and PLL sync up to the new channel. This
@@ -222,9 +310,19 @@ U8 drvr_get_channel()
  * In a normal case, this would probably only happen if the channel that was
  * set is outside the 16 channels supported by 802.15.4.
  */
-U8 drvr_set_channel(U8 channel)
+uint8_t drvr_set_channel(uint8_t channel)
 {
-	U8 state;
+	uint8_t state;
+
+	if ((channel < RF230_MIN_CHANNEL) || (channel > RF230_MAX_CHANNEL))
+		return RADIO_INVALID_ARGUMENT;
+
+	if (at86_is_sleeping())
+		return RADIO_WRONG_STATE;
+
+	if (drvr_get_channel() == channel)
+		return RADIO_SUCCESS;
+
 	hal_subregister_write(SR_CHANNEL, channel);
 
 	/* add a delay to allow the PLL to lock if in active mode */
@@ -233,9 +331,9 @@ U8 drvr_set_channel(U8 channel)
 		delay_us(TIME_PLL_LOCK);
 
 	if (drvr_get_channel() == channel)
-		return (U8)RADIO_SUCCESS;
+		return RADIO_SUCCESS;
 
-	return (U8)RADIO_TIMED_OUT;
+	return RADIO_TIMED_OUT;
 }
 
 /*
@@ -258,8 +356,13 @@ bool drvr_get_coord()
 	return hal_subregister_read(SR_I_AM_COORD);
 }
 
-/* Get the TX power setting from hardware */
-U8 drvr_get_tx_pwr()
+/*
+ * Get the TX power setting from hardware
+ *
+ * 0 to 15 Current output power in "TX power settings" as defined in
+ * the radio transceiver's datasheet
+ */
+uint8_t drvr_get_tx_pwr()
 {
 	return hal_subregister_read(SR_TX_PWR);
 }
@@ -284,14 +387,26 @@ U8 drvr_get_tx_pwr()
  * 0xE     -12
  * 0xF     -17
  */
-U8 drvr_set_tx_pwr(U8 pwr_level)
+/* This function will change the output power level.
+ *
+ * power_level New output power level in the "TX power settings"
+ *             as defined in the radio transceiver's datasheet.
+ *
+ * RADIO_SUCCESS New output power set successfully.
+ * RADIO_INVALID_ARGUMENT The supplied function argument is out of bounds.
+ * RADIO_WRONG_STATE It is not possible to change the TX power when the
+ *                 device is sleeping.
+ */
+uint8_t drvr_set_tx_pwr(uint8_t power_level)
 {
-	if (hal_get_slptr())
-	{
-		return RADIO_WRONG_STATE;
-	}
+	/*Check function parameter and state.*/
+	if (power_level > TX_PWR_17_2DBM)
+		return RADIO_INVALID_ARGUMENT;
 
-	hal_subregister_write(SR_TX_PWR, pwr_level & 0xf);
+	if (at86_is_sleeping())
+		return RADIO_WRONG_STATE;
+
+	hal_subregister_write(SR_TX_PWR, power_level & 0xf);
 
 	return RADIO_SUCCESS;
 }
@@ -299,15 +414,31 @@ U8 drvr_set_tx_pwr(U8 pwr_level)
 /*
  * Set the PAN ID in hardware. When the auto frame filtering is used, the hardware
  * will discard any frames that don't match the PAN ID set in the device.
+ * the value is from 0 to 0xFFFF
  */
-void drvr_set_pan_id(U16 pan_id)
+void drvr_set_pan_id(uint16_t new_pan_id)
 {
-	U8 i;
+	uint8_t pan_byte;
 
-	for (i = 0; i < 2; i++)
-	{
-		hal_register_write(RG_PAN_ID_0 + i, pan_id >> (8 * i));
-	}
+	pan_byte = new_pan_id & 0xFF; /*  Extract new_pan_id_7_0. */
+	hal_register_write(RG_PAN_ID_0, pan_byte);
+
+	pan_byte = (new_pan_id >> 8*1) & 0xFF;  /*  Extract new_pan_id_15_8. */
+	hal_register_write(RG_PAN_ID_1, pan_byte);
+}
+
+/* Get the PAN ID of the device. Returns the 16-bit PAN ID */
+uint16_t drvr_get_pan_id()
+{
+	uint8_t pan_id_15_8, pan_id_7_0;
+	uint16_t pan_id = 0;
+
+	pan_id_15_8 = hal_register_read(RG_PAN_ID_1); /*  Read pan_id_15_8. */
+	pan_id_7_0 = hal_register_read(RG_PAN_ID_0); /*  Read pan_id_7_0. */
+
+	pan_id = ((uint16_t)(pan_id_15_8 << 8)) | pan_id_7_0;
+
+	return pan_id;
 }
 
 /*
@@ -321,51 +452,43 @@ void drvr_set_frm_pend(bool pend)
     hal_subregister_write(SR_AACK_SET_PD, pend);
 }
 
-/* Get the PAN ID of the device. Returns the 16-bit PAN ID */
-U16 drvr_get_pan_id()
-{
-	U8 i;
-	U16 pan_id = 0;
-
-	for (i = 0; i < 2; i++)
-	{
-		pan_id |= hal_register_read(RG_PAN_ID_0 + i) << (8 * i);
-	}
-	return pan_id;
-}
-
-/*
- * Set the short address of the device. If auto frame filtering is used, any
- * frames that don't match the short address, extended address, or broadcast
- * address will be discarded.
+/** \brief  This function will return the current short address used by the
+ *          address filter.
+ *
+ *  \retval Any value from 0x0000 to 0xFFFF
  */
-void drvr_set_short_addr(U16 addr)
+uint16_t drvr_get_short_addr(void)
 {
-	U8 i;
 
-	for (i=0; i<2; i++)
-	{
-		hal_register_write(RG_SHORT_ADDR_0 + i, addr >> (8 * i));
-	}
+	uint8_t short_address_15_8, short_address_7_0;
+	uint16_t short_address;
+
+	short_address_15_8 = hal_register_read(RG_SHORT_ADDR_1); /*  Read short_address_15_8. */
+	short_address_7_0  = hal_register_read(RG_SHORT_ADDR_1); /*  Read short_address_7_0. */
+
+	short_address = ((uint16_t)(short_address_15_8 << 8)) | short_address_7_0;
+
+	return short_address;
 }
 
-/* Get the short address. Returns the 16-bit short (network) address */
-U16 drvr_get_short_addr()
+/** \brief  This function will set the short address used by the address filter.
+ *
+ *  \param  new_short_address Short address to be used by the address filter.
+ */
+void drvr_set_short_addr(uint16_t new_short_address)
 {
-	U8 i;
-	U16 addr = 0;
 
-	for (i = 0; i < 2; i++)
-	{
-		addr |= hal_register_read(RG_SHORT_ADDR_0 + i) << (8 * i);
-	}
-	return addr;
+    uint8_t short_address_byte = new_short_address & 0xFF; /*  Extract short_address_7_0. */
+    hal_register_write(RG_SHORT_ADDR_0, short_address_byte);
+
+    short_address_byte = (new_short_address >> 8*1) & 0xFF; /*  Extract short_address_15_8. */
+    hal_register_write(RG_SHORT_ADDR_1, short_address_byte);
 }
 
 /* Set the extended address */
 void drvr_set_ext_addr(U64 addr)
 {
-	U8 i;
+	uint8_t i;
 
 	for (i = 0; i < 8; i++) {
 		hal_register_write(RG_IEEE_ADDR_0 + i, addr >> (8 * i));
@@ -375,7 +498,7 @@ void drvr_set_ext_addr(U64 addr)
 /* Get the extended address */
 U64 drvr_get_ext_addr()
 {
-	U8 i;
+	uint8_t i;
 	U64 addr = 0;
 
 	for (i = 0; i < 8; i++) {
@@ -390,11 +513,11 @@ U64 drvr_get_ext_addr()
  * the max CSMA retries (ie: number of CSMA backoffs allowed), the min backoff exponent,
  * and the CSMA seeds. When two devices try to transmit at the same time,
  */
-U8 drvr_config_csma(U8 seed0, U8 seed1, U8 min_be, U8 frame_retries, U8 csma_retries)
+uint8_t drvr_config_csma(uint8_t seed0, uint8_t seed1, uint8_t min_be, uint8_t frame_retries, uint8_t csma_retries)
 {
 	/* make sure the device ain't sleeping */
-	if (hal_get_slptr())
-	return RADIO_WRONG_STATE;
+	if (at86_is_sleeping())
+		return RADIO_WRONG_STATE;
 
 	/*
 	 * note: in revA, max frame retries should be set to 0
@@ -416,14 +539,14 @@ U8 drvr_config_csma(U8 seed0, U8 seed1, U8 min_be, U8 frame_retries, U8 csma_ret
  * the carrier sense or also including energy detection. Please see datasheet
  * for more details.
  */
-U8 drvr_set_cca(U8 mode, U8 ed_thresh)
+uint8_t drvr_set_cca(uint8_t mode, uint8_t ed_thresh)
 {
 	if ((mode != CCA_ED) &&
 	    (mode != CCA_CARRIER_SENSE) &&
 	    (mode != CCA_CARRIER_SENSE_WITH_ED))
 		return RADIO_INVALID_ARGUMENT;
 
-	if (hal_get_slptr())
+	if (at86_is_sleeping())
 		return RADIO_WRONG_STATE;
 
 	/*Change cca mode and ed threshold.*/
@@ -434,7 +557,7 @@ U8 drvr_set_cca(U8 mode, U8 ed_thresh)
 }
 
 /* Get the clear channel assessment mode */
-U8 drvr_get_cca()
+uint8_t drvr_get_cca()
 {
 	return hal_subregister_read(SR_CCA_MODE);
 }
@@ -443,7 +566,7 @@ U8 drvr_get_cca()
  * Get the energy detection value for the current channel. This normally
  * used in network formation to find a channel with low activity.
  */
-U8 drvr_get_ed()
+uint8_t drvr_get_ed()
 {
 	/*
 	 * ED register needs to be written with a dummy
@@ -461,25 +584,25 @@ U8 drvr_get_ed()
  * for certain operations. Check the datasheet for more details on the state
  * machine and manipulations.
  */
-U8 drvr_set_trx_state(U8 state)
+uint8_t drvr_set_trx_state(uint8_t state)
 {
-	U8 curr_state, delay;
+	uint8_t current_state, delay;
 
 	/* if we're sleeping then don't allow transition */
-	if (hal_get_slptr() != 0)
+	if (at86_is_sleeping())
 		return RADIO_WRONG_STATE;
 
 	/*
 	 * if we're in a transition state, wait for the
 	 * state to become stable
 	 */
-	curr_state = drvr_get_trx_state();
-	if ((curr_state == BUSY_TX_ARET) ||
-	    (curr_state == BUSY_RX_AACK) ||
-	    (curr_state == BUSY_RX) ||
-	    (curr_state == BUSY_TX))
+	current_state = drvr_get_trx_state();
+	if ((current_state == BUSY_TX_ARET) ||
+	    (current_state == BUSY_RX_AACK) ||
+	    (current_state == BUSY_RX) ||
+	    (current_state == BUSY_TX))
 	{
-		while (drvr_get_trx_state() == curr_state);
+		while (drvr_get_trx_state() == current_state);
 	}
 
 	/*
@@ -519,7 +642,7 @@ U8 drvr_set_trx_state(U8 state)
 
 	/* When the PLL is active most states can be reached in 1us. However, from */
 	/* TRX_OFF the PLL needs time to activate. */
-	delay = (curr_state == TRX_OFF) ? TIME_TRX_OFF_TO_PLL_ACTIVE :
+	delay = (current_state == TRX_OFF) ? TIME_TRX_OFF_TO_PLL_ACTIVE :
 					  TIME_STATE_TRANSITION_PLL_ACTIVE;
 	delay_us(delay);
 
@@ -540,9 +663,9 @@ U8 drvr_set_trx_state(U8 state)
  * TODO: need to modify this and see if its cool to write the frame data
  * to the buffer before initiate the transmission...that's just kind of weird...
  */
-U8 drvr_tx(const buffer_t *buf)
+uint8_t drvr_tx(const buffer_t *buf)
 {
-	U8 state = drvr_get_trx_state();
+	uint8_t state = drvr_get_trx_state();
 
 	if ((state == BUSY_TX) || (state == BUSY_TX_ARET))
 		return RADIO_WRONG_STATE;
@@ -583,8 +706,8 @@ U8 drvr_tx(const buffer_t *buf)
  */
 void drvr_init()
 {
-	U8 part_num, ver_num, irq;
-	U16 man_id = 0;
+	uint8_t part_num, ver_num, irq;
+	uint16_t man_id = 0;
 
 	memset(&dcb, 0, sizeof(at86_dcb_t));
 
@@ -647,7 +770,7 @@ void drvr_init()
  */
 static void pollhandler()
 {
-	U8 status;
+	uint8_t status;
 
 	if (dcb.data_rx) {
 		process_post(&mac_process, event_mac_rx, NULL);
