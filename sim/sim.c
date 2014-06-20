@@ -311,11 +311,14 @@ void static kill_a_node(struct sim_node_t *nd)
 	close(nd->cmd_in.pipe);
 	close(nd->cmd_out.name);
 
+	/* sleep 1s to wait the process of the pid to exit */
+	sleep(1);
+
 	unlink(nd->data_in.name);
 	unlink(nd->data_out.name);
 	unlink(nd->cmd_in.name);
 	unlink(nd->cmd_out.name);
-	sleep(1);
+
 	list_remove(&node_list, &nd->list);
 	free(nd);
 
