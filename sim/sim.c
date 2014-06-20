@@ -342,19 +342,13 @@ static void sim_kill_all_nodes()
 	char msg[30];
 	struct sim_node_t *nd;
 
-	if (errno == EEXIST)
-		return;
-
-	if (errno == EINTR)
+	close(pp.pipe);
+	unlink(pp.name);
+	list_for_each_entry(nd, &node_list, list)
 	{
-		close(pp.pipe);
-		unlink(pp.name);
-		list_for_each_entry(nd, &node_list, list)
-		{
-			kill_a_node(nd);
-		}
-		exit(EXIT_SUCCESS);
+		kill_a_node(nd);
 	}
+	exit(EXIT_SUCCESS);
 }
 
 void sigchld_handler()
