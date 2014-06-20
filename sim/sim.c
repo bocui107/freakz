@@ -309,10 +309,12 @@ void static kill_a_node(struct sim_node_t *nd)
 	close(nd->data_out.pipe);
 	close(nd->data_in.pipe);
 	close(nd->cmd_in.pipe);
+	close(nd->cmd_out.name);
 
 	unlink(nd->data_in.name);
 	unlink(nd->data_out.name);
 	unlink(nd->cmd_in.name);
+	unlink(nd->cmd_out.name);
 	sleep(1);
 	list_remove(&node_list, &nd->list);
 	free(nd);
