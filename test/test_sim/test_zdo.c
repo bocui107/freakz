@@ -86,9 +86,16 @@ void test_zdo_nwk_form_conf(U8 status)
 {
     if (status == NWK_SUCCESS)
     {
+#ifdef TEST_SIM
+	sim_node_t *node = node_get();
+	char msg[BUFSIZE];
+
+	sprintf(msg, "node %d nwk form success\n", node->index);
+	format_cmd_str((U8 *)msg);
+	sim_pipe_cmd_out((U8 *)msg, strlen(msg) + 1);
+#endif
         DBG_PRINT_SIMONLY("TEST_ZDO_NWK_FORM_CONF: Network Formation Successful.\n");
-    }
-    else
+    } else
     {
         DBG_PRINT_SIMONLY("TEST_ZDO_NWK_FORM_CONF: Error occurred forming network.\n");
     }
@@ -104,6 +111,14 @@ void test_zdo_nwk_join_conf(U8 status, U16 nwk_addr, U16 parent_addr)
 {
     if (status == NWK_SUCCESS)
     {
+#ifdef TEST_SIM
+	sim_node_t *node = node_get();
+	char msg[BUFSIZE];
+
+	sprintf(msg, "node %d nwk join success\n", node->index);
+	format_cmd_str((U8 *)msg);
+	sim_pipe_cmd_out((U8 *)msg, strlen(msg) + 1);
+#endif
         DBG_PRINT_SIMONLY("test_zdo_NWK_JOIN_CONF: Network joined successfully. Nwk Address: %4X.\n", nwk_addr);
     }
     else

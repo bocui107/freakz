@@ -80,6 +80,17 @@ void test_data_rx_handler(U8 *data, U8 len, U16 src_addr, U8 src_ep, U16 clust_i
 
 void test_data_conf_handler(U8 status, U8 handle)
 {
+#ifdef TEST_SIM
+	sim_node_t *node = node_get();
+	char msg[BUFSIZE];
+
+	if(status == APS_SUCCESS)
+		sprintf(msg, "node %d aps ack received\n", node->index);
+	else
+		sprintf(msg, "node %d data received\n", node->index);
+	format_cmd_str((U8 *)msg);
+	sim_pipe_cmd_out((U8 *)msg, strlen(msg) + 1);
+#endif
 	DBG_PRINT_SIMONLY("TEST DATA CONF RCVD: Status: %s, Handle: %x.\n",
 					debug_dump_af_status(status), handle);
 }
