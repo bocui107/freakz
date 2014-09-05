@@ -119,7 +119,7 @@ PROCESS_THREAD(etimer_process, ev, data)
 		} else if(ev != PROCESS_EVENT_POLL) {
 			continue;
 		}
-		/* 如果是PROCESS_EVENT_POLL, 则略过,执行下次循环 */
+		/* 如果不是PROCESS_EVENT_POLL, 则略过,执行下次循环 */
 again:
 		u = NULL;
 

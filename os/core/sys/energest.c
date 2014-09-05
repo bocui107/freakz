@@ -52,7 +52,7 @@ unsigned char energest_current_mode[ENERGEST_TYPE_MAX];
 
 void energest_init(void)
 {
-  int i;
+	int i;
 
 	for(i = 0; i < ENERGEST_TYPE_MAX; ++i) {
 		energest_total_time[i].current = energest_current_time[i] = 0;
