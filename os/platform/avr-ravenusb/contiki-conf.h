@@ -64,7 +64,7 @@ typedef int32_t s32_t;
 #define SLIP_PORT RS232_PORT_0
 
 /* Pre-allocated memory for loadable modules heap space (in bytes)*/
-//#define MMEM_CONF_SIZE 256
+#define MMEM_CONF_SIZE 2048
 
 /* Use the following address for code received via the codeprop
  * facility
