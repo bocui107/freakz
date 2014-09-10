@@ -42,10 +42,7 @@
 */
 /**************************************************************************/
 #include "freakz.h"
-
-#if (TEST_SIM == 1)
-	#include "test_app.h"
-#endif
+#include "test_app.h"
 
 /* Dummy function that just initializes everybody. */
 void freakz_init()
@@ -60,10 +57,7 @@ void freakz_init()
 	zdo_init();
 	buf_init();
 	slow_clock_init();
-
-#if (TEST_SIM == 1)
 	test_app_init();
-#endif
 }
 
 
