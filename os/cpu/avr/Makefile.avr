@@ -1,27 +1,18 @@
-# $Id: Makefile.avr,v 1.12 2008/10/14 19:06:51 c_oflynn Exp $
-
-### Check if we are running under Windows
-
-ifndef WINDIR
-  ifdef OS
-    ifneq (,$(findstring Windows,$(OS)))
-      WINDIR := Windows
-    endif
-  endif
-endif
 
 .SUFFIXES:
 
-### Optimization setting
-OPTI=0
+### Optimization setting. $make OPTI=0 for easier debugging of changed source file(s)
+ifndef OPTI
+  OPTI=s
+endif
 
-### Define the CPU directory
+### Define the CPU directory of the AVR port
 CONTIKI_CPU=$(CONTIKI)/cpu/avr
 
-### Define the source files we have in the AVR port
-
-AVR        = clock.c random.c
-TARGETLIBS = clock.c flash.c
+### These directories will be searched for the specified source files
+### TARGETLIBS are platform-specific routines in the contiki library path
+AVR        = clock.c flash.c
+TARGETLIBS = random.c
 
 CONTIKI_TARGET_SOURCEFILES += ${AVR} $(SENSORS) \
                               $(SYSAPPS) \
@@ -35,32 +26,43 @@ CC       = avr-gcc
 LD       = avr-gcc
 AS       = avr-as
 AR       = avr-ar
+ELF_SIZE = avr-size -C --mcu=$(MCU)
 OBJCOPY  = avr-objcopy
 STRIP    = avr-strip
-CFLAGSNO = -I. -I$(CONTIKI)/core -I$(CONTIKI_CPU) $(USB_INCLUDES) \
-           -I$(CONTIKI)/platform/$(TARGET) \
-           ${addprefix -I,$(APPDIRS)} \
-           -Wall -mmcu=$(MCU) -gdwarf-2 $(CONTIKI_PLAT_DEFS)
+CFLAGSNO = -Wall -mmcu=$(MCU) -gdwarf-2 -fno-strict-aliasing \
+            -I$(CONTIKI)/platform/$(TARGET) \
+            -I. -I$(CONTIKI)/core -I$(CONTIKI_CPU) $(USB_INCLUDES) \
+            $(CONTIKI_PLAT_DEFS)
 CFLAGS   += $(CFLAGSNO) -O$(OPTI)
-BOOTLOADER_START = 0x1FC00
-LDFLAGS  = -mmcu=$(MCU) -Wl,-Map=contiki-$(TARGET).map \
-		-Wl,--section-start=.bootloader=$(BOOTLOADER_START)
 
+ifndef BOOTLOADER_START
+  BOOTLOADER_START = 0x1F800
+endif
+
+LDFLAGS  += -mmcu=$(MCU) -Wl,-Map=contiki-$(TARGET).map \
+           -Wl,--section-start=.bootloader=$(BOOTLOADER_START)
+
+SMALL ?= 1
+
+### These flags help significantly reduce the code size
+ifeq ($(SMALL),1)
+CFLAGS += -ffunction-sections
+CFLAGS += -fdata-sections
+LDFLAGS += -Wl,--gc-sections
+endif # SMALL
+
+vpath %.c $(PROJECTDIRS) $(CONTIKI)/cpu/avr/dev \
+         $(CONTIKIDIRS) $(APPDIRS) $(CONTIKI_TARGET_DIRS_CONCAT) \
+         $(CONTIKI_CPU)
 
 ### Setup directory search path for source files
 
 CONTIKI_TARGET_DIRS_CONCAT = ${addprefix $(CONTIKI)/platform/$(TARGET)/, \
                                $(CONTIKI_TARGET_DIRS)}
 
-vpath %.c $(PROJECTDIRS) $(CONTIKI)/cpu/avr/dev $(CONTIKI)/cpu/avr/dev/usb \
-      $(CONTIKI)/cpu/avr/dev/usb/rndis $(CONTIKI)/cpu/avr/dev/usb/serial \
-      $(CONTIKI)/cpu/avr/dev/usb/storage \
-	  $(CONTIKIDIRS) $(APPDIRS) $(CONTIKI_TARGET_DIRS_CONCAT) \
-	  $(CONTIKI_CPU) $(CONTIKI)/cpu/avr/radio/rf230 $(CONTIKI)/cpu/avr/radio/mac
-
 ### Compilation rules
 
-$(OBJECTDIR)/%.o: %.c
+$(OBJECTDIR)/%.o: %.c | $(OBJECTDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 %.o: %.c
@@ -71,13 +73,21 @@ $(OBJECTDIR)/%.o: %.c
 
 %.elf:	%.co $(PROJECT_OBJECTFILES) contiki-$(TARGET).a symbols.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(filter-out %.a,$^) $(filter %.a,$^) $(LDLIBS)
+#Allow top-level makefile to always show size even when build is up to date
+ifndef NOAVRSIZE
+	avr-size -C --mcu=$(MCU) $@
+endif
 
 %.hex: %.out
+	$(OBJCOPY) $^ -j .text -j .data -O ihex $@
+
+%.ihex: %.out
 	$(OBJCOPY) $^ -O ihex $@
 
 # Add a namelist to the kernel
 %.out: %.co $(PROJECT_OBJECTFILES) contiki-$(TARGET).a
-	$(CONTIKI)/tools/make-empty-symbols
+	cp ${CONTIKI}/tools/empty-symbols.c symbols.c
+	cp ${CONTIKI}/tools/empty-symbols.h symbols.h
 	$(CC) $(LDFLAGS) $(CFLAGS) -o $@ $^ $(LIBC) symbols.c
 ifdef SYMBOLS
 	$(CONTIKI)/tools/avr-make-symbols $@
@@ -87,7 +97,7 @@ ifdef SYMBOLS
 endif
 
 #%.hex: %.elf
-#	$(OBJCOPY) -R .eeprom $^ -O ihex $@
+#	$(OBJCOPY) -R .eeprom -R .fuse -R .signature $^ -O ihex $@
 
 %.eep: %.out
 	-$(OBJCOPY) -j .eeprom --set-section-flags=.eeprom="alloc,load" \
@@ -107,7 +117,8 @@ endif
 #	$(STRIP) --strip-unneeded -g -x $@
 
 %.co: %.c
-	$(CONTIKI)/tools/make-empty-symbols
+	cp $(CONTIKI)/tools/empty-symbols.c symbols.c
+	cp $(CONTIKI)/tools/empty-symbols.h symbols.h
 	$(CC) $(CFLAGS) -DAUTOSTART_ENABLE -c $< -o $@
 
 %-stripped.o: %.o
@@ -120,8 +131,28 @@ endif
 	$(OBJCOPY) -O srec $< $@
 
 ### Upload image
+#Let avrdude use defaults if port or programmer not defined
+AVRDUDE ?= avrdude
+ifdef AVRDUDE_PORT
+AVRDUDE_PORT:=-P $(AVRDUDE_PORT)
+endif
+
+ifdef AVRDUDE_PROGRAMMER
+AVRDUDE_PROGRAMMER:=-c $(AVRDUDE_PROGRAMMER)
+endif
+
+ifdef AVRDUDE_MCU
+AVRDUDE_MCU:=-p $(AVRDUDE_MCU)
+else
+AVRDUDE_MCU:=-p $(MCU)
+endif
+
 %.u: %.hex
-	avrdude ${AVRDUDE_OPTIONS} -P ${AVRDUDE_PORT} -c ${AVRDUDE_PROGRAMMER} -p ${MCU} -U flash:w:$<
+	$(AVRDUDE) $(AVRDUDE_MCU) $(AVRDUDE_OPTIONS) $(AVRDUDE_PORT) $(AVRDUDE_PROGRAMMER) -U flash:w:$<
+
+%.eu: %.eep
+	$(AVRDUDE) $(AVRDUDE_MCU) ${AVRDUDE_OPTIONS} ${AVRDUDE_PORT} ${AVRDUDE_PROGRAMMER} -U eeprom:w:$<
 
 symbols.c:
-	@${CONTIKI}/tools/make-empty-symbols
+	cp ${CONTIKI}/tools/empty-symbols.c symbols.c
+	cp ${CONTIKI}/tools/empty-symbols.h symbols.h
