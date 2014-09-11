@@ -20,7 +20,6 @@ CONTIKI_TARGET_SOURCEFILES += ${AVR} $(SENSORS) \
 
 CONTIKI_SOURCEFILES        += $(CONTIKI_TARGET_SOURCEFILES)
 
-
 ### Compiler definitions
 CC       = avr-gcc
 LD       = avr-gcc
@@ -54,11 +53,6 @@ endif # SMALL
 vpath %.c $(PROJECTDIRS) $(CONTIKI)/cpu/avr/dev \
          $(CONTIKIDIRS) $(APPDIRS) $(CONTIKI_TARGET_DIRS_CONCAT) \
          $(CONTIKI_CPU)
-
-### Setup directory search path for source files
-
-CONTIKI_TARGET_DIRS_CONCAT = ${addprefix $(CONTIKI)/platform/$(TARGET)/, \
-                               $(CONTIKI_TARGET_DIRS)}
 
 ### Compilation rules
 
