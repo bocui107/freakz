@@ -11,10 +11,11 @@ CONTIKI_CPU=$(CONTIKI)/cpu/avr
 
 ### These directories will be searched for the specified source files
 ### TARGETLIBS are platform-specific routines in the contiki library path
+CONTIKI_CPU_DIRS = . dev
 AVR        = clock.c flash.c
 TARGETLIBS = random.c
 
-CONTIKI_TARGET_SOURCEFILES += ${AVR} $(SENSORS) \
+CONTIKI_TARGET_SOURCEFILES += $(AVR) $(SENSORS) \
                               $(SYSAPPS) \
                               $(TARGETLIBS)
 
@@ -49,10 +50,6 @@ CFLAGS += -ffunction-sections
 CFLAGS += -fdata-sections
 LDFLAGS += -Wl,--gc-sections
 endif # SMALL
-
-vpath %.c $(PROJECTDIRS) $(CONTIKI)/cpu/avr/dev \
-         $(CONTIKIDIRS) $(APPDIRS) $(CONTIKI_TARGET_DIRS_CONCAT) \
-         $(CONTIKI_CPU)
 
 ### Compilation rules
 

@@ -84,21 +84,18 @@
 #include "constants.h"
 #include "types.h"
 #include "buf.h"
-#include "debug.h"
+#include "mem_heap.h"
+#include "mac.h"
+#include "dev_dbg.h"
 #include "zcl.h"
 #include "zdo.h"
 #include "af.h"
 #include "aps.h"
 #include "nwk.h"
-#include "mac.h"
 #include "mac_hw.h"
 #include "misc.h"
 #include "slow_clock.h"
 #include "mmem.h"
-
-/* TEST */
-#include "mem_heap.h"
-/* END TEST */
 
 /* MAC rx event */
 process_event_t event_mac_rx;
