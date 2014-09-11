@@ -1,23 +1,37 @@
+# -*- makefile -*-
+
 ifndef CONTIKI
-  ${error CONTIKI not defined! You must specify where CONTIKI resides!}
+  ${error CONTIKI not defined! You must specify where Contiki resides}
 endif
-
-LINT = lint-nt
-STD_LINT = $(ROOT_DIR)/lint/std.lnt
-
-OBJECTDIR = obj_$(TARGET)
-CFLAGS += -DCONTIKI_TARGET=$(TARGET) -fpack-struct
 
 ifeq ($(TARGET),)
   -include Makefile.target
   ifeq ($(TARGET),)
-    ifeq ($(DEFAULT_TARGET),)
-      DEFAULT_TARGET=native
-    endif
-    ${warning TARGET not defined, using target '$(DEFAULT_TARGET)'}
-    TARGET=$(DEFAULT_TARGET)
+    ${info TARGET not defined, using target 'native'}
+    TARGET=native
   else
-    ${warning using saved target '$(TARGET)'}
+    ${info using saved target '$(TARGET)'}
+  endif
+endif
+
+ifeq ($(UIP_CONF_IPV6),1)
+  CFLAGS += -DUIP_CONF_IPV6=1
+endif
+
+ifeq ($(DEFINES),)
+  -include Makefile.$(TARGET).defines
+  ifneq ($(DEFINES),)
+    ${info using saved defines '$(DEFINES)'}
+  endif
+endif
+
+ifndef HOST_OS
+  ifeq ($(OS),Windows_NT)
+  ## TODO: detect more specific Windows set-ups,
+  ## e.g. CygWin, MingW, VisualC, Watcom, Interix
+    HOST_OS := Windows
+  else
+    HOST_OS := $(shell uname)
   endif
 endif
 
@@ -25,27 +39,32 @@ usage:
 	@echo "make MAKETARGETS... [TARGET=(TARGET)] [savetarget] [targets]"
 
 targets:
-	@ls -1 $(CONTIKI)/platform | grep -v CVS
+	@ls -1 $(CONTIKI)/platform $(TARGETDIRS) | grep -v CVS
 
 savetarget:
 	-@rm -f Makefile.target
+	@echo "saving Makefile.target"
 	@echo >Makefile.target "TARGET = $(TARGET)"
 
-ifeq (${wildcard $(OBJECTDIR)},)
-DUMMY := ${shell mkdir $(OBJECTDIR)}
-endif
+savedefines:
+	-@rm -f Makefile.$(TARGET).defines
+	@echo "saving Makefile.$(TARGET).defines"
+	@echo >Makefile.$(TARGET).defines "DEFINES = $(DEFINES)"
 
 include $(CONTIKI)/../freakz/Makefile.freakz
+OBJECTDIR = obj_$(TARGET)
 
-SYSTEM  = process.c procinit.c autostart.c
-LIBS    = memb.c timer.c list.c etimer.c rtimer.c ctimer.c mmem.c
+LOWERCASE = -abcdefghijklmnopqrstuvwxyz
+UPPERCASE = _ABCDEFGHIJKLMNOPQRSTUVWXYZ
+TARGET_UPPERCASE := ${strip ${shell echo $(TARGET) | sed y!$(LOWERCASE)!$(UPPERCASE)!}}
+CFLAGS += -DCONTIKI=1 -DCONTIKI_TARGET_$(TARGET_UPPERCASE)=1
 
-CONTIKIFILES = $(SYSTEM) $(LIBS)
+MODULES += core/sys core/dev core/lib
 
 CONTIKI_SOURCEFILES += $(CONTIKIFILES)
 
-CONTIKIDIRS += ${addprefix $(CONTIKI)/core/,dev lib sys \
-                  loader . }
+CONTIKIDIRS += ${addprefix $(CONTIKI)/core/,dev lib net net/mac net/rime \
+                 net/rpl sys cfs ctk lib/ctk loader . }
 
 oname = ${patsubst %.c,%.o,${patsubst %.S,%.o,$(1)}}
 
@@ -53,13 +72,20 @@ CONTIKI_OBJECTFILES = ${addprefix $(OBJECTDIR)/,${call oname, $(CONTIKI_SOURCEFI
 
 PROJECT_OBJECTFILES = ${addprefix $(OBJECTDIR)/,${call oname, $(PROJECT_SOURCEFILES)}}
 
-CONTIKI_ASMOBJECTFILES = ${addprefix $(OBJECTDIR)/,$(CONTIKI_ASMFILES:.S=.o)}
+# Provide way to create $(OBJECTDIR) if it has been removed by make clean
+$(OBJECTDIR):
+	mkdir $@
+
+uniq = $(if $1,$(firstword $1) $(call uniq,$(filter-out $(firstword $1),$1)))
 
 ### Include application makefiles
 
 ifdef APPS
-  APPDIRS += ${addprefix $(CONTIKI)/apps/, $(APPS)}
-  APPINCLUDES = ${foreach APP, $(APPS), $(CONTIKI)/apps/$(APP)/Makefile.$(APP)}
+  APPDS = ${wildcard ${foreach DIR, $(APPDIRS), ${addprefix $(DIR)/, $(APPS)}}} \
+             ${wildcard ${addprefix $(CONTIKI)/apps/, $(APPS)} \
+             ${addprefix $(CONTIKI)/platform/$(TARGET)/apps/, $(APPS)} \
+             $(APPS)}
+  APPINCLUDES = ${foreach APP, $(APPS), ${wildcard ${foreach DIR, $(APPDS), $(DIR)/Makefile.$(APP)}}}
   -include $(APPINCLUDES)
   APP_SOURCES = ${foreach APP, $(APPS), $($(APP)_src)}
   DSC_SOURCES = ${foreach APP, $(APPS), $($(APP)_dsc)}
@@ -68,29 +94,70 @@ endif
 
 ### Include target makefile (TODO Unsafe?)
 
-target_makefile := $(wildcard $(CONTIKI)/platform/$(TARGET)/Makefile.$(TARGET))
+target_makefile := $(wildcard $(CONTIKI)/platform/$(TARGET)/Makefile.$(TARGET) ${foreach TDIR, $(TARGETDIRS), $(TDIR)/$(TARGET)/Makefile.$(TARGET)})
 
-# Check if the target makefile exists
+# Check if the target makefile exists, and create the object directory if necessary.
 ifeq ($(strip $(target_makefile)),)
   ${error The target platform "$(TARGET)" does not exist (maybe it was misspelled?)}
 else
-  include $(CONTIKI)/platform/$(TARGET)/Makefile.$(TARGET)
+  ifneq (1, ${words $(target_makefile)})
+    ${error More than one TARGET Makefile found: $(target_makefile)}
+  endif
+  include $(target_makefile)
 endif
+
+ifdef MODULES
+  UNIQUEMODULES = $(call uniq,$(MODULES))
+  MODULESSUBST = ${subst /,-,$(UNIQUEMODULES)}
+  MODULEDIRS = ${wildcard ${addprefix $(CONTIKI)/, $(UNIQUEMODULES)}}
+  MODULES_SOURCES = ${foreach d, $(MODULEDIRS), ${subst ${d}/,,${wildcard $(d)/*.c}}}
+  CONTIKI_SOURCEFILES += $(MODULES_SOURCES)
+  APPDS += $(MODULEDIRS)
+endif
+
+### Verbosity control. Use  make V=1  to get verbose builds.
+
+ifeq ($(V),1)
+  TRACE_CC =
+  TRACE_LD =
+  TRACE_AR =
+  TRACE_AS =
+  Q=
+else
+  TRACE_CC = @echo "  CC       " $<
+  TRACE_LD = @echo "  LD       " $@
+  TRACE_AR = @echo "  AR       " $@
+  TRACE_AS = @echo "  AS       " $<
+  Q=@
+endif
+
+### Forward comma-separated list of arbitrary defines to the compiler
+
+COMMA := ,
+CFLAGS += ${addprefix -D,${subst $(COMMA), ,$(DEFINES)}}
 
 ### Setup directory search path for source and header files
 
-CONTIKI_TARGET_DIRS_CONCAT = ${addprefix $(CONTIKI)/platform/$(TARGET)/, \
+CONTIKI_TARGET_DIRS_CONCAT = ${addprefix ${dir $(target_makefile)}, \
                                $(CONTIKI_TARGET_DIRS)}
 CONTIKI_CPU_DIRS_CONCAT    = ${addprefix $(CONTIKI_CPU)/, \
                                $(CONTIKI_CPU_DIRS)}
 
-SOURCEDIRS += $(PROJECTDIRS) $(CONTIKI_TARGET_DIRS_CONCAT) \
-             $(CONTIKI_CPU_DIRS_CONCAT) $(CONTIKIDIRS) $(APPDIRS)
+SOURCEDIRS = . $(PROJECTDIRS) $(CONTIKI_TARGET_DIRS_CONCAT) \
+             $(CONTIKI_CPU_DIRS_CONCAT) $(CONTIKIDIRS) $(APPDS) ${dir $(target_makefile)}
 
 vpath %.c $(SOURCEDIRS)
 vpath %.S $(SOURCEDIRS)
 
-CFLAGS += ${addprefix -I,$(SOURCEDIRS)}
+CFLAGS += ${addprefix -I,$(SOURCEDIRS) $(CONTIKI)}
+
+### Check for a git repo and pass version if found
+### git.exe in Windows cmd shells may require no stderr redirection
+#RELSTR=${shell git describe --tags}
+RELSTR=${shell git --git-dir ${CONTIKI}/.git describe --tags 2>/dev/null}
+ifneq ($(RELSTR),)
+CFLAGS += -DCONTIKI_VERSION_STRING=\"Contiki-$(RELSTR)\"
+endif
 
 ### Automatic dependency generation
 
@@ -99,40 +166,59 @@ ifneq ($(MAKECMDGOALS),clean)
                                    $(PROJECT_SOURCEFILES:.c=.d)}
 endif
 
+### See http://make.paulandlesley.org/autodep.html#advanced
+
+define FINALIZE_DEPENDENCY
+cp $(@:.o=.d) $(@:.o=.$$$$); \
+sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
+    -e '/^$$/ d' -e 's/$$/ :/' < $(@:.o=.$$$$) >> $(@:.o=.d); \
+rm -f $(@:.o=.$$$$)
+endef
+
 clean:
-	rm -f *~ *core core *.srec \
+	-rm -f *~ *core core *.srec \
 	*.lst *.map \
-        *.cprg *.bin *.data contiki*.a *.firmware core-labels.S *.ihex *.ini \
-        *.ce *.co $(CLEAN)
+	*.cprg *.bin *.data contiki*.a *.firmware core-labels.S *.ihex *.ini \
+	*.ce *.co
+	rm -rf $(CLEAN)
 	-rm -rf $(OBJECTDIR)
 
-lint: $(CONTIKI_SOURCEFILES)
-	$(LINT) $(STD_LINT) $^
+distclean: clean
+	-rm -f ${addsuffix .$(TARGET),$(CONTIKI_PROJECT)}
+
+-include $(CONTIKI)/platform/$(TARGET)/Makefile.customrules-$(TARGET)
 
 ifndef CUSTOM_RULE_C_TO_CE
 %.ce: %.c
-	$(CC) $(CFLAGS) -DAUTOSTART_ENABLE -c $< -o $@
+	$(TRACE_CC)
+	$(Q)$(CC) $(CFLAGS) -DAUTOSTART_ENABLE -c $< -o $@
 	$(STRIP) --strip-unneeded -g -x $@
 endif
 
 ifndef CUSTOM_RULE_C_TO_OBJECTDIR_O
-$(OBJECTDIR)/%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+$(OBJECTDIR)/%.o: %.c | $(OBJECTDIR)
+	$(TRACE_CC)
+	$(Q)$(CC) $(CFLAGS) -MMD -c $< -o $@
+	@$(FINALIZE_DEPENDENCY)
 endif
 
 ifndef CUSTOM_RULE_S_TO_OBJECTDIR_O
-$(OBJECTDIR)/%.o: %.S
-	$(AS) $(ASFLAGS) -o $@ $<
+$(OBJECTDIR)/%.o: %.S | $(OBJECTDIR)
+	$(TRACE_AS)
+	$(Q)$(AS) $(ASFLAGS) -o $@ $<
 endif
 
 ifndef CUSTOM_RULE_C_TO_O
 %.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(TRACE_CC)
+	$(Q)$(CC) $(CFLAGS) -c $< -o $@
 endif
+
 
 ifndef CUSTOM_RULE_C_TO_CO
 %.co: %.c
-	$(CC) $(CFLAGS) -DAUTOSTART_ENABLE -c $< -o $@
+	$(TRACE_CC)
+	$(Q)$(CC) $(CFLAGS) -DAUTOSTART_ENABLE -c $< -o $@
 endif
 
 ifndef AROPTS
@@ -141,22 +227,8 @@ endif
 
 ifndef CUSTOM_RULE_ALLOBJS_TO_TARGETLIB
 contiki-$(TARGET).a: $(CONTIKI_OBJECTFILES)
-	$(AR) $(AROPTS) $@ $^
-endif
-
-ifndef CCDEP
-  CCDEP = $(CC)
-endif
-ifndef CDEPFLAGS
-  CDEPFLAGS = $(CFLAGS)
-endif
-
-ifndef CUSTOM_RULE_C_TO_OBJECTDIR_D
-$(OBJECTDIR)/%.d: %.c
-	@echo Making dependencies for $<; set -e; rm -f $@; \
-	$(CCDEP) -MM $(CDEPFLAGS) $< > $@.$$$$; \
-	sed 's,\($*\)\.o[ :]*,$(OBJECTDIR)/\1.o $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
+	$(TRACE_AR)
+	$(Q)$(AR) $(AROPTS) $@ $^
 endif
 
 ifndef LD
@@ -164,23 +236,17 @@ ifndef LD
 endif
 
 ifndef CUSTOM_RULE_LINK
-  ifdef TEST_RAVEN_USB
-  # Needed for AVR Studio. They need a target with the same name as the project. ack!
-  %.$(TARGET): %.co $(PROJECT_OBJECTFILES) $(PROJECT_LIBRARIES) contiki-$(TARGET).a
-	$(LD) $(LDFLAGS) $(TARGET_STARTFILES) ${filter-out %.a,$^} ${filter %.a,$^} $(TARGET_LIBFILES) -o $@
-	  cp test_avr_ravenusb.$(TARGET) test_avr_ravenusb.elf
-  else
-    ifdef TEST_RAVEN
-    # Needed for AVR Studio. They need a target with the same name as the project. ack!
-    %.$(TARGET): %.co $(PROJECT_OBJECTFILES) $(PROJECT_LIBRARIES) contiki-$(TARGET).a
-	$(LD) $(LDFLAGS) $(TARGET_STARTFILES) ${filter-out %.a,$^} ${filter %.a,$^} $(TARGET_LIBFILES) -o $@
-	  cp test_avr_raven.$(TARGET) avr_raven.elf
-    else
-    %.$(TARGET): %.co $(PROJECT_OBJECTFILES) $(PROJECT_LIBRARIES) contiki-$(TARGET).a
-	$(LD) $(LDFLAGS) $(TARGET_STARTFILES) ${filter-out %.a,$^} ${filter %.a,$^} $(TARGET_LIBFILES) -o $@ -lpthread
-    endif
-  endif
+%.$(TARGET): %.co $(PROJECT_OBJECTFILES) $(PROJECT_LIBRARIES) contiki-$(TARGET).a
+	$(TRACE_LD)
+	$(Q)$(LD) $(LDFLAGS) $(TARGET_STARTFILES) ${filter-out %.a,$^} \
+	    ${filter %.a,$^} $(TARGET_LIBFILES) -o $@
 endif
+
+%.ramprof: %.$(TARGET)
+	$(NM) -S -td --size-sort $< | grep -i " [abdrw] " | cut -d' ' -f2,4
+
+%.flashprof: %.$(TARGET)
+	$(NM) -S -td --size-sort $< | grep -i " [t] " | cut -d' ' -f2,4
 
 # Don't treat %.$(TARGET) as an intermediate file because it is
 # in fact the primary target.
