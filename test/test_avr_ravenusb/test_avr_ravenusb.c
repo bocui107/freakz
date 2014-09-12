@@ -42,6 +42,7 @@
 #include "test_avr_ravenusb.h"
 #include "drvr_avr_at86.h"
 #include "freakusb.h"
+#include "test_app.h"
 
 static U8 msg[MAX_MSG_SIZE];
 static U8 *msg_ptr;

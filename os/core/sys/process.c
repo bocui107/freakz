@@ -330,10 +330,10 @@ int process_post(struct process *p, process_event_t ev, process_data_t data)
 	if(nevents == PROCESS_CONF_NUMEVENTS) {
 #if DEBUG
 		if(p == PROCESS_BROADCAST) {
-			printf("soft panic: event queue is full when broadcast event %d was
+			printf("soft panic: event queue is full when broadcast event %d was \
 				 posted from %s\n", ev, PROCESS_NAME_STRING(process_current));
 		} else {
-			printf("soft panic: event queue is full when event %d was posted to
+			printf("soft panic: event queue is full when event %d was posted to \
 			 %s frpm %s\n", ev, PROCESS_NAME_STRING(p), PROCESS_NAME_STRING(process_current));
 		}
 #endif /* DEBUG */

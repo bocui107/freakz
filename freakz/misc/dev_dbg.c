@@ -448,9 +448,9 @@ void debug_dump_nbor_tbl()
  * Converts the network status value into a human readable string for easy
  * debugging. No more 802.15.4 spec lookups!
  */
+#if (DEBUG_NWK == 1)
 static char *debug_dump_nwk_status(U8 status)
 {
-#if (DEBUG_NWK == 1)
 	switch (status)
 	{
 	case NWK_SUCCESS:
@@ -494,8 +494,8 @@ static char *debug_dump_nwk_status(U8 status)
 	default:
 		return "INVALID STATUS";
 	}
-#endif
 }
+#endif
 
 /* Dump the routing table */
 void debug_dump_rte_tbl()
@@ -624,9 +624,9 @@ void debug_dump_pan_descr(pan_descr_t *desc)
  * Decode the AF status value into a human readable string.
  * No more 802.15.4 lookups!
  */
+#if (DEBUG_ZDO == 1) || (DEBUG_ZCL == 1)
 char *debug_dump_af_status(U8 status)
 {
-#if (DEBUG_ZDO == 1) || (DEBUG_ZCL == 1)
 	switch (status)
 	{
 	case AF_SUCCESS:
@@ -661,8 +661,8 @@ char *debug_dump_af_status(U8 status)
 		return "AF_ERROR";
 	}
 	return NULL;
-#endif
 }
+#endif
 
 /* Dump the specified cluster list for the endpoint */
 void debug_dump_clust_list(clust_list_t *clust_list)
@@ -820,10 +820,10 @@ void debug_dump_zdo_request(zdo_req_t *req)
 #endif
 }
 
+#if (DEBUG_ZDO == 1)
 /* Dump all the neighbor entries from the ZDO LQI response */
 static void debug_dump_nbor_entry(zdo_resp_t *resp, U8 *data)
 {
-#if (DEBUG_ZDO == 1)
 	U8 i, tmp;
 
 	for (i=0; i<resp->type.nwk_lqi.nbor_list_cnt; i++)
@@ -875,13 +875,13 @@ static void debug_dump_nbor_entry(zdo_resp_t *resp, U8 *data)
 		DBG_PRINT("LIST_ENTRY %02X: LQI           = %02X.\n", i, *data);
 		data++;
 	}
-#endif
 }
+#endif
 
+#if (DEBUG_ZDO == 1)
 /* Dump all the remote nwk discovery entries in the ZDO response */
 static void debug_dump_disc_entry(zdo_resp_t *resp, U8 *data)
 {
-#if (DEBUG_ZDO == 1)
 	U8 i;
 
 	for (i=0; i<resp->type.nwk_disc.nwk_list_cnt; i++)
@@ -904,8 +904,8 @@ static void debug_dump_disc_entry(zdo_resp_t *resp, U8 *data)
 		DBG_PRINT("LIST_ENTRY %02X: PERMIT JOIN   = %02X.\n", i, *data & 0x1);
 		data++;
 	}
-#endif
 }
+#endif
 
 /* Dump the contents of the ZDO response */
 void debug_dump_zdo_resp(zdo_resp_t *resp, U8 *data)
@@ -1034,9 +1034,9 @@ void debug_dump_simple_desc(U8 *desc)
  * Decode the attribute type value into human readable form for printing to
  * screen.
  */
+#if (DEBUG_ZCL == 1)
 static void debug_dump_attrib_type(U8 type)
 {
-#if (DEBUG_ZCL == 1)
 	switch (type)
 	{
 	case ZCL_TYPE_U8:
@@ -1057,16 +1057,16 @@ static void debug_dump_attrib_type(U8 type)
 	default:
 		break;
 	}
-#endif
 }
+#endif
 
 /*
  * Dump the attribute data. Both the attribute type and value will get printed out.
  * Currently, only supports certain attribute types.
  */
+#if (DEBUG_ZCL == 1)
 static U8 debug_dump_attrib_data(U8 type, U8 *data)
 {
-#if (DEBUG_ZCL == 1)
 	U8 size, str_buf[128], *data_ptr = data;
 	switch (type)
 	{
@@ -1107,12 +1107,12 @@ static U8 debug_dump_attrib_data(U8 type, U8 *data)
 		break;
 	}
 	return data_ptr - data;
-#endif
 }
+#endif
 
+#if (DEBUG_ZCL == 1)
 static char *debug_dump_zcl_cmd(U16 clust, U8 cmd_id)
 {
-#if (DEBUG_ZCL == 1)
 	switch (clust)
 	{
 	case ZCL_IDENTIFY_CLUST_ID:
@@ -1130,8 +1130,8 @@ static char *debug_dump_zcl_cmd(U16 clust, U8 cmd_id)
 		}
 	}
 	return NULL;
-#endif
 }
+#endif
 
 /* Decode the ZCL status value into human readable form. No more 802.15.4 lookups! */
 char *debug_dump_zcl_status(U8 status)
