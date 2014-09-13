@@ -9,9 +9,10 @@ ZIGBEE  = freakz.c \
 	  mac.c mac_gen.c mac_parse.c mac_indir.c mac_queue.c mac_start.c mac_reset.c \
 	  mac_scan.c mac_assoc.c mac_poll.c mac_retry.c \
 	  buf.c dev_dbg.c misc.c slow_clock.c mem_heap.c \
+	  test_app.c test_data.c test_zcl.c test_zdo.c
 
 ZIGBEE_SOURCEFILES += $(ZIGBEE)
-ZIGBEEDIRS += $(ZIGBEE_PATH) $(TEST_DIR) ${addprefix $(ZIGBEE_PATH)/, af zdo aps nwk mac test misc zcl zcl/general}
+ZIGBEEDIRS += $(ZIGBEE_PATH) $(TEST_DIR) ${addprefix $(ZIGBEE_PATH)/, af zdo aps nwk mac test misc zcl zcl/general app}
 ZIGBEE_OBJECTFILES = ${addprefix $(OBJECTDIR)/,${call oname, $(ZIGBEE_SOURCEFILES)}}
 
 SOURCEDIRS += $(ZIGBEEDIRS)
