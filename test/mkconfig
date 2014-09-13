@@ -1,0 +1,50 @@
+#!/bin/sh -e
+
+# Script to create header files and links to configure
+# U-Boot for a specific board.
+#
+# Parameters:  Target  Architecture  CPU  Board [VENDOR] [SOC]
+#
+# (C) 2002-2013 DENX Software Engineering, Wolfgang Denk <wd@denx.de>
+#
+# SPDX-License-Identifier:	GPL-2.0+
+#
+
+APPEND=no	# Default: Create new config file
+BOARD_NAME=""	# Name to print in make output
+TARGETS=""
+
+while [ $# -gt 0 ] ; do
+	case "$1" in
+	--) shift ; break ;;
+	-a) shift ; APPEND=yes ;;
+	-n) shift ; BOARD_NAME="${3%_config}" ; shift ;;
+	-t) shift ; TARGETS="`echo $1 | sed 's:_: :g'` ${TARGETS}" ; shift ;;
+	*)  break ;;
+	esac
+done
+
+
+# Strip all options and/or _config suffixes
+CONFIG_NAME="${3%_config}"
+
+if [ ! -d "$CONFIG_NAME"]; then
+	echo "make: *** No rule to make target \`$2_config'.  Stop." >&2
+	exit 1
+fi
+
+[ "${BOARD_NAME}" ] || BOARD_NAME="${7%_config}"
+
+if [ "$options" ] ; then
+	echo "Configuring for ${BOARD_NAME} - Board: ${CONFIG_NAME}, Options: ${options}"
+else
+	echo "Configuring for ${BOARD_NAME} board..."
+fi
+
+#
+# Create include file for Make
+#
+( echo "BOARD  = ${board}"
+    exit 0 ) > config.mk
+
+exit 0
