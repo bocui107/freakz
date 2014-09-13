@@ -42,7 +42,6 @@ PROCINIT(&etimer_process);
 
 int contiki_main(void)
 {
-	int n;
 	struct timeval tv;
 
 	process_init();
@@ -58,7 +57,7 @@ int contiki_main(void)
 
 	while(1)
 	{
-		n = process_run();
+		process_run();
 		tv.tv_sec = 0;
 		tv.tv_usec = 1;
 		/*
