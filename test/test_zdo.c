@@ -380,7 +380,7 @@ void test_zdo_bind_req(U8 argc, char **argv)
 {
 	U64 src_addr;
 	U8 src_ep, dest_ep;
-	U16 dest_addr, clust_id;
+	U16 src_addr_short, dest_addr, clust_id;
 	zdo_req_t req;
 
 	if (argc != 7) {
