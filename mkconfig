@@ -159,7 +159,11 @@ echo "#define CONFIG_SYS_BOARD \"${board}\"" >> config.h
 
 [ "${cpu}"  ] && echo "#define CONFIG_CPUDIR os/cpu/$CPUDIR" >> config.h
 cat << EOF >> config.h
+#include <config_cmd_defaults.h>
+#include <config_defaults.h>
 #include <configs/${CONFIG_NAME}.h>
+#include <asm/config.h>
+#include <config_fallbacks.h>
 EOF
 
 exit 0
