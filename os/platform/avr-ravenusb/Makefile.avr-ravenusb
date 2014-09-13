@@ -30,6 +30,3 @@ AVRDUDE_PORT=usb:00B000000D79
 # Additional avrdude options
 # Verify off
 AVRDUDE_OPTIONS=-V
-
-
-
