@@ -173,6 +173,7 @@ int main(int argc, char *argv[])
 {
 	char msg[BUFSIZE];
 	int index = strtol(argv[1], NULL, 10);
+	FILE *errfile;
 
 	sprintf(msg, "./log/node_%03d.txt", index);
 	fp = fopen(msg, "w");
@@ -181,7 +182,9 @@ int main(int argc, char *argv[])
 	fout = fopen(msg, "w");
 
 	sprintf(msg, "./log/node_%03d_err.txt", index);
-	freopen(msg, "w", stderr);
+	errfile = freopen(msg, "w", stderr);
+	if(!errfile)
+		perror("Fail to open the err log file");
 
 	/* opening public fifo */
 	strcpy(pp.name, "./fifo/PUBLIC");

@@ -189,6 +189,17 @@ void test_zcl_rx_handler(U8 *data, U8 len, U16 src_addr, U8 src_ep, U16 clust_id
 
 void test_zcl_conf_handler(U8 status, U8 handle)
 {
+#ifdef TEST_SIM
+	sim_node_t *node = node_get();
+	char msg[BUFSIZE];
+
+	if(status == APS_SUCCESS)
+	       sprintf(msg, "node %d aps ack received\n", node->index);
+	else
+	       sprintf(msg, "node %d data received\n", node->index);
+	format_cmd_str((U8 *)msg);
+	sim_pipe_cmd_out((U8 *)msg, strlen(msg) + 1);
+#endif
 }
 
 void test_zcl_on_off_action_handler(U8 action, void *data)

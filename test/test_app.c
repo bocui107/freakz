@@ -67,6 +67,7 @@ static void test_app_rem_bnd(U8 argc, char **argv);
 static void test_app_add_grp(U8 argc, char **argv);
 static void test_app_rem_grp(U8 argc, char **argv);
 static void test_app_dump_free_bufs(U8 argc, char **argv);
+static void test_app_led_toggle(U8 argc, char **argv);
 
 /* Main command table for this node */
 static test_app_cmd_t test_app_cmd_tbl[] =
@@ -85,6 +86,7 @@ static test_app_cmd_t test_app_cmd_tbl[] =
 	{"ag",		test_app_add_grp		},
 	{"rg",		test_app_rem_grp		},
 	{"ra",		test_zcl_read_attrib		},
+	{"led",		test_app_led_toggle		},
 	{"wa",		test_zcl_write_attrib		},
 	{"da",		test_zcl_disc_attrib		},
 	{"cr",		test_zcl_config_rpt		},
@@ -282,3 +284,9 @@ static void test_app_rem_grp(U8 argc, char **argv)
 	ep = strtol(argv[2], NULL, 16);
 	aps_grp_rem(id, ep);
 }
+
+static void test_app_led_toggle(U8 argc, char **argv)
+{
+	drvr_toggle_leds();
+}
+

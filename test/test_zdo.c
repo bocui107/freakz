@@ -41,7 +41,7 @@
 #include "freakz.h"
 #include "test_zdo.h"
 
-// callbacks for the ZDO
+/* callbacks for the ZDO */
 static zdo_cb_t test_zdo_cb =
 {
 	test_zdo_nwk_form_conf,
@@ -51,41 +51,31 @@ static zdo_cb_t test_zdo_cb =
 	NULL
 };
 
-/**************************************************************************/
-/*!
-    Normally for an endpoint, we'd need to register it with the AF. But the
-    ZDO is already present in the stack and is registered with it. The ZDO
-    in the stack communicates with this application via the ZDo callbacks.
-    This apps main function is just to generate requests and process indications
-    and confirmations.
-*/
-/**************************************************************************/
+/*
+ * Normally for an endpoint, we'd need to register it with the AF. But the
+ * ZDO is already present in the stack and is registered with it. The ZDO
+ * in the stack communicates with this application via the ZDo callbacks.
+ * This apps main function is just to generate requests and process indications
+ * and confirmations.
+ */
 void test_zdo_init()
 {
-	// register the callbacks with the zdo layer
+	/* register the callbacks with the zdo layer */
 	zdo_reg_cb(&test_zdo_cb);
 }
 
-/**************************************************************************/
-/*!
-
-*/
-/**************************************************************************/
 void test_zdo_nwk_join_ind(U16 nwk_addr)
 {
 	DBG_PRINT_SIMONLY("TEST_ZDO_JOIN_IN: Need to hook this in.\n");
 }
 
-/**************************************************************************/
-/*!
-    This is the nwk formation confirm callback which is called from the ZDO
-    layer. This goes into the callback structure.
-*/
-/**************************************************************************/
+/*
+ * This is the nwk formation confirm callback which is called from the ZDO
+ * layer. This goes into the callback structure.
+ */
 void test_zdo_nwk_form_conf(U8 status)
 {
-	if (status == NWK_SUCCESS)
-	{
+	if (status == NWK_SUCCESS) {
 #ifdef TEST_SIM
 		sim_node_t *node = node_get();
 		char msg[BUFSIZE];
@@ -95,22 +85,18 @@ void test_zdo_nwk_form_conf(U8 status)
 		sim_pipe_cmd_out((U8 *)msg, strlen(msg) + 1);
 #endif
 		DBG_PRINT_SIMONLY("TEST_ZDO_NWK_FORM_CONF: Network Formation Successful.\n");
-	} else
-	{
+	} else {
 		DBG_PRINT_SIMONLY("TEST_ZDO_NWK_FORM_CONF: Error occurred forming network.\n");
 	}
 }
 
-/**************************************************************************/
-/*!
-    This is the callback function for the nwk join confirm that comes from
-    the ZDO layer.
-*/
-/**************************************************************************/
+/*
+ * This is the callback function for the nwk join confirm that comes from
+ * the ZDO layer.
+ */
 void test_zdo_nwk_join_conf(U8 status, U16 nwk_addr, U16 parent_addr)
 {
-	if (status == NWK_SUCCESS)
-	{
+	if (status == NWK_SUCCESS) {
 #ifdef TEST_SIM
 		sim_node_t *node = node_get();
 		char msg[BUFSIZE];
@@ -119,19 +105,13 @@ void test_zdo_nwk_join_conf(U8 status, U16 nwk_addr, U16 parent_addr)
 		format_cmd_str((U8 *)msg);
 		sim_pipe_cmd_out((U8 *)msg, strlen(msg) + 1);
 #endif
-		DBG_PRINT_SIMONLY("test_zdo_NWK_JOIN_CONF: Network joined successfully. Nwk Address: %4X.\n", nwk_addr);
-	}
-	else
-	{
+		DBG_PRINT_SIMONLY("test_zdo_NWK_JOIN_CONF: Network joined successfully. \
+				   Nwk Address: %4X.\n", nwk_addr);
+	} else {
 		DBG_PRINT_SIMONLY("test_zdo_NWK_JOIN_CONF: Error joining network.\n");
 	}
 }
 
-/**************************************************************************/
-/*!
-
-*/
-/**************************************************************************/
 void test_zdo_nwk_addr_req(U8 argc, char **argv)
 {
 	U64 ext_addr;
@@ -147,11 +127,6 @@ void test_zdo_nwk_addr_req(U8 argc, char **argv)
 	zdo_gen_req(MAC_BROADCAST_ADDR, &req);
 }
 
-/**************************************************************************/
-/*!
-
-*/
-/**************************************************************************/
 void test_zdo_ieee_addr_req(U8 argc, char **argv)
 {
 	U16 nwk_addr;
@@ -167,15 +142,14 @@ void test_zdo_ieee_addr_req(U8 argc, char **argv)
 	zdo_gen_req(MAC_BROADCAST_ADDR, &req);
 }
 
-/**************************************************************************/
-/*!
-    fmt: cmd, num_in_clust, ...in_clust..., num_out_clust, ...out_clust...
-    ex: edb 3 1 2 3 3 4 5 6
-*/
-/**************************************************************************/
+/*
+ * fmt: cmd, num_in_clust, ...in_clust..., num_out_clust, ...out_clust...
+ * ex: edb 3 1 2 3 3 4 5 6
+ */
 void test_zdo_end_dev_bind(U8 argc, char **argv)
 {
-	U8 i, tmp, num_in_clust, num_out_clust, in_clust[ZDO_MAX_CLUST], out_clust[ZDO_MAX_CLUST];
+	U8 i, tmp, num_in_clust, num_out_clust;
+	U8 in_clust[ZDO_MAX_CLUST], out_clust[ZDO_MAX_CLUST];
 	U16 *in_clust_ptr, *out_clust_ptr;
 	zdo_req_t req;
 	mac_pib_t *pib = mac_pib_get();
@@ -212,12 +186,10 @@ void test_zdo_end_dev_bind(U8 argc, char **argv)
 	zdo_gen_req(0, &req);
 }
 
-/**************************************************************************/
-/*!
-    fmt: cmd, dest_addr
-    ex: znl 0
-*/
-/**************************************************************************/
+/*
+ * fmt: cmd, dest_addr
+ * ex: znl 0
+ */
 void test_zdo_nwk_lqi_req(U8 argc, char **argv)
 {
 	U16 addr;
@@ -230,11 +202,6 @@ void test_zdo_nwk_lqi_req(U8 argc, char **argv)
 	zdo_gen_req(addr, &req);
 }
 
-/**************************************************************************/
-/*!
-
-*/
-/**************************************************************************/
 void test_zdo_nwk_leave_req(U8 argc, char **argv)
 {
 	U16 addr, tmp;
@@ -255,26 +222,19 @@ void test_zdo_nwk_leave_req(U8 argc, char **argv)
 	// rem children needs to be a bool
 	rem_children = tmp ? true : false;
 
-	if (addr == pib->short_addr)
-	{
+	if (addr == pib->short_addr) {
 		nwk_leave_req(0, rem_children, false);
-	}
-	else
-	{
+	} else {
 		nwk_addr.mode = SHORT_ADDR;
 		nwk_addr.short_addr = addr;
 		if ((nbor_mem_ptr = nwk_neighbor_tbl_get_entry(&nwk_addr)) != NULL)
 		{
-		    nwk_leave_req(NBOR_ENTRY(nbor_mem_ptr)->ext_addr, rem_children, false);
+			nwk_leave_req(NBOR_ENTRY(nbor_mem_ptr)->ext_addr, rem_children, false);
 		}
 	}
 }
 
-/**************************************************************************/
-/*!
-    format: ndr <target addr>
-*/
-/**************************************************************************/
+/* format: ndr <target addr> */
 void test_zdo_nwk_disc_req(U8 argc, char **argv)
 {
 	U16 addr;
@@ -296,15 +256,13 @@ void test_zdo_nwk_disc_req(U8 argc, char **argv)
 	zdo_gen_req(addr, &req);
 }
 
-/**************************************************************************/
-/*!
-    format: nur <addr> <operation>
-
-    0: change channel <channel>
-    1: change channel mask and nwk manager
-    3: energy scan
-*/
-/**************************************************************************/
+/*
+ * format: nur <addr> <operation>
+ *
+ * 0: change channel <channel>
+ * 1: change channel mask and nwk manager
+ * 3: energy scan
+ */
 void test_zdo_nwk_update_req(U8 argc, char **argv)
 {
 	U32 mask;
@@ -312,8 +270,7 @@ void test_zdo_nwk_update_req(U8 argc, char **argv)
 	U8 op, channel, duration;
 	zdo_req_t req;
 
-	if (argc < 3)
-	{
+	if (argc < 3) {
 		DBG_PRINT_SIMONLY("ERROR: Arguments are incorrect!\n");
 		return;
 	}
@@ -323,51 +280,47 @@ void test_zdo_nwk_update_req(U8 argc, char **argv)
 
 	switch (op)
 	{
-		case 0:
-			if (argc != 4)
-			{
-				DBG_PRINT_SIMONLY("ERROR: Arguments are incorrect!\n");
-				return;
-			}
+	case 0:
+		if (argc != 4) {
+			DBG_PRINT_SIMONLY("ERROR: Arguments are incorrect!\n");
+			return;
+		}
 
-			channel = strtol(argv[3], NULL, 10);
-			duration = 0xFE;
+		channel = strtol(argv[3], NULL, 10);
+		duration = 0xFE;
 
-			if ((channel > MAC_PHY_CHANNEL_OFFSET) && (channel < MAC_PHY_CHANNEL_OFFSET + MAC_MAX_CHANNELS))
-			{
-				mask = 1 << channel;
-			}
-			else
-			{
-				DBG_PRINT_SIMONLY("ERROR: Channel is invalid!\n");
-				return;
-			}
-			nwk_mgr = 0;
-			break;
-		case 1:
-			if (argc != 4)
-			{
-				DBG_PRINT_SIMONLY("ERROR: Arguments are incorrect!\n");
-			}
-			nwk_mgr = strtol(argv[3], NULL, 10);
-			duration = 0xFF;
-			mask = (unsigned)0x07FFF800;
-			break;
-		case 2:
-			if (argc != 3)
-			{
-				DBG_PRINT_SIMONLY("ERROR: Arguments are incorrect!\n");
-			}
+		if ((channel > MAC_PHY_CHANNEL_OFFSET) &&
+		    (channel < MAC_PHY_CHANNEL_OFFSET + MAC_MAX_CHANNELS))
+		{
+			mask = 1 << channel;
+		} else {
+			DBG_PRINT_SIMONLY("ERROR: Channel is invalid!\n");
+			return;
+		}
+		nwk_mgr = 0;
+		break;
+	case 1:
+		if (argc != 4) {
+			DBG_PRINT_SIMONLY("ERROR: Arguments are incorrect!\n");
+		}
+		nwk_mgr = strtol(argv[3], NULL, 10);
+		duration = 0xFF;
+		mask = (unsigned)0x07FFF800;
+		break;
+	case 2:
+		if (argc != 3) {
+			DBG_PRINT_SIMONLY("ERROR: Arguments are incorrect!\n");
+		}
 
-			duration = 5;
-			mask = (unsigned)0x07FFF800;
-			nwk_mgr = 0;
-			break;
-		default:
-			mask = 0;
-			duration = 0;
-			nwk_mgr = 0;
-			break;
+		duration = 5;
+		mask = (unsigned)0x07FFF800;
+		nwk_mgr = 0;
+		break;
+	default:
+		mask = 0;
+		duration = 0;
+		nwk_mgr = 0;
+		break;
 	}
 
 	req.seq                             = zdo_seq_get();
@@ -380,11 +333,6 @@ void test_zdo_nwk_update_req(U8 argc, char **argv)
 	zdo_gen_req(addr, &req);
 }
 
-/**************************************************************************/
-/*!
-
-*/
-/**************************************************************************/
 void test_zdo_server_nwk_leave_req(U8 argc, char **argv)
 {
 	U16 dest_addr;
@@ -392,8 +340,9 @@ void test_zdo_server_nwk_leave_req(U8 argc, char **argv)
 	bool rem_children;
 	zdo_req_t req;
 
-	if (argc != 4)
+	if (argc != 4) {
 		DBG_PRINT_SIMONLY("ERROR: Arguments are incorrect!\n");
+	}
 
 	dest_addr = strtol(argv[1], NULL, 16);
 	lv_addr = (U64)strtol(argv[2], NULL, 16);
@@ -407,19 +356,15 @@ void test_zdo_server_nwk_leave_req(U8 argc, char **argv)
 	zdo_gen_req(dest_addr, &req);
 }
 
-/**************************************************************************/
-/*!
-
-*/
-/**************************************************************************/
 void test_zdo_permit_join_req(U8 argc, char **argv)
 {
 	U16 dest_addr;
 	U8 duration;
 	zdo_req_t req;
 
-	if (argc != 3)
+	if (argc != 3) {
 		DBG_PRINT_SIMONLY("ERROR: Arguments are incorrect!\n");
+	}
 
 	dest_addr = strtol(argv[1], NULL, 10);
 	duration = strtol(argv[2], NULL, 10);
@@ -431,20 +376,16 @@ void test_zdo_permit_join_req(U8 argc, char **argv)
 	zdo_gen_req(dest_addr, &req);
 }
 
-/**************************************************************************/
-/*!
-
-*/
-/**************************************************************************/
 void test_zdo_bind_req(U8 argc, char **argv)
 {
 	U64 src_addr;
 	U8 src_ep, dest_ep;
-	U16 src_addr_short, dest_addr, clust_id;
+	U16 dest_addr, clust_id;
 	zdo_req_t req;
 
-	if (argc != 7)
+	if (argc != 7) {
 		DBG_PRINT_SIMONLY("ERROR: Arguments are incorrect!\n");
+	}
 
 	src_addr_short  = strtol(argv[1], NULL, 16);
 	src_addr        = strtol(argv[2], NULL, 16);
@@ -464,11 +405,7 @@ void test_zdo_bind_req(U8 argc, char **argv)
 	zdo_gen_req(dest_addr, &req);
 }
 
-/**************************************************************************/
-/*!
-    Send an unbind request to the destination
-*/
-/**************************************************************************/
+/* Send an unbind request to the destination */
 void test_zdo_unbind_req(U8 argc, char **argv)
 {
 	U64 src_addr;
@@ -476,8 +413,9 @@ void test_zdo_unbind_req(U8 argc, char **argv)
 	U16 src_addr_short, dest_addr, clust_id;
 	zdo_req_t req;
 
-	if (argc != 7)
+	if (argc != 7) {
 		DBG_PRINT_SIMONLY("ERROR: Arguments are incorrect!\n");
+	}
 
 	src_addr_short  = strtol(argv[1], NULL, 16);
 	src_addr        = strtol(argv[2], NULL, 16);
