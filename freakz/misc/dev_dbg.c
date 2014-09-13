@@ -103,7 +103,7 @@ void debug_dump_mac_hdr(const mac_hdr_t *hdr)
 			break;
 		case LONG_ADDR:
 			DBG_PRINT("DUMP_MAC_HDR: DEST PAN ID    = %04X.\n", hdr->dest_pan_id);
-			DBG_PRINT("DUMP_MAC_HDR: DEST ADDR      = %016llX.\n",  hdr->dest_addr.long_addr);
+			DBG_PRINT("DUMP_MAC_HDR: DEST ADDR      = %016lu.\n",  hdr->dest_addr.long_addr);
 			break;
 		default:
 			break;
@@ -123,7 +123,7 @@ void debug_dump_mac_hdr(const mac_hdr_t *hdr)
 			DBG_PRINT("DUMP_MAC_HDR: SRC ADDR       = %04X.\n", hdr->src_addr.short_addr);
 			break;
 		case LONG_ADDR:
-			DBG_PRINT("DUMP_MAC_HDR: SRC ADDR       = %016llX.\n",  hdr->src_addr.long_addr);
+			DBG_PRINT("DUMP_MAC_HDR: SRC ADDR       = %016lu.\n",  hdr->src_addr.long_addr);
 			break;
 		default:
 			break;
@@ -163,10 +163,10 @@ void debug_dump_nwk_hdr(const nwk_hdr_t *hdr)
 	DBG_PRINT("DUMP_NWK_HDR: HANDLE         = %02X.\n", hdr->handle);
 
 	if (hdr->nwk_frm_ctrl.dest_ieee_addr_flag)
-		DBG_PRINT("DUMP_NWK_HDR: DEST IEEE ADDR = %016llX.\n", hdr->dest_ieee_addr);
+		DBG_PRINT("DUMP_NWK_HDR: DEST IEEE ADDR = %016lu.\n", hdr->dest_ieee_addr);
 
 	if (hdr->nwk_frm_ctrl.src_ieee_addr_flag)
-		DBG_PRINT("DUMP_NWK_HDR: SRC IEEE ADDR  = %016llX.\n", hdr->src_ieee_addr);
+		DBG_PRINT("DUMP_NWK_HDR: SRC IEEE ADDR  = %016lu.\n", hdr->src_ieee_addr);
 
 	if (hdr->nwk_frm_ctrl.mcast_flag)
 		DBG_PRINT("DUMP_NWK_HDR: MCAST CTRL     = %02X.\n", hdr->mcast_ctrl);
@@ -353,7 +353,7 @@ void debug_dump_nib()
 	DBG_PRINT("DUMP_NWK_NIB: TRXN PERSIST   = %04X.\n",     nib->traxn_persist_time);
 	DBG_PRINT("DUMP_NWK_NIB: SHORT ADDR     = %04X.\n",     nib->short_addr);
 	DBG_PRINT("DUMP_NWK_NIB: STACK PROFILE  = %02X.\n",     nib->stack_profile);
-	DBG_PRINT("DUMP_NWK_NIB: EXT PAN ID     = %016llX.\n",  nib->ext_pan_ID);
+	DBG_PRINT("DUMP_NWK_NIB: EXT PAN ID     = %016lu.\n",  nib->ext_pan_ID);
 	DBG_PRINT("DUMP_NWK_NIB: DEPTH          = %02X.\n",     nib->depth);
 	DBG_PRINT("DUMP_NWK_NIB: RTR CAPACITY   = %02X.\n",     nib->rtr_cap);
 	DBG_PRINT("DUMP_NWK_NIB: ED CAPACITY    = %02X.\n",     nib->ed_cap);
@@ -376,9 +376,9 @@ void debug_dump_nbor_tbl()
 	DBG_PRINT("\n");
 	for (mem_ptr = nwk_neighbor_tbl_get_head(); mem_ptr != NULL; mem_ptr = mem_ptr->next)
 	{
-		DBG_PRINT("NBOR ENTRY %02X: EXT_ADDR      = %016llX.\n",
+		DBG_PRINT("NBOR ENTRY %02X: EXT_ADDR      = %016lu.\n",
 					i, NBOR_ENTRY(mem_ptr)->ext_addr);
-		DBG_PRINT("NBOR ENTRY %02X: EXT_PAN_ID    = %016llX.\n",
+		DBG_PRINT("NBOR ENTRY %02X: EXT_PAN_ID    = %016lu.\n",
 					i, NBOR_ENTRY(mem_ptr)->ext_pan_id);
 		DBG_PRINT("NBOR ENTRY %02X: NWK_ADDR      = %04X.\n",
 					i, NBOR_ENTRY(mem_ptr)->nwk_addr);
@@ -537,7 +537,7 @@ void debug_dump_bnd_tbl()
 			DBG_PRINT("BIND ENTRY %02X: DEST ADDR     = %04X.\n",
 				  i, BIND_ENTRY(mem_ptr)->dest_addr.short_addr);
 		} else {
-			DBG_PRINT("BIND_ENTRY %02X: DEST_ADDR     = %016llX.\n",
+			DBG_PRINT("BIND_ENTRY %02X: DEST_ADDR     = %016lu.\n",
 				  i, BIND_ENTRY(mem_ptr)->dest_addr.long_addr);
 		}
 
@@ -579,14 +579,14 @@ void debug_dump_pib()
 	DBG_PRINT("DUMP_MAC_PIB: RESP WAIT TIME = %02X.\n",    pib->resp_wait_time);
 	DBG_PRINT("DUMP_MAC_PIB: SECURITY ENB   = %s.\n",      pib->security_enb ? "TRUE" : "FALSE");
 	DBG_PRINT("DUMP_MAC_PIB: SHORT ADDR     = %04X.\n",    pib->short_addr);
-	DBG_PRINT("DUMP_MAC_PIB: EXT ADDR       = %016llX.\n", pib->ext_addr);
+	DBG_PRINT("DUMP_MAC_PIB: EXT ADDR       = %016lu.\n", pib->ext_addr);
 	DBG_PRINT("DUMP_MAC_PIB: COORDINATOR    = %s.\n",      pib->coord ? "TRUE" : "FALSE");
 	DBG_PRINT("DUMP_MAC_PIB: CURR CHANNEL   = %02X.\n",    pib->curr_channel);
 
 	if (pib->coord_addr.mode == SHORT_ADDR) {
 		DBG_PRINT("DUMP_MAC_PIB: COORD ADDR     = %04X.\n", pib->coord_addr.short_addr);
 	} else {
-		DBG_PRINT("DUMP_MAC_PIB: COORD ADDR     = %16llX.\n", pib->coord_addr.long_addr);
+		DBG_PRINT("DUMP_MAC_PIB: COORD ADDR     = %16lu.\n", pib->coord_addr.long_addr);
 	}
 #endif
 }
@@ -600,7 +600,7 @@ void debug_dump_pan_descr(pan_descr_t *desc)
 	if (desc->coord_addr.mode == SHORT_ADDR) {
 		DBG_PRINT("DUMP_PAN_DESCR: COORD ADDR      = %04X.\n", desc->coord_addr.short_addr);
 	} else {
-		DBG_PRINT("DUMP_PAN_DESCR: COORD ADDR      = %016llX.\n", desc->coord_addr.long_addr);
+		DBG_PRINT("DUMP_PAN_DESCR: COORD ADDR      = %016lu.\n", desc->coord_addr.long_addr);
 	}
 	DBG_PRINT("DUMP_PAN_DESCR: COORD PAN ID    = %04X.\n", desc->coord_pan_id);
 	DBG_PRINT("DUMP_PAN_DESCR: CHANNEL         = %02d.\n", desc->channel);
@@ -615,7 +615,7 @@ void debug_dump_pan_descr(pan_descr_t *desc)
 	DBG_PRINT("DUMP_PAN_DESCR: PROTOCOL VER    = %02X.\n", desc->prot_ver);
 	DBG_PRINT("DUMP_PAN_DESCR: ROUTER CAPACITY = %s.\n", (desc->rtr_cap) ? "TRUE" : "FALSE");
 	DBG_PRINT("DUMP_PAN_DESCR: END DEV CAPACITY= %s.\n", (desc->end_dev_cap) ? "TRUE" : "FALSE");
-	DBG_PRINT("DUMP_PAN_DESCR: EXT PAN ID      = %016llX.\n", desc->ext_pan_id);
+	DBG_PRINT("DUMP_PAN_DESCR: EXT PAN ID      = %016lu.\n", desc->ext_pan_id);
 	DBG_PRINT("DUMP_PAN_DESCR: POTENTIAL PARENT= %s.\n", (desc->pot_parent) ? "TRUE" : "FALSE");
 #endif
 }
@@ -693,7 +693,7 @@ void debug_dump_zdo_request(zdo_req_t *req)
 	switch (req->clust) {
 	case NWK_ADDR_REQ_CLUST:
 		DBG_PRINT("DUMP_ZDO_REQ: REQ            = NWK ADDR REQ.\n");
-		DBG_PRINT("DUMP_ZDO_REQ: EXT ADDR       = %016llX.\n",
+		DBG_PRINT("DUMP_ZDO_REQ: EXT ADDR       = %016lu.\n",
 			  req->type.nwk_addr.ext_addr);
 		DBG_PRINT("DUMP_ZDO_REQ: TYPE           = %s.\n",
 			  req->type.nwk_addr.req_type ? "EXTENDED" : "SINGLE");
@@ -712,7 +712,7 @@ void debug_dump_zdo_request(zdo_req_t *req)
 	case END_DEV_BIND_REQ_CLUST:
 		DBG_PRINT("DUMP_ZDO_REQ: REQ            = %s.\n", "END DEVICE BIND REQ");
 		DBG_PRINT("DUMP_ZDO_REQ: TARGET         = %04X.\n", req->type.ed_bind.target);
-		DBG_PRINT("DUMP_ZDO_REQ: SRC ADDR       = %016llX.\n", req->type.ed_bind.src_ext_addr);
+		DBG_PRINT("DUMP_ZDO_REQ: SRC ADDR       = %016lu.\n", req->type.ed_bind.src_ext_addr);
 		DBG_PRINT("DUMP_ZDO_REQ: SRC EP         = %02X.\n", req->type.ed_bind.src_ep);
 		DBG_PRINT("DUMP_ZDO_REQ: PROFILE ID     = %04X.\n", req->type.ed_bind.prof_id);
 
@@ -742,7 +742,7 @@ void debug_dump_zdo_request(zdo_req_t *req)
 		break;
 	case BIND_REQ_CLUST:
 		DBG_PRINT("DUMP_ZDO_REQ: REQ            = %s.\n", "BIND REQ");
-		DBG_PRINT("DUMP_ZDO_REQ: SRC ADDR       = %016llX.\n", req->type.bind.src_addr);
+		DBG_PRINT("DUMP_ZDO_REQ: SRC ADDR       = %016lu.\n", req->type.bind.src_addr);
 		DBG_PRINT("DUMP_ZDO_REQ: SRC EP         = %02X.\n", req->type.bind.src_ep);
 		DBG_PRINT("DUMP_ZDO_REQ: CLUST          = %04X.\n", req->type.bind.clust);
 		DBG_PRINT("DUMP_ZDO_REQ: DEST ADDR MODE = %02X.\n", req->type.bind.dest_addr.mode);
@@ -752,7 +752,7 @@ void debug_dump_zdo_request(zdo_req_t *req)
 			DBG_PRINT("DUMP_ZDO_REQ: GROUP ADDR     = %04X.\n",
 				  req->type.bind.dest_addr.short_addr);
 		} else if (req->type.bind.dest_addr.mode == LONG_ADDR) {
-			DBG_PRINT("DUMP_ZDO_REQ: DEST ADDR      = %016llX.\n",
+			DBG_PRINT("DUMP_ZDO_REQ: DEST ADDR      = %016lu.\n",
 				  req->type.bind.dest_addr.long_addr);
 			DBG_PRINT("DUMP_ZDO_REQ: DEST EP        = %02X.\n",
 				  req->type.bind.dest_ep);
@@ -760,7 +760,7 @@ void debug_dump_zdo_request(zdo_req_t *req)
 		break;
 	case UNBIND_REQ_CLUST:
 		DBG_PRINT("DUMP_ZDO_REQ: REQ            = %s.\n", "UNBIND REQ");
-		DBG_PRINT("DUMP_ZDO_REQ: SRC ADDR       = %016llX.\n", req->type.bind.src_addr);
+		DBG_PRINT("DUMP_ZDO_REQ: SRC ADDR       = %016lu.\n", req->type.bind.src_addr);
 		DBG_PRINT("DUMP_ZDO_REQ: SRC EP         = %02X.\n", req->type.bind.src_ep);
 		DBG_PRINT("DUMP_ZDO_REQ: CLUST          = %04X.\n", req->type.bind.clust);
 		DBG_PRINT("DUMP_ZDO_REQ: DEST ADDR MODE = %02X.\n", req->type.bind.dest_addr.mode);
@@ -770,7 +770,7 @@ void debug_dump_zdo_request(zdo_req_t *req)
 			DBG_PRINT("DUMP_ZDO_REQ: GROUP ADDR     = %04X.\n",
 				  req->type.bind.dest_addr.short_addr);
 		} else if (req->type.bind.dest_addr.mode == LONG_ADDR) {
-			DBG_PRINT("DUMP_ZDO_REQ: DEST ADDR      = %016llX.\n",
+			DBG_PRINT("DUMP_ZDO_REQ: DEST ADDR      = %016lu.\n",
 				  req->type.bind.dest_addr.long_addr);
 			DBG_PRINT("DUMP_ZDO_REQ: DEST EP        = %02X.\n",
 				  req->type.bind.dest_ep);
@@ -793,7 +793,7 @@ void debug_dump_zdo_request(zdo_req_t *req)
 		break;
 	case NWK_LEAVE_REQ_CLUST:
 		DBG_PRINT("DUMP_ZDO_REQ: REQ            = %s.\n", "NWK LEAVE REQ");
-		DBG_PRINT("DUMP_ZDO_REQ: ADDR           = %016llX.\n", req->type.leave.addr);
+		DBG_PRINT("DUMP_ZDO_REQ: ADDR           = %016lu.\n", req->type.leave.addr);
 		DBG_PRINT("DUMP_ZDO_REQ: REM CHILDREN   = %s.\n",
 			  req->type.leave.rem_children ? "TRUE" : "FALSE");
 		DBG_PRINT("DUMP_ZDO_REQ: REJOIN         = %s.\n",
@@ -828,9 +828,9 @@ static void debug_dump_nbor_entry(zdo_resp_t *resp, U8 *data)
 
 	for (i=0; i<resp->type.nwk_lqi.nbor_list_cnt; i++)
 	{
-		DBG_PRINT("LIST_ENTRY %02X: EXT PAN ID    = %016llX.\n", i, *(U64 *)data);
+		DBG_PRINT("LIST_ENTRY %02X: EXT PAN ID    = %016lu.\n", i, *(U64 *)data);
 		data += sizeof(U64);
-		DBG_PRINT("LIST_ENTRY %02X: EXT ADDR      = %016llX.\n", i, *(U64 *)data);
+		DBG_PRINT("LIST_ENTRY %02X: EXT ADDR      = %016lu.\n", i, *(U64 *)data);
 		data += sizeof(U64);
 		DBG_PRINT("LIST_ENTRY %02X: NWK ADDR      = %04X.\n", i, *(U16 *)data);
 		data += sizeof(U16);
@@ -887,7 +887,7 @@ static void debug_dump_disc_entry(zdo_resp_t *resp, U8 *data)
 	for (i=0; i<resp->type.nwk_disc.nwk_list_cnt; i++)
 	{
 		DBG_PRINT_RAW("\n");
-		DBG_PRINT("DISC_ENTRY %02X: EXT PAN ID    = %016llX.\n", i, *(U64 *)data);
+		DBG_PRINT("DISC_ENTRY %02X: EXT PAN ID    = %016lu.\n", i, *(U64 *)data);
 		data += sizeof(U64);
 
 		DBG_PRINT("LIST_ENTRY %02X: CHANNEL       = %02X.\n", i, *data);
@@ -923,7 +923,7 @@ void debug_dump_zdo_resp(zdo_resp_t *resp, U8 *data)
 		DBG_PRINT("DUMP_ZDO_RESP: RESP          = NWK ADDR RESPONSE.\n");
 		DBG_PRINT("DUMP_ZDO_RESP: STATUS        = %s.\n",
 			  debug_dump_af_status(resp->type.addr.status));
-		DBG_PRINT("DUMP_ZDO_RESP: IEEE ADDR     = %016llX.\n",
+		DBG_PRINT("DUMP_ZDO_RESP: IEEE ADDR     = %016lu.\n",
 			  resp->type.addr.ext_addr_rmt);
 		DBG_PRINT("DUMP_ZDO_RESP: NWK ADDR      = %04X.\n",
 			  resp->type.addr.nwk_addr_rmt);
@@ -932,7 +932,7 @@ void debug_dump_zdo_resp(zdo_resp_t *resp, U8 *data)
 		DBG_PRINT("DUMP_ZDO_RESP: RESP          = IEEE ADDR RESPONSE.\n");
 		DBG_PRINT("DUMP_ZDO_RESP: STATUS        = %s.\n",
 			  debug_dump_af_status(resp->type.addr.status));
-		DBG_PRINT("DUMP_ZDO_RESP: IEEE ADDR     = %016llX.\n",
+		DBG_PRINT("DUMP_ZDO_RESP: IEEE ADDR     = %016lu.\n",
 			  resp->type.addr.ext_addr_rmt);
 		DBG_PRINT("DUMP_ZDO_RESP: NWK ADDR      = %04X.\n",
 			  resp->type.addr.nwk_addr_rmt);
@@ -1188,7 +1188,7 @@ char *debug_dump_zcl_status(U8 status)
 void debug_dump_zcl_frm(U8 *data, zcl_hdr_t *hdr, U16 clust)
 {
 #if (DEBUG_ZCL == 1)
-	U8 i, *data_ptr, status, dir, type, len;
+	U8 i, *data_ptr, status, type, len;
 	U16 attrib_id;
 
 	DBG_PRINT_RAW("\n");
@@ -1310,7 +1310,6 @@ void debug_dump_zcl_frm(U8 *data, zcl_hdr_t *hdr, U16 clust)
 			data_ptr = hdr->payload;
 
 			status      = *data_ptr++;
-			dir         = *data_ptr++;
 			attrib_id   = *(U16 *)data_ptr;
 			data_ptr += sizeof(U16);
 			DBG_PRINT("DUMP_ZCL_FRM: ATTRIB ID = %04X.\n ", attrib_id);
