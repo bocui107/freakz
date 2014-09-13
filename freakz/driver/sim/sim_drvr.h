@@ -74,5 +74,7 @@ void drvr_set_ext_addr(U64 addr);
 void drvr_set_short_addr(U16 addr);
 void drvr_set_pan_id(U16 pan_id);
 void drvr_set_coord(bool coord);
-
+void drvr_init_leds();
+void drvr_set_leds(bool on);
+void drvr_toggle_leds();
 #endif // SIM_DRVR_H

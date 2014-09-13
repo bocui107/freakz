@@ -101,6 +101,18 @@ void drvr_set_frm_pend(bool pend)
 {
 }
 
+void drvr_init_leds()
+{
+}
+
+void drvr_set_leds(bool on)
+{
+}
+
+void drvr_toggle_leds()
+{
+}
+
 /*
  * Get the simulated clear channel assessment. Return true if the CCA is
  * below the clear channel assessment threshold. Otherwise return false.

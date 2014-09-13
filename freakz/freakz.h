@@ -55,7 +55,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#if (TEST_SIM == 1)
+#ifdef TEST_SIM
 	#include <unistd.h>
 	#include "test_sim.h"
 	#include "sim_drvr.h"
