@@ -47,6 +47,8 @@
 #include "freakz.h"
 #include <sys/time.h>
 
+#include "sim_drvr.h"
+
 /* Main process for simulation driver */
 PROCESS(drvr_process, "Test Driver Process");
 

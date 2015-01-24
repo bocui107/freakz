@@ -44,6 +44,28 @@
 #include "freakz.h"
 #include "test_app.h"
 
+enum {
+	_mac_rx,
+	_af_tx,
+	_af_rx,
+	_af_conf,
+	_drvr_conf,
+	_ed_bind_req,
+	_ed_bind_match,
+	_unbind_resp,
+};
+
+#define DECL_WEAK_PET(x) process_event_t event##x __attribute__((weak)) = x
+
+DECL_WEAK_PET(_mac_rx);
+DECL_WEAK_PET(_af_tx);
+DECL_WEAK_PET(_af_rx);
+DECL_WEAK_PET(_af_conf);
+DECL_WEAK_PET(_drvr_conf);
+DECL_WEAK_PET(_ed_bind_req);
+DECL_WEAK_PET(_ed_bind_match);
+DECL_WEAK_PET(_unbind_resp);
+
 /* Dummy function that just initializes everybody. */
 void freakz_init()
 {

@@ -1,0 +1,6 @@
+2008-09-30	Akiba	<chris@freaklabs.org>
+    * Initial import of FreakZ source code into SourceForge repository.   
+2013-09-27	Zhong Hongbo	<bocui107@gmail.com>
+    * init base for freakz
+2015-01-23	Christopher Friedt	<chrisfriedt@gmail.com>
+	* cloned project on bitbucket, added autotools support

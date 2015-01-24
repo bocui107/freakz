@@ -44,6 +44,8 @@
  *
  */
 
+#include <stddef.h>
+
 #include "contiki-conf.h"
 
 #include "sys/etimer.h"

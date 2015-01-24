@@ -47,7 +47,7 @@ int contiki_main(void)
 	process_init();
 	procinit_init();
 
-#if (TEST_SIM == 0)
+#if 0
 	autostart_start((struct process **)autostart_processes);
 #endif
 

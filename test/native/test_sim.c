@@ -169,6 +169,10 @@ static void sigkill_handler()
 	exit(EXIT_SUCCESS);
 }
 
+#ifndef format_cmd_str
+#define format_cmd_str(x)
+#endif
+
 int main(int argc, char *argv[])
 {
 	char msg[BUFSIZE];

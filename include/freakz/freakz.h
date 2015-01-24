@@ -98,28 +98,28 @@
 #include "mmem.h"
 
 /* MAC rx event */
-process_event_t event_mac_rx;
+extern process_event_t event_mac_rx;
 
 /* Application Framework tx event */
-process_event_t event_af_tx;
+extern process_event_t event_af_tx;
 
 /* Application Framework rx event */
-process_event_t event_af_rx;
+extern process_event_t event_af_rx;
 
 /* Application Framework confirm event */
-process_event_t event_af_conf;
+extern process_event_t event_af_conf;
 
 /* Driver confirmation available */
-process_event_t event_drvr_conf;
+extern process_event_t event_drvr_conf;
 
 /* End dev bind request received */
-process_event_t event_ed_bind_req;
+extern process_event_t event_ed_bind_req;
 
 /* End dev bind - clust match finished */
-process_event_t event_ed_bind_match;
+extern process_event_t event_ed_bind_match;
 
 /* End dev bind - Unbind response received */
-process_event_t event_unbind_resp;
+extern process_event_t event_unbind_resp;
 
 void freakz_init();
 #endif

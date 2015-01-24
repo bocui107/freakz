@@ -42,7 +42,7 @@
 */
 #ifndef MAC_H
 #define MAC_H
-#include "contiki.h"
+//#include "contiki.h"
 #include "ctimer.h"
 #include "types.h"
 #include "buf.h"
