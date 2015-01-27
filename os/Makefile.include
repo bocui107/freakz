@@ -181,6 +181,7 @@ clean:
 	*.cprg *.bin *.data contiki*.a *.firmware core-labels.S *.ihex *.ini \
 	*.ce *.co
 	rm -rf $(CLEAN)
+	rm -rf config.mk
 	-rm -rf $(OBJECTDIR)
 
 distclean: clean

@@ -1,1 +1,0 @@
-BOARD_NAME:=native
