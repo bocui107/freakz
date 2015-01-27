@@ -24,16 +24,10 @@ while [ $# -gt 0 ] ; do
 	esac
 done
 
-
 # Strip all options and/or _config suffixes
-CONFIG_NAME="${3%_config}"
+CONFIG_NAME="${1%_config}"
 
-if [ ! -d "$CONFIG_NAME"]; then
-	echo "make: *** No rule to make target \`$2_config'.  Stop." >&2
-	exit 1
-fi
-
-[ "${BOARD_NAME}" ] || BOARD_NAME="${7%_config}"
+[ "${BOARD_NAME}" ] || BOARD_NAME="${1%_config}"
 
 if [ "$options" ] ; then
 	echo "Configuring for ${BOARD_NAME} - Board: ${CONFIG_NAME}, Options: ${options}"
@@ -44,7 +38,7 @@ fi
 #
 # Create include file for Make
 #
-( echo "BOARD  = ${board}"
+( echo "BOARD_NAME=${BOARD_NAME}"
     exit 0 ) > config.mk
 
 exit 0
